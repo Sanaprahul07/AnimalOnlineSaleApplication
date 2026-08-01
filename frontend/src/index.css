@@ -1,0 +1,90 @@
+/* ==========================================
+   Global CSS - Animal Online Sale Application
+========================================== */
+
+/* Reset CSS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* HTML, BODY, ROOT */
+
+html,
+body,
+#root {
+    width: 100%;
+    min-height: 100vh;
+}
+
+/* Body */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+    overflow-x: hidden;
+}
+
+/* Images */
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Links */
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Heading */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+/* Paragraph */
+
+p {
+    margin-bottom: 15px;
+}
+
+/* List */
+
+ul,
+ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Button */
+
+button {
+    cursor: pointer;
+}
+
+/* Bootstrap Container */
+
+.container,
+.container-fluid {
+    width: 100%;
+}
+
+/* Section */
+
+section {
+    width: 100%;
+}

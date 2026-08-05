@@ -1,99 +1,88 @@
 import { useEffect, useState } from "react";
 import { getAllAnimals } from "../services/AnimalService";
+import AnimalCard from "./AnimalCard";
 
 function FeaturedAnimals() {
 
-    // State
     const [animals, setAnimals] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    // Backend API Call
-    function loadAnimals() {
+    const loadAnimals = async () => {
+        try {
+            const response = await getAllAnimals();
+            setAnimals(response.data);
+        } catch (err) {
+            console.error(err);
+            setError("Unable to load animals.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        getAllAnimals()
-            .then((response) => {
-
-                console.log(response.data);
-                setAnimals(response.data);
-
-            })
-            .catch((error) => {
-
-                console.log(error);
-
-            });
-
-    }
-
-    // Page Load झाल्यावर Call होईल
     useEffect(() => {
-
         loadAnimals();
-
     }, []);
 
-    return (
+    if (loading) {
+        return (
+            <section className="py-5">
+                <div className="container text-center">
+                    <h4>Loading Animals...</h4>
+                </div>
+            </section>
+        );
+    }
 
+    if (error) {
+        return (
+            <section className="py-5">
+                <div className="container">
+                    <div className="alert alert-danger">
+                        {error}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    return (
         <section className="py-5 bg-light">
 
             <div className="container">
 
-                <h2 className="text-center mb-5">
-                    Featured Animals
-                </h2>
+                <h2 className="text-center fw-bold mb-5">
+    Latest Animals
+</h2>
 
                 <div className="row">
 
-                    {animals.map((animal) => (
+                    {animals.length > 0 ? (
 
-                        <div className="col-md-4 mb-4" key={animal.id}>
+                        animals.map((animal) => (
 
-                            <div className="card shadow h-100">
-
-                                <img
-                                    src="https://via.placeholder.com/400x250"
-                                    className="card-img-top"
-                                    height="250"
-                                    alt={animal.animalName}
-                                />
-
-                                <div className="card-body">
-
-                                    <h4>{animal.animalName}</h4>
-
-                                    <p>
-                                        <strong>Breed :</strong> {animal.breed}
-                                    </p>
-
-                                    <p>
-                                        <strong>Category :</strong> {animal.category}
-                                    </p>
-
-                                    <p>
-                                        <strong>Location :</strong> {animal.location}
-                                    </p>
-
-                                    <h5 className="text-success">
-                                        ₹ {animal.price}
-                                    </h5>
-
-                                    <button className="btn btn-success w-100">
-                                        View Details
-                                    </button>
-
-                                </div>
-
+                            <div
+                                className="col-lg-3 col-md-6 col-sm-12 mb-4"
+                                key={animal.id}
+                            >
+                                <AnimalCard animal={animal} />
                             </div>
 
+                        ))
+
+                    ) : (
+
+                        <div className="text-center">
+                            <h5>No Animals Available.</h5>
                         </div>
 
-                    ))}
+                    )}
 
                 </div>
 
             </div>
 
         </section>
-
     );
 }
 

@@ -88,3 +88,98 @@ button {
 section {
     width: 100%;
 }
+
+/* ==========================================
+   Navbar
+========================================== */
+
+.navbar-brand {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.navbar .form-control {
+    border-radius: 0;
+}
+
+.navbar .btn-success {
+    border-radius: 6px;
+}
+
+/* ==========================================
+   Category Bar
+========================================== */
+
+.category-bar {
+    background: #ffffff;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+/* ==========================================
+   OLX Style Mega Menu
+========================================== */
+
+.menu-item {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    color: #212529;
+}
+
+.menu-item:hover {
+    background: #198754;
+    color: #ffffff !important;
+    padding-left: 20px;
+}
+
+.shadow-lg {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================
+   Cards
+========================================== */
+
+.card {
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+
+/* ==========================================
+   Hero Section
+========================================== */
+
+.hero-image {
+    border-radius: 12px;
+}
+
+.hero-btn {
+    margin-right: 10px;
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media (max-width: 992px) {
+
+    .navbar-brand {
+        font-size: 24px;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .menu-item {
+        margin-bottom: 8px;
+    }
+
+}

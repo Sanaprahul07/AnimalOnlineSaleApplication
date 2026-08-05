@@ -6,6 +6,10 @@ export const getAllAnimals = () => {
     return axios.get(`${BASE_URL}/getAll`);
 };
 
+export const getAnimalsByCategory = (category) => {
+    return axios.get(`${BASE_URL}/category/${category}`);
+};
+
 export const getAnimalById = (id) => {
     return axios.get(`${BASE_URL}/${id}`);
 };

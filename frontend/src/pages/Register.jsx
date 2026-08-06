@@ -1,6 +1,72 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerCustomer } from "../services/CustomerService";
 
 function Register() {
+
+    const navigate = useNavigate();
+
+    const [customerName, setCustomerName] = useState("");
+    const [email, setEmail] = useState("");
+    const [mobile, setMobile] = useState("");
+    const [password, setPassword] = useState("");
+
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+
+    const handleRegister = async (e) => {
+
+        e.preventDefault();
+
+        setMessage("");
+        setError("");
+
+        if (!customerName || !email || !mobile || !password) {
+            setError("Please fill all required fields");
+            return;
+        }
+
+        const customerData = {
+            customerName: customerName,
+            email: email,
+            mobile: mobile,
+            password: password,
+
+            address: "",
+            city: "",
+            state: "",
+            pincode: "",
+            profileImage: ""
+        };
+
+        try {
+
+            const response = await registerCustomer(customerData);
+
+            console.log("Register Response:", response.data);
+
+            setMessage("Registration Successful");
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+
+        } catch (error) {
+
+            console.error("Registration Error:", error);
+
+            if (error.response) {
+                setError(
+                    error.response.data?.message ||
+                    "Registration Failed"
+                );
+            } else {
+                setError(
+                    "Backend server is not running"
+                );
+            }
+        }
+    };
 
     return (
 
@@ -15,51 +81,115 @@ function Register() {
                         <div className="card-header bg-warning text-dark text-center">
 
                             <h3>Online Animal Sale Application</h3>
+
                             <h5>Register</h5>
 
                         </div>
 
                         <div className="card-body">
 
-                            <div className="mb-3">
-                                <label>Full Name</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter Full Name"
-                                />
-                            </div>
+                            {message && (
+                                <div className="alert alert-success">
+                                    {message}
+                                </div>
+                            )}
 
-                            <div className="mb-3">
-                                <label>Email</label>
-                                <input
-                                    type="email"
-                                    className="form-control"
-                                    placeholder="Enter Email"
-                                />
-                            </div>
+                            {error && (
+                                <div className="alert alert-danger">
+                                    {error}
+                                </div>
+                            )}
 
-                            <div className="mb-3">
-                                <label>Mobile Number</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter Mobile Number"
-                                />
-                            </div>
+                            <form onSubmit={handleRegister}>
 
-                            <div className="mb-3">
-                                <label>Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Enter Password"
-                                />
-                            </div>
+                                {/* Customer Name */}
 
-                            <button className="btn btn-warning w-100">
-                                Register
-                            </button>
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+                                        Full Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Enter Full Name"
+                                        value={customerName}
+                                        onChange={(e) =>
+                                            setCustomerName(e.target.value)
+                                        }
+                                    />
+
+                                </div>
+
+                                {/* Email */}
+
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+                                        Email
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        className="form-control"
+                                        placeholder="Enter Email"
+                                        value={email}
+                                        onChange={(e) =>
+                                            setEmail(e.target.value)
+                                        }
+                                    />
+
+                                </div>
+
+                                {/* Mobile */}
+
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+                                        Mobile Number
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Enter Mobile Number"
+                                        value={mobile}
+                                        onChange={(e) =>
+                                            setMobile(e.target.value)
+                                        }
+                                    />
+
+                                </div>
+
+                                {/* Password */}
+
+                                <div className="mb-3">
+
+                                    <label className="form-label">
+                                        Password
+                                    </label>
+
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        placeholder="Enter Password"
+                                        value={password}
+                                        onChange={(e) =>
+                                            setPassword(e.target.value)
+                                        }
+                                    />
+
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="btn btn-warning w-100"
+                                >
+                                    Register
+                                </button>
+
+                            </form>
 
                             <div className="text-center mt-3">
 
@@ -82,7 +212,6 @@ function Register() {
             </div>
 
         </div>
-
     );
 }
 

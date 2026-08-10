@@ -4,8 +4,7 @@ import SellerTopbar from "./SellerTopbar";
 function SellerLayout({ children }) {
 
     return (
-
-        <div className="d-flex">
+        <div className="d-flex min-vh-100">
 
             {/* Seller Sidebar */}
             <SellerSidebar />
@@ -18,15 +17,12 @@ function SellerLayout({ children }) {
 
                 {/* Page Content */}
                 <main className="p-4">
-
                     {children}
-
                 </main>
 
             </div>
 
         </div>
-
     );
 }
 

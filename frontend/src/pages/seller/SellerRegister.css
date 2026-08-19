@@ -1,7 +1,6 @@
 /* =========================================================
-   ANIMAL SALE
-   SELLER REGISTRATION MODULE
-   PROFESSIONAL SELLER UI
+   SELLER REGISTER PAGE
+   AnimalSale
    ========================================================= */
 
 
@@ -10,20 +9,19 @@
    ========================================================= */
 
 .seller-register-page {
-
     min-height: 100vh;
-
     background:
         linear-gradient(
             135deg,
             #f3fbf7 0%,
             #ffffff 50%,
-            #f4faf7 100%
+            #f5faf8 100%
         );
 
     padding-top: 40px;
     padding-bottom: 40px;
 
+    overflow-x: hidden;
 }
 
 
@@ -32,28 +30,26 @@
    ========================================================= */
 
 .seller-register-page .container {
-
     max-width: 1200px;
-
 }
 
 
 /* =========================================================
    LEFT SIDE
    IMPORTANT:
-   LEFT SIDE NEVER ROTATES
+   LEFT SIDE WILL NEVER ROTATE
    ========================================================= */
 
 .seller-register-left {
-
     position: relative;
 
     padding-top: 45px;
+    padding-bottom: 45px;
 
     transform: none !important;
-
     transition: none !important;
 
+    animation: none !important;
 }
 
 
@@ -62,37 +58,33 @@
    ========================================================= */
 
 .seller-brand {
+    color: #008f63;
 
-    color: #087f5b;
-
-    font-size: 34px;
+    font-size: 32px;
 
     letter-spacing: -0.5px;
 
+    margin-bottom: 5px;
 }
 
 
-.seller-register-left > p {
-
-    font-size: 16px;
-
-    margin-bottom: 0;
-
+.seller-brand::first-letter {
+    font-size: 34px;
 }
 
 
 /* =========================================================
-   TITLE
+   REGISTER TITLE
    ========================================================= */
 
 .seller-register-title {
+    color: #1f2933;
 
     font-size: 34px;
 
-    color: #1f2933;
-
     line-height: 1.2;
 
+    margin-top: 35px;
 }
 
 
@@ -101,13 +93,11 @@
    ========================================================= */
 
 .seller-register-description {
-
-    max-width: 430px;
-
-    font-size: 17px;
+    font-size: 16px;
 
     line-height: 1.7;
 
+    max-width: 440px;
 }
 
 
@@ -116,88 +106,69 @@
    ========================================================= */
 
 .seller-feature-icon {
+    width: 48px;
+    height: 48px;
 
-    width: 52px;
-
-    height: 52px;
-
-    min-width: 52px;
+    min-width: 48px;
 
     border-radius: 50%;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    font-size: 23px;
+    font-size: 22px;
 
     margin-right: 15px;
-
 }
 
-
-/* GREEN */
 
 .seller-feature-green {
-
-    background: #dff7ed;
-
+    background: #e1f8ed;
 }
 
-
-/* BLUE */
 
 .seller-feature-blue {
-
-    background: #e3efff;
-
+    background: #e5f0ff;
 }
 
-
-/* ORANGE */
 
 .seller-feature-orange {
-
-    background: #fff0d8;
-
+    background: #fff0d9;
 }
 
 
-/* =========================================================
-   FEATURE TEXT
-   ========================================================= */
-
 .seller-register-left strong {
-
     display: block;
 
     color: #1f2933;
 
-    font-size: 16px;
+    font-size: 15px;
 
+    margin-bottom: 3px;
 }
 
 
 .seller-register-left small {
-
     font-size: 13px;
 
-    line-height: 1.5;
-
+    line-height: 1.4;
 }
 
 
 /* =========================================================
    RIGHT SIDE
-   ONLY RIGHT SIDE IS ALLOWED TO FLIP
+   ONLY RIGHT SIDE WILL FLIP
    ========================================================= */
 
 .seller-register-right {
+    position: relative;
 
-    perspective: 1600px;
+    perspective: 1800px;
 
+    transform: none !important;
+
+    transition: none !important;
 }
 
 
@@ -206,13 +177,11 @@
    ========================================================= */
 
 .seller-flip-wrapper {
+    position: relative;
 
     width: 100%;
 
-    position: relative;
-
-    perspective: 1600px;
-
+    perspective: 1800px;
 }
 
 
@@ -221,10 +190,11 @@
    ========================================================= */
 
 .seller-flip-inner {
-
     position: relative;
 
     width: 100%;
+
+    min-height: 760px;
 
     transform-style: preserve-3d;
 
@@ -235,34 +205,37 @@
             0.2,
             1
         );
-
 }
 
 
 /* =========================================================
-   FLIPPED STATE
+   WHEN OTP SCREEN IS ACTIVE
+   ONLY RIGHT SIDE ROTATES
    ========================================================= */
 
 .seller-flip-wrapper.is-flipped
 .seller-flip-inner {
-
     transform: rotateY(180deg);
-
 }
 
 
 /* =========================================================
-   REGISTER / OTP FACE
+   REGISTER FACE
    ========================================================= */
 
 .seller-register-face {
+    position: absolute;
+
+    top: 0;
+    left: 0;
 
     width: 100%;
+
+    min-height: 760px;
 
     backface-visibility: hidden;
 
     -webkit-backface-visibility: hidden;
-
 }
 
 
@@ -271,11 +244,9 @@
    ========================================================= */
 
 .seller-register-front {
-
-    position: relative;
+    transform: rotateY(0deg);
 
     z-index: 2;
-
 }
 
 
@@ -284,24 +255,17 @@
    ========================================================= */
 
 .seller-register-back {
-
-    position: absolute;
-
-    top: 0;
-
-    left: 0;
-
     transform: rotateY(180deg);
 
+    z-index: 1;
 }
 
 
 /* =========================================================
-   CARD
+   REGISTER CARD
    ========================================================= */
 
 .seller-register-card {
-
     width: 100%;
 
     border-radius: 18px !important;
@@ -310,8 +274,12 @@
 
     background: #ffffff;
 
-    border: 1px solid #e5e7eb !important;
-
+    border: 1px solid rgba(
+        0,
+        143,
+        99,
+        0.10
+    ) !important;
 }
 
 
@@ -320,18 +288,15 @@
    ========================================================= */
 
 .seller-card-header {
-
     background:
         linear-gradient(
             135deg,
-            #087f5b,
-            #18a974
+            #087f5b 0%,
+            #08a36c 50%,
+            #14b878 100%
         );
 
-    padding-top: 30px !important;
-
-    padding-bottom: 30px !important;
-
+    border-radius: 18px 18px 0 0;
 }
 
 
@@ -340,9 +305,7 @@
    ========================================================= */
 
 .seller-header-icon {
-
     width: 58px;
-
     height: 58px;
 
     background: rgba(
@@ -356,11 +319,12 @@
         255,
         255,
         255,
-        0.25
+        0.30
     );
 
-    font-size: 27px;
+    font-size: 28px;
 
+    backdrop-filter: blur(4px);
 }
 
 
@@ -369,31 +333,23 @@
    ========================================================= */
 
 .seller-card-header h3 {
+    font-size: 24px;
 
-    font-size: 25px;
-
+    letter-spacing: -0.2px;
 }
 
-
-/* =========================================================
-   CARD SUBTITLE
-   ========================================================= */
 
 .seller-card-header p {
-
-    font-size: 14px;
-
+    font-size: 13px;
 }
 
 
 /* =========================================================
-   FORM BODY
+   CARD BODY
    ========================================================= */
 
 .seller-register-card .card-body {
-
     background: #ffffff;
-
 }
 
 
@@ -402,14 +358,31 @@
    ========================================================= */
 
 .seller-register-card h5 {
+    position: relative;
 
-    font-size: 17px;
+    font-size: 16px;
 
-    padding-bottom: 8px;
+    letter-spacing: 0.1px;
 
-    border-bottom:
-        2px solid #e5f4ed;
+    padding-left: 12px;
+}
 
+
+.seller-register-card h5::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 2px;
+
+    width: 4px;
+
+    height: 18px;
+
+    border-radius: 5px;
+
+    background: #079866;
 }
 
 
@@ -418,49 +391,33 @@
    ========================================================= */
 
 .seller-register-card .form-label {
-
     color: #263238;
 
-    font-size: 14px;
+    font-size: 13px;
 
-    margin-bottom: 7px;
-
+    margin-bottom: 6px;
 }
 
 
 /* =========================================================
-   INPUT
+   FORM INPUT
    ========================================================= */
 
 .seller-register-card .form-control {
-
-    min-height: 45px;
+    min-height: 42px;
 
     border-radius: 8px;
 
-    border:
-        1px solid #d6dee5;
+    border: 1px solid #d9e2e8;
 
     font-size: 14px;
+
+    color: #263238;
 
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease,
         background-color 0.2s ease;
-
-}
-
-
-/* =========================================================
-   TEXTAREA
-   ========================================================= */
-
-.seller-register-card textarea.form-control {
-
-    min-height: 75px;
-
-    resize: vertical;
-
 }
 
 
@@ -469,20 +426,31 @@
    ========================================================= */
 
 .seller-register-card .form-control:focus {
-
-    border-color: #12a66a;
+    border-color: #079866;
 
     background-color: #ffffff !important;
 
     box-shadow:
-        0 0 0 0.2rem
+        0 0 0 3px
         rgba(
-            18,
-            166,
-            106,
-            0.12
+            7,
+            152,
+            102,
+            0.10
         );
 
+    outline: none;
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.seller-register-card textarea.form-control {
+    min-height: 85px;
+
+    resize: vertical;
 }
 
 
@@ -491,31 +459,28 @@
    ========================================================= */
 
 .seller-register-card input[type="file"] {
+    padding: 8px;
 
-    padding: 9px 12px;
-
-    background: #f8fbff;
-
+    cursor: pointer;
 }
 
 
-/* =========================================================
-   FILE INPUT FOCUS
-   ========================================================= */
+.seller-register-card input[type="file"]::file-selector-button {
+    border: none;
 
-.seller-register-card input[type="file"]:focus {
+    background: #e7f8f0;
 
-    border-color: #12a66a;
+    color: #087f5b;
 
-    box-shadow:
-        0 0 0 0.2rem
-        rgba(
-            18,
-            166,
-            106,
-            0.12
-        );
+    border-radius: 6px;
 
+    padding: 7px 12px;
+
+    margin-right: 10px;
+
+    font-weight: 600;
+
+    cursor: pointer;
 }
 
 
@@ -525,11 +490,18 @@
 
 .seller-register-card
 .form-control::placeholder {
-
-    color: #9aa6b2;
+    color: #9aa6ad;
 
     font-size: 13px;
+}
 
+
+/* =========================================================
+   SMALL HELP TEXT
+   ========================================================= */
+
+.seller-register-card small {
+    font-size: 11px;
 }
 
 
@@ -538,28 +510,29 @@
    ========================================================= */
 
 .seller-primary-button {
+    border: none !important;
+
+    border-radius: 9px;
 
     background:
         linear-gradient(
             135deg,
-            #087f5b,
-            #159f69
-        ) !important;
-
-    border: none !important;
-
-    border-radius: 9px !important;
+            #07875f,
+            #0ca96f
+        );
 
     min-height: 52px;
 
-    font-size: 16px;
+    font-size: 15px;
+
+    letter-spacing: 0.2px;
 
     box-shadow:
-        0 5px 15px
+        0 6px 15px
         rgba(
-            8,
-            127,
-            91,
+            0,
+            143,
+            99,
             0.18
         );
 
@@ -567,7 +540,6 @@
         transform 0.2s ease,
         box-shadow 0.2s ease,
         opacity 0.2s ease;
-
 }
 
 
@@ -575,19 +547,24 @@
    BUTTON HOVER
    ========================================================= */
 
-.seller-primary-button:hover:not(:disabled) {
-
-    transform: translateY(-2px);
-
-    box-shadow:
-        0 8px 20px
-        rgba(
-            8,
-            127,
-            91,
-            0.25
+.seller-primary-button:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #067b56,
+            #099d67
         );
 
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 18px
+        rgba(
+            0,
+            143,
+            99,
+            0.24
+        );
 }
 
 
@@ -596,9 +573,7 @@
    ========================================================= */
 
 .seller-primary-button:active {
-
     transform: translateY(0);
-
 }
 
 
@@ -607,35 +582,26 @@
    ========================================================= */
 
 .seller-primary-button:disabled {
-
-    opacity: 0.7;
-
     cursor: not-allowed;
 
+    opacity: 0.65;
+
+    transform: none;
+
+    box-shadow: none;
 }
 
 
 /* =========================================================
-   ALERT
+   ALERTS
    ========================================================= */
 
 .seller-register-card .alert {
-
     border-radius: 9px;
 
-    font-size: 14px;
+    font-size: 13px;
 
-}
-
-
-/* =========================================================
-   SELECTED FILE MESSAGE
-   ========================================================= */
-
-.seller-register-card .text-success {
-
-    color: #087f5b !important;
-
+    line-height: 1.5;
 }
 
 
@@ -644,9 +610,7 @@
    ========================================================= */
 
 .seller-otp-card {
-
-    min-height: 650px;
-
+    min-height: 760px;
 }
 
 
@@ -655,35 +619,52 @@
    ========================================================= */
 
 .seller-otp-card input[name="emailOtp"] {
+    height: 58px;
 
-    height: 60px;
+    border: 2px solid #dce7e2;
 
     border-radius: 10px;
 
-    border:
-        2px solid #d6dee5;
+    background: #f8fbff !important;
 
+    color: #087f5b;
+
+    font-size: 23px !important;
+
+    letter-spacing: 8px !important;
+
+    text-align: center;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.seller-otp-card input[name="emailOtp"]:focus {
+    border-color: #079866;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(
+            7,
+            152,
+            102,
+            0.10
+        );
+
+    outline: none;
 }
 
 
 /* =========================================================
-   OTP INPUT FOCUS
+   OTP EMAIL
    ========================================================= */
 
-.seller-otp-card
-input[name="emailOtp"]:focus {
+.seller-otp-card strong {
+    font-size: 15px;
 
-    border-color: #12a66a;
-
-    box-shadow:
-        0 0 0 0.2rem
-        rgba(
-            18,
-            166,
-            106,
-            0.12
-        );
-
+    word-break: break-word;
 }
 
 
@@ -691,15 +672,14 @@ input[name="emailOtp"]:focus {
    RESEND BUTTON
    ========================================================= */
 
-.seller-otp-card
-.btn-outline-success {
-
-    min-width: 130px;
+.seller-otp-card .btn-outline-success {
+    min-width: 140px;
 
     border-radius: 8px;
 
     font-weight: 600;
 
+    padding: 9px 18px;
 }
 
 
@@ -708,41 +688,76 @@ input[name="emailOtp"]:focus {
    ========================================================= */
 
 .seller-register-card a {
-
     transition:
-        color 0.2s ease;
-
+        color 0.2s ease,
+        opacity 0.2s ease;
 }
 
 
 .seller-register-card a:hover {
+    color: #056b4a !important;
 
-    color: #055c42 !important;
-
+    opacity: 0.85;
 }
 
 
 /* =========================================================
-   SMALL TEXT
+   CARD SHADOW
    ========================================================= */
 
-.seller-register-card small {
-
-    font-size: 12px;
-
+.seller-register-card {
+    box-shadow:
+        0 12px 35px
+        rgba(
+            28,
+            45,
+            38,
+            0.10
+        ) !important;
 }
 
 
 /* =========================================================
-   DESKTOP
+   MOBILE
    ========================================================= */
 
-@media (min-width: 992px) {
+@media (max-width: 991px) {
+
+    .seller-register-page {
+        padding-top: 25px;
+
+        padding-bottom: 25px;
+    }
+
+
+    .seller-register-left {
+        padding-top: 15px;
+
+        padding-bottom: 20px;
+
+        text-align: center;
+    }
+
+
+    .seller-register-description {
+        margin-left: auto;
+
+        margin-right: auto;
+    }
+
+
+    .seller-feature-icon {
+        margin-right: 10px;
+    }
+
 
     .seller-register-right {
+        width: 100%;
+    }
 
-        padding-left: 25px;
 
+    .seller-flip-inner {
+        min-height: 760px;
     }
 
 }
@@ -752,40 +767,40 @@ input[name="emailOtp"]:focus {
    TABLET
    ========================================================= */
 
-@media (max-width: 991px) {
+@media (max-width: 768px) {
 
-    .seller-register-left {
-
-        padding-top: 10px;
-
-        text-align: center;
-
+    .seller-register-title {
+        font-size: 28px;
     }
 
 
-    .seller-register-description {
-
-        margin-left: auto;
-
-        margin-right: auto;
-
+    .seller-brand {
+        font-size: 28px;
     }
 
 
-    .seller-register-left
-    .d-flex {
-
-        justify-content: center;
-
-        text-align: left;
-
+    .seller-register-card .card-body {
+        padding: 25px !important;
     }
 
 
-    .seller-register-right {
+    .seller-card-header {
+        padding: 25px !important;
+    }
 
-        margin-top: 20px;
 
+    .seller-register-face {
+        min-height: 700px;
+    }
+
+
+    .seller-flip-inner {
+        min-height: 700px;
+    }
+
+
+    .seller-otp-card {
+        min-height: 700px;
     }
 
 }
@@ -795,122 +810,135 @@ input[name="emailOtp"]:focus {
    MOBILE
    ========================================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 576px) {
 
     .seller-register-page {
+        display: block !important;
 
-        padding-top: 20px;
+        padding-left: 10px;
 
-        padding-bottom: 20px;
-
+        padding-right: 10px;
     }
 
 
-    .seller-brand {
+    .seller-register-left {
+        padding-left: 10px;
 
-        font-size: 28px;
+        padding-right: 10px;
 
+        text-align: left;
     }
 
 
     .seller-register-title {
+        font-size: 25px;
 
+        margin-top: 25px;
+    }
+
+
+    .seller-brand {
         font-size: 27px;
-
     }
 
 
     .seller-register-description {
-
-        font-size: 15px;
-
+        font-size: 14px;
     }
 
 
-    .seller-register-card
-    .card-body {
-
-        padding: 22px !important;
-
+    .seller-register-card {
+        border-radius: 14px !important;
     }
 
 
     .seller-card-header {
-
-        padding: 25px 20px !important;
-
+        border-radius: 14px 14px 0 0;
     }
 
 
     .seller-card-header h3 {
-
         font-size: 21px;
+    }
 
+
+    .seller-register-card .card-body {
+        padding: 20px !important;
+    }
+
+
+    .seller-register-face {
+        min-height: 700px;
+    }
+
+
+    .seller-flip-inner {
+        min-height: 700px;
     }
 
 
     .seller-otp-card {
-
-        min-height: 580px;
-
+        min-height: 700px;
     }
 
 
-    .seller-register-card
-    .row {
+    .seller-otp-card input[name="emailOtp"] {
+        font-size: 20px !important;
 
-        margin-left: 0;
+        letter-spacing: 5px !important;
+    }
 
-        margin-right: 0;
 
+    .seller-feature-icon {
+        width: 42px;
+
+        height: 42px;
+
+        min-width: 42px;
+
+        font-size: 19px;
     }
 
 }
 
 
 /* =========================================================
-   SMALL MOBILE
+   VERY SMALL MOBILE
    ========================================================= */
 
-@media (max-width: 480px) {
+@media (max-width: 400px) {
 
     .seller-register-page {
+        padding-left: 5px;
 
-        padding-left: 10px;
-
-        padding-right: 10px;
-
+        padding-right: 5px;
     }
 
 
-    .seller-register-card
-    .card-body {
-
-        padding: 18px !important;
-
+    .seller-register-card .card-body {
+        padding: 16px !important;
     }
 
 
-    .seller-feature-icon {
-
-        width: 45px;
-
-        height: 45px;
-
-        min-width: 45px;
-
-        font-size: 20px;
-
+    .seller-card-header {
+        padding: 20px !important;
     }
 
 
-    .seller-otp-card
-    input[name="emailOtp"] {
+    .seller-card-header h3 {
+        font-size: 19px;
+    }
 
-        font-size: 19px !important;
 
-        letter-spacing: 5px !important;
+    .seller-register-card .form-control {
+        font-size: 13px;
+    }
 
+
+    .seller-primary-button {
+        min-height: 48px;
+
+        font-size: 14px;
     }
 
 }
@@ -926,36 +954,39 @@ button:focus-visible,
 input:focus-visible,
 .seller-register-card
 textarea:focus-visible {
-
-    outline:
-        2px solid #12a66a;
+    outline: 2px solid #079866;
 
     outline-offset: 2px;
-
 }
 
 
 /* =========================================================
-   IMPORTANT
-   LEFT SIDE MUST NEVER PARTICIPATE IN FLIP
+   REMOVE UNWANTED ROTATION FROM LEFT SIDE
    ========================================================= */
 
 .seller-register-left,
 .seller-register-left * {
-
-    backface-visibility: visible !important;
-
-    -webkit-backface-visibility: visible !important;
-
+    transform-style: flat;
 }
 
 
 /* =========================================================
-   PREVENT HORIZONTAL OVERFLOW
+   RIGHT SIDE ONLY - 3D EFFECT
    ========================================================= */
 
-.seller-register-page {
+.seller-register-right,
+.seller-flip-wrapper,
+.seller-flip-inner {
+    transform-style: preserve-3d;
+}
 
+
+/* =========================================================
+   PREVENT HORIZONTAL SCROLL
+   ========================================================= */
+
+.seller-register-page,
+.seller-register-page .container,
+.seller-register-page .row {
     overflow-x: hidden;
-
 }

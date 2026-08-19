@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getAnimalsBySeller } from "../../services/AnimalService";
 
 function SellerDashboard() {
@@ -10,8 +11,6 @@ function SellerDashboard() {
     const [totalAnimals, setTotalAnimals] = useState(0);
     const [availableAnimals, setAvailableAnimals] = useState(0);
 
-    // Orders APIs अजून तयार नसल्यामुळे
-    // सध्या 0 ठेवत आहोत.
     const [orders, setOrders] = useState(0);
     const [cancelledOrders, setCancelledOrders] = useState(0);
 
@@ -20,22 +19,45 @@ function SellerDashboard() {
 
 
     // =====================================
-    // LOAD DASHBOARD DATA
+    // LOAD DASHBOARD
     // =====================================
 
-    function loadDashboardData() {
+    const loadDashboard = () => {
 
         // -------------------------------------
-        // Current logged-in seller
+        // GET LOGGED-IN SELLER ID
         // -------------------------------------
-        // Development / testing मध्ये sellerId = 9
-        const sellerId = 9;
+
+        const sellerId = localStorage.getItem("sellerId");
+
+        console.log("=================================");
+        console.log("SELLER DASHBOARD");
+        console.log("Logged-in Seller ID:", sellerId);
+        console.log("=================================");
+
+
+        // -------------------------------------
+        // SELLER ID CHECK
+        // -------------------------------------
+
+        if (!sellerId) {
+
+            setError(
+                "Seller session not found. Please login again."
+            );
+
+            setLoading(false);
+
+            return;
+        }
+
 
         setLoading(true);
         setError("");
 
+
         // -------------------------------------
-        // Get Seller Animals
+        // GET SELLER ANIMALS
         // -------------------------------------
 
         getAnimalsBySeller(sellerId)
@@ -43,18 +65,33 @@ function SellerDashboard() {
             .then((response) => {
 
                 console.log(
-                    "Dashboard Seller Animals:",
+                    "Seller Dashboard Animals:",
                     response.data
                 );
 
-                const animals = response.data || [];
+
+                // -------------------------------------
+                // RESPONSE DATA
+                // -------------------------------------
+
+                const animals = Array.isArray(response.data)
+                    ? response.data
+                    : [];
+
+
+                console.log(
+                    "Total Animals For Seller:",
+                    animals.length
+                );
 
 
                 // -------------------------------------
                 // TOTAL ANIMALS
                 // -------------------------------------
 
-                setTotalAnimals(animals.length);
+                setTotalAnimals(
+                    animals.length
+                );
 
 
                 // -------------------------------------
@@ -62,18 +99,37 @@ function SellerDashboard() {
                 // -------------------------------------
 
                 const availableCount = animals.filter(
-                    (animal) => animal.available === true
+                    (animal) =>
+                        animal.available === true ||
+                        animal.status === "AVAILABLE" ||
+                        animal.status === "Available"
                 ).length;
 
-                setAvailableAnimals(availableCount);
+
+                console.log(
+                    "Available Animals:",
+                    availableCount
+                );
+
+
+                setAvailableAnimals(
+                    availableCount
+                );
 
 
                 // -------------------------------------
-                // Orders
+                // ORDERS
                 // -------------------------------------
-                // Order API अजून तयार नाही
+
+                // Order API is not created yet.
                 setOrders(0);
 
+
+                // -------------------------------------
+                // CANCELLED ORDERS
+                // -------------------------------------
+
+                // Order API is not created yet.
                 setCancelledOrders(0);
 
             })
@@ -81,13 +137,15 @@ function SellerDashboard() {
             .catch((error) => {
 
                 console.error(
-                    "Error loading dashboard data:",
+                    "Error loading seller dashboard:",
                     error
                 );
 
+
                 setError(
-                    "Unable to load dashboard data."
+                    "Unable to load seller dashboard data."
                 );
+
 
                 setTotalAnimals(0);
                 setAvailableAnimals(0);
@@ -99,7 +157,7 @@ function SellerDashboard() {
                 setLoading(false);
 
             });
-    }
+    };
 
 
     // =====================================
@@ -108,7 +166,7 @@ function SellerDashboard() {
 
     useEffect(() => {
 
-        loadDashboardData();
+        loadDashboard();
 
     }, []);
 
@@ -121,26 +179,52 @@ function SellerDashboard() {
 
         <div className="container-fluid p-4">
 
-            {/* =========================
+
+            {/* =====================================
                     PAGE HEADER
-            ========================= */}
+            ===================================== */}
 
             <div className="mb-4">
 
-                <h2 className="fw-bold text-success">
-                    Seller Dashboard
-                </h2>
+                <div className="d-flex justify-content-between align-items-center">
 
-                <p className="text-muted">
-                    Welcome to Animal Online Sale Seller Panel.
-                </p>
+                    <div>
+
+                        <h2 className="fw-bold text-success">
+                            Seller Dashboard
+                        </h2>
+
+                        <p className="text-muted mb-0">
+                            Welcome to Animal Online Sale Seller Panel.
+                        </p>
+
+                    </div>
+
+
+                    {/* SELLER ID */}
+
+                    <div className="text-end">
+
+                        <small className="text-muted">
+                            Seller ID
+                        </small>
+
+                        <h5 className="fw-bold text-success mb-0">
+
+                            {localStorage.getItem("sellerId") || "-"}
+
+                        </h5>
+
+                    </div>
+
+                </div>
 
             </div>
 
 
-            {/* =========================
+            {/* =====================================
                     ERROR MESSAGE
-            ========================= */}
+            ===================================== */}
 
             {error && (
 
@@ -153,9 +237,9 @@ function SellerDashboard() {
             )}
 
 
-            {/* =========================
+            {/* =====================================
                     LOADING
-            ========================= */}
+            ===================================== */}
 
             {loading && (
 
@@ -168,7 +252,7 @@ function SellerDashboard() {
                     </div>
 
                     <p className="mt-2">
-                        Loading dashboard...
+                        Loading seller dashboard...
                     </p>
 
                 </div>
@@ -176,16 +260,16 @@ function SellerDashboard() {
             )}
 
 
-            {/* =========================
+            {/* =====================================
                     DASHBOARD CARDS
-            ========================= */}
+            ===================================== */}
 
             <div className="row g-4">
 
 
-                {/* =========================
+                {/* =====================================
                         TOTAL ANIMALS
-                ========================= */}
+                ===================================== */}
 
                 <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
 
@@ -229,14 +313,15 @@ function SellerDashboard() {
 
                             <h1 className="fw-bold text-success">
 
-                                {loading ? "..." : totalAnimals}
+                                {loading
+                                    ? "..."
+                                    : totalAnimals
+                                }
 
                             </h1>
 
                             <p className="text-muted mb-0">
-
                                 Total animals listed by you
-
                             </p>
 
                         </div>
@@ -246,9 +331,9 @@ function SellerDashboard() {
                 </div>
 
 
-                {/* =========================
+                {/* =====================================
                         AVAILABLE ANIMALS
-                ========================= */}
+                ===================================== */}
 
                 <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
 
@@ -292,14 +377,15 @@ function SellerDashboard() {
 
                             <h1 className="fw-bold text-primary">
 
-                                {loading ? "..." : availableAnimals}
+                                {loading
+                                    ? "..."
+                                    : availableAnimals
+                                }
 
                             </h1>
 
                             <p className="text-muted mb-0">
-
                                 Animals currently available
-
                             </p>
 
                         </div>
@@ -309,9 +395,9 @@ function SellerDashboard() {
                 </div>
 
 
-                {/* =========================
+                {/* =====================================
                         ORDERS
-                ========================= */}
+                ===================================== */}
 
                 <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
 
@@ -354,15 +440,11 @@ function SellerDashboard() {
                         <div className="card-body p-4">
 
                             <h1 className="fw-bold text-warning">
-
                                 {orders}
-
                             </h1>
 
                             <p className="text-muted mb-0">
-
                                 Total customer orders
-
                             </p>
 
                         </div>
@@ -372,9 +454,9 @@ function SellerDashboard() {
                 </div>
 
 
-                {/* =========================
+                {/* =====================================
                         CANCELLED ORDERS
-                ========================= */}
+                ===================================== */}
 
                 <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
 
@@ -417,15 +499,11 @@ function SellerDashboard() {
                         <div className="card-body p-4">
 
                             <h1 className="fw-bold text-danger">
-
                                 {cancelledOrders}
-
                             </h1>
 
                             <p className="text-muted mb-0">
-
                                 Total cancelled orders
-
                             </p>
 
                         </div>
@@ -437,9 +515,9 @@ function SellerDashboard() {
             </div>
 
 
-            {/* =========================
+            {/* =====================================
                     QUICK ACTIONS
-            ========================= */}
+            ===================================== */}
 
             <div className="mt-5">
 
@@ -455,14 +533,12 @@ function SellerDashboard() {
 
                     <div className="col-md-4">
 
-                        <a
-                            href="/seller/add-animal"
+                        <Link
+                            to="/seller/add-animal"
                             className="btn btn-success w-100 p-3 shadow-sm"
                         >
-
                             ➕ Add New Animal
-
-                        </a>
+                        </Link>
 
                     </div>
 
@@ -471,14 +547,12 @@ function SellerDashboard() {
 
                     <div className="col-md-4">
 
-                        <a
-                            href="/seller/animals"
+                        <Link
+                            to="/seller/animals"
                             className="btn btn-primary w-100 p-3 shadow-sm"
                         >
-
                             🐄 View My Animals
-
-                        </a>
+                        </Link>
 
                     </div>
 
@@ -487,14 +561,12 @@ function SellerDashboard() {
 
                     <div className="col-md-4">
 
-                        <a
-                            href="/seller/profile"
+                        <Link
+                            to="/seller/profile"
                             className="btn btn-dark w-100 p-3 shadow-sm"
                         >
-
                             👤 Manage Profile
-
-                        </a>
+                        </Link>
 
                     </div>
 
@@ -505,7 +577,6 @@ function SellerDashboard() {
         </div>
 
     );
-
 }
 
 export default SellerDashboard;

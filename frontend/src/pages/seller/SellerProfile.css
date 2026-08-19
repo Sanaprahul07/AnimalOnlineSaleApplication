@@ -1,0 +1,970 @@
+/* =====================================================
+   SELLER PROFILE DASHBOARD
+   FINAL VERSION
+===================================================== */
+
+.seller-profile-page {
+    height: calc(100vh - 60px);
+    min-height: 0;
+
+    padding: 28px 30px 40px;
+
+    background: #f5f7f9;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    scroll-behavior: smooth;
+}
+
+
+/* =====================================================
+   RIGHT SIDE SCROLLBAR
+===================================================== */
+
+.seller-profile-page::-webkit-scrollbar {
+    width: 9px;
+}
+
+.seller-profile-page::-webkit-scrollbar-track {
+    background: #edf0f2;
+}
+
+.seller-profile-page::-webkit-scrollbar-thumb {
+    background: #198754;
+    border-radius: 10px;
+}
+
+.seller-profile-page::-webkit-scrollbar-thumb:hover {
+    background: #157347;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.profile-page-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 22px;
+
+    gap: 20px;
+}
+
+.profile-page-header h2 {
+    margin: 0;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    color: #198754;
+}
+
+.profile-page-header p {
+    margin: 6px 0 0;
+
+    color: #6c757d;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   EDIT PROFILE BUTTON
+===================================================== */
+
+.edit-profile-btn {
+    border: none;
+
+    background: #198754;
+
+    color: white;
+
+    padding: 11px 22px;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    white-space: nowrap;
+}
+
+.edit-profile-btn:hover {
+    background: #157347;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 10px rgba(25, 135, 84, 0.20);
+}
+
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+.profile-success {
+    background: #d1e7dd;
+
+    color: #0f5132;
+
+    border: 1px solid #badbcc;
+
+    padding: 12px 16px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   ERROR MESSAGE
+===================================================== */
+
+.profile-danger {
+    background: #f8d7da;
+
+    color: #842029;
+
+    border: 1px solid #f5c2c7;
+
+    padding: 12px 16px;
+
+    border-radius: 8px;
+
+    margin-bottom: 20px;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   PROFILE SUMMARY / HEADER CARD
+===================================================== */
+
+.profile-summary-card {
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 25px;
+
+    margin-bottom: 22px;
+
+    border: 1px solid #e5e7eb;
+
+    box-shadow:
+        0 5px 18px rgba(0, 0, 0, 0.05);
+}
+
+
+/* =====================================================
+   SUMMARY CONTENT
+===================================================== */
+
+.summary-content {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 25px;
+}
+
+
+/* =====================================================
+   SELLER PROFILE PHOTO
+   PHOTO APPEARS ONLY HERE
+===================================================== */
+
+.profile-photo-header {
+    display: flex;
+
+    align-items: center;
+
+    gap: 22px;
+
+    min-width: 0;
+}
+
+
+/* =====================================================
+   SELLER PHOTO WRAPPER
+===================================================== */
+
+.seller-photo-wrapper {
+    width: 125px;
+
+    height: 125px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    padding: 5px;
+
+    background: linear-gradient(
+        135deg,
+        #198754,
+        #20c997
+    );
+
+    box-shadow:
+        0 5px 15px rgba(25, 135, 84, 0.20);
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   SELLER PHOTO
+===================================================== */
+
+.seller-profile-photo {
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    background: white;
+
+    border: 4px solid white;
+
+    display: block;
+}
+
+
+/* =====================================================
+   PHOTO PLACEHOLDER
+===================================================== */
+
+.seller-photo-placeholder {
+    width: 100%;
+
+    height: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e9ecef;
+
+    font-size: 42px;
+
+    border: 4px solid white;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   SUMMARY DETAILS
+===================================================== */
+
+.photo-details {
+    min-width: 0;
+}
+
+.summary-label {
+    font-size: 11px;
+
+    font-weight: 700;
+
+    color: #198754;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+.summary-content h3 {
+    margin: 5px 0 3px;
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    color: #212529;
+}
+
+.summary-content p {
+    margin: 0;
+
+    color: #6c757d;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   PROFILE IMAGE URL
+   EDIT MODE ONLY
+===================================================== */
+
+.profile-image-input {
+    margin-top: 12px;
+
+    width: 100%;
+
+    max-width: 480px;
+
+    padding: 9px 12px;
+
+    border: 1px solid #dfe3e6;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    outline: none;
+
+    box-sizing: border-box;
+}
+
+.profile-image-input:focus {
+    border-color: #198754;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 135, 84, 0.10);
+}
+
+
+/* =====================================================
+   STATUS GROUP
+===================================================== */
+
+.status-group {
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+}
+
+.status-box {
+    min-width: 120px;
+
+    padding: 12px 16px;
+
+    background: #f8f9fa;
+
+    border: 1px solid #e9ecef;
+
+    border-radius: 10px;
+
+    text-align: left;
+}
+
+.status-box span {
+    display: block;
+
+    font-size: 11px;
+
+    color: #6c757d;
+
+    margin-bottom: 4px;
+}
+
+.status-box strong {
+    color: #198754;
+
+    font-size: 14px;
+
+    text-transform: uppercase;
+}
+
+
+/* =====================================================
+   SECTION CARD
+===================================================== */
+
+.profile-section-card {
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    padding: 25px;
+
+    margin-bottom: 22px;
+
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.section-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 25px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #eeeeee;
+}
+
+.section-title > span {
+    width: 40px;
+
+    height: 40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #e8f5ee;
+
+    font-size: 19px;
+
+    flex-shrink: 0;
+}
+
+.section-title h4 {
+    margin: 0;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    color: #198754;
+}
+
+.section-title p {
+    margin: 3px 0 0;
+
+    font-size: 12px;
+
+    color: #6c757d;
+}
+
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.profile-section-card label {
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #343a40;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.profile-input {
+    width: 100%;
+
+    min-height: 43px;
+
+    border: 1px solid #dfe3e6;
+
+    border-radius: 8px;
+
+    padding: 10px 13px;
+
+    background: white;
+
+    color: #212529;
+
+    outline: none;
+
+    transition: all 0.2s ease;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+}
+
+.profile-input:focus {
+    border-color: #198754;
+
+    box-shadow:
+        0 0 0 3px rgba(25, 135, 84, 0.10);
+}
+
+textarea.profile-input {
+    resize: vertical;
+
+    min-height: 90px;
+}
+
+
+/* =====================================================
+   DISABLED INPUT
+===================================================== */
+
+.profile-input:disabled {
+    background: #f1f3f5;
+
+    color: #495057;
+
+    cursor: not-allowed;
+
+    opacity: 1;
+
+    border-color: #e1e4e7;
+}
+
+
+/* =====================================================
+   LOCKED INPUT
+===================================================== */
+
+.locked-input {
+    background: #f1f3f5 !important;
+
+    color: #495057 !important;
+
+    border-color: #dfe3e6 !important;
+
+    cursor: not-allowed !important;
+}
+
+
+/* =====================================================
+   LOCKED LABEL
+===================================================== */
+
+.locked-label {
+    margin-left: 8px;
+
+    font-size: 10px;
+
+    color: #842029;
+
+    background: #f8d7da;
+
+    padding: 3px 7px;
+
+    border-radius: 5px;
+
+    font-weight: 600;
+
+    vertical-align: middle;
+}
+
+
+/* =====================================================
+   SMALL TEXT
+===================================================== */
+
+.profile-section-card small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #6c757d;
+
+    font-size: 11px;
+}
+
+
+/* =====================================================
+   KYC DISPLAY
+===================================================== */
+
+.kyc-display {
+    min-height: 43px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 10px 13px;
+
+    background: #f1f3f5;
+
+    border: 1px solid #dfe3e6;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+    color: #343a40;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   KYC LAST 4 DIGITS
+===================================================== */
+
+.aadhaar-last-four {
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    color: #343a40;
+}
+
+
+/* =====================================================
+   STATUS CARDS
+===================================================== */
+
+.status-cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.status-card {
+    padding: 18px;
+
+    background: #f8f9fa;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    transition: 0.2s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 5px 14px rgba(0, 0, 0, 0.05);
+}
+
+.status-card span {
+    display: block;
+
+    color: #6c757d;
+
+    font-size: 12px;
+
+    margin-bottom: 7px;
+}
+
+.status-card strong {
+    color: #198754;
+
+    font-size: 15px;
+
+    text-transform: uppercase;
+}
+
+
+/* =====================================================
+   ACTION BUTTONS
+===================================================== */
+
+.profile-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    padding: 10px 0 30px;
+}
+
+.save-profile-btn {
+    border: none;
+
+    background: #198754;
+
+    color: white;
+
+    padding: 12px 25px;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.save-profile-btn:hover {
+    background: #157347;
+
+    transform: translateY(-1px);
+}
+
+.save-profile-btn:disabled {
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+.cancel-profile-btn {
+    border: none;
+
+    background: #6c757d;
+
+    color: white;
+
+    padding: 12px 25px;
+
+    border-radius: 8px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.cancel-profile-btn:hover {
+    background: #5c636a;
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.profile-loading {
+    min-height: 60vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.profile-loading p {
+    color: #6c757d;
+}
+
+
+/* =====================================================
+   ERROR PAGE
+===================================================== */
+
+.profile-error {
+    padding: 30px;
+}
+
+
+/* =====================================================
+   BOTTOM SPACE
+===================================================== */
+
+.profile-bottom-space {
+    height: 20px;
+}
+
+
+/* =====================================================
+   REMOVE OLD PHOTO SECTION
+===================================================== */
+
+/*
+   IMPORTANT:
+   Old bottom profile-photo-section is no longer required.
+
+   Photo should appear ONLY inside:
+   .profile-summary-card
+
+   Do not create another photo section
+   at the bottom of the page.
+*/
+
+
+/* =====================================================
+   RESPONSIVE - TABLET
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .summary-content {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .status-group {
+        width: 100%;
+
+        justify-content: flex-start;
+    }
+
+    .status-box {
+        flex: 1;
+    }
+}
+
+
+/* =====================================================
+   RESPONSIVE - MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+
+    .seller-profile-page {
+        height: calc(100vh - 60px);
+
+        padding: 18px 15px 30px;
+    }
+
+
+    .profile-page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+
+    .profile-page-header h2 {
+        font-size: 24px;
+    }
+
+
+    .edit-profile-btn {
+        width: 100%;
+    }
+
+
+    .profile-summary-card {
+        padding: 20px;
+    }
+
+
+    .profile-photo-header {
+        width: 100%;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .seller-photo-wrapper {
+        width: 110px;
+
+        height: 110px;
+    }
+
+
+    .summary-content h3 {
+        font-size: 22px;
+    }
+
+
+    .status-group {
+        width: 100%;
+
+        flex-direction: column;
+    }
+
+
+    .status-box {
+        width: 100%;
+
+        box-sizing: border-box;
+    }
+
+
+    .profile-section-card {
+        padding: 18px;
+    }
+
+
+    .status-cards {
+        grid-template-columns: 1fr;
+    }
+
+
+    .profile-actions {
+        justify-content: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .save-profile-btn,
+    .cancel-profile-btn {
+        width: 100%;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL SCREEN
+===================================================== */
+
+@media (max-width: 480px) {
+
+    .seller-profile-page {
+        padding: 15px 10px 25px;
+    }
+
+
+    .profile-page-header h2 {
+        font-size: 21px;
+    }
+
+
+    .profile-summary-card {
+        padding: 16px;
+    }
+
+
+    .profile-section-card {
+        padding: 15px;
+    }
+}

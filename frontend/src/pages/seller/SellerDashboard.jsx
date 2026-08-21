@@ -10,10 +10,8 @@ function SellerDashboard() {
 
     const [totalAnimals, setTotalAnimals] = useState(0);
     const [availableAnimals, setAvailableAnimals] = useState(0);
-
     const [orders, setOrders] = useState(0);
     const [cancelledOrders, setCancelledOrders] = useState(0);
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -122,6 +120,7 @@ function SellerDashboard() {
                 // -------------------------------------
 
                 // Order API is not created yet.
+
                 setOrders(0);
 
 
@@ -130,6 +129,7 @@ function SellerDashboard() {
                 // -------------------------------------
 
                 // Order API is not created yet.
+
                 setCancelledOrders(0);
 
             })
@@ -148,6 +148,7 @@ function SellerDashboard() {
 
 
                 setTotalAnimals(0);
+
                 setAvailableAnimals(0);
 
             })
@@ -181,43 +182,18 @@ function SellerDashboard() {
 
 
             {/* =====================================
-                    PAGE HEADER
+                    PAGE TITLE
             ===================================== */}
 
             <div className="mb-4">
 
-                <div className="d-flex justify-content-between align-items-center">
+                <h2 className="fw-bold text-dark mb-2">
+                    Seller Dashboard
+                </h2>
 
-                    <div>
-
-                        <h2 className="fw-bold text-success">
-                            Seller Dashboard
-                        </h2>
-
-                        <p className="text-muted mb-0">
-                            Welcome to Animal Online Sale Seller Panel.
-                        </p>
-
-                    </div>
-
-
-                    {/* SELLER ID */}
-
-                    <div className="text-end">
-
-                        <small className="text-muted">
-                            Seller ID
-                        </small>
-
-                        <h5 className="fw-bold text-success mb-0">
-
-                            {localStorage.getItem("sellerId") || "-"}
-
-                        </h5>
-
-                    </div>
-
-                </div>
+                <p className="text-muted mb-0">
+                    Welcome to Animal Online Sale Seller Panel.
+                </p>
 
             </div>
 
@@ -281,6 +257,8 @@ function SellerDashboard() {
                         }}
                     >
 
+                        {/* CARD HEADER */}
+
                         <div
                             className="card-header text-white border-0"
                             style={{
@@ -308,6 +286,8 @@ function SellerDashboard() {
 
                         </div>
 
+
+                        {/* CARD BODY */}
 
                         <div className="card-body p-4">
 
@@ -345,6 +325,8 @@ function SellerDashboard() {
                         }}
                     >
 
+                        {/* CARD HEADER */}
+
                         <div
                             className="card-header text-white border-0"
                             style={{
@@ -372,6 +354,8 @@ function SellerDashboard() {
 
                         </div>
 
+
+                        {/* CARD BODY */}
 
                         <div className="card-body p-4">
 
@@ -409,6 +393,8 @@ function SellerDashboard() {
                         }}
                     >
 
+                        {/* CARD HEADER */}
+
                         <div
                             className="card-header text-white border-0"
                             style={{
@@ -436,6 +422,8 @@ function SellerDashboard() {
 
                         </div>
 
+
+                        {/* CARD BODY */}
 
                         <div className="card-body p-4">
 
@@ -468,6 +456,8 @@ function SellerDashboard() {
                         }}
                     >
 
+                        {/* CARD HEADER */}
+
                         <div
                             className="card-header text-white border-0"
                             style={{
@@ -495,6 +485,8 @@ function SellerDashboard() {
 
                         </div>
 
+
+                        {/* CARD BODY */}
 
                         <div className="card-body p-4">
 
@@ -529,21 +521,25 @@ function SellerDashboard() {
                 <div className="row g-3">
 
 
-                    {/* ADD ANIMAL */}
+                    {/* =====================================
+                            HOME
+                    ===================================== */}
 
                     <div className="col-md-4">
 
                         <Link
-                            to="/seller/add-animal"
+                            to="/"
                             className="btn btn-success w-100 p-3 shadow-sm"
                         >
-                            ➕ Add New Animal
+                            🏠 Home
                         </Link>
 
                     </div>
 
 
-                    {/* MY ANIMALS */}
+                    {/* =====================================
+                            MY ANIMALS
+                    ===================================== */}
 
                     <div className="col-md-4">
 
@@ -557,7 +553,9 @@ function SellerDashboard() {
                     </div>
 
 
-                    {/* PROFILE */}
+                    {/* =====================================
+                            PROFILE
+                    ===================================== */}
 
                     <div className="col-md-4">
 
@@ -574,9 +572,11 @@ function SellerDashboard() {
 
             </div>
 
+
         </div>
 
     );
+
 }
 
 export default SellerDashboard;

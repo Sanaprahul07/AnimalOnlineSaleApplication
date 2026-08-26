@@ -1,673 +1,170 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { getAllAnimals } from "../services/AnimalService";
+import { ChevronRight } from "./Icons";
 
+// Fallback sample images (used only when the API returns nothing)
+import hfImg from "../assets/HF.png";
 import cowImg from "../assets/cowimg.png";
-import buffaloImg from "../assets/buffal.jpg";
+import murrahImg from "../assets/MurrahBuffalo.png";
 import goatImg from "../assets/goat1.jpg";
-import sheepImg from "../assets/sheep.jpg";
-
-import BoerGoat from "../assets/BoerGoat.png";
-import Gaur from "../assets/Gaur.png";
-import Jersey from "../assets/jersey.png";
-import KathiawariHorse from "../assets/KathiawariHorse.png";
-import MarwariHorse from "../assets/MarwariHorse.png";
-import MurrahBuffalo from "../assets/MurrahBuffalo.png";
-import OsmanabadiGoat from "../assets/OsmanabadiGoat.png";
-import PandharpuriBuffalo from "../assets/PandharpuriBuffalo.png";
-import Raja from "../assets/Raja.png";
-import SirohiGoat from "../assets/SirohiGoat.png";
-
+import dogImg from "../assets/Dog.png";
 
 // =====================================================
-// FEATURED / LATEST ANIMALS
+// FEATURED ANIMALS
+// Loads real listings; falls back to samples if empty.
 // =====================================================
+
+const SAMPLE_ANIMALS = [
+    { id: "s1", animalName: "HF Cow", price: 65000, age: "2 Years", gender: "Female", location: "Punjab", image: hfImg },
+    { id: "s2", animalName: "Sahiwal Cow", price: 55000, age: "3 Years", gender: "Female", location: "Haryana", image: cowImg },
+    { id: "s3", animalName: "Murrah Buffalo", price: 75000, age: "4 Years", gender: "Female", location: "Uttar Pradesh", image: murrahImg },
+    { id: "s4", animalName: "Beetal Goat", price: 8500, age: "1.5 Years", gender: "Male", location: "Rajasthan", image: goatImg },
+    { id: "s5", animalName: "Golden Retriever", price: 18000, age: "8 Months", gender: "Male", location: "Maharashtra", image: dogImg }
+];
 
 function FeaturedAnimals() {
-
     const navigate = useNavigate();
-
-
-    // =================================================
-    // STATES
-    // =================================================
+    const scrollRef = useRef(null);
 
     const [animals, setAnimals] = useState([]);
-
+    const [usingSamples, setUsingSamples] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const [error, setError] = useState("");
-
-
-    // =================================================
-    // LOCAL ANIMAL IMAGE MAP
-    // =================================================
-
-    const animalImages = {
-
-        cow: cowImg,
-
-        buffalo: buffaloImg,
-
-        goat: goatImg,
-
-        sheep: sheepImg,
-
-        horse: KathiawariHorse,
-
-        dog: Raja,
-
-        cat: Raja,
-
-        poultry: Raja,
-
-        boer: BoerGoat,
-
-        gaur: Gaur,
-
-        jersey: Jersey,
-
-        kathiawari: KathiawariHorse,
-
-        marwari: MarwariHorse,
-
-        murrah: MurrahBuffalo,
-
-        osmanabadi: OsmanabadiGoat,
-
-        pandharpuri: PandharpuriBuffalo,
-
-        sirohi: SirohiGoat,
-
-    };
-
-
-    // =================================================
-    // GET IMAGE BASED ON ANIMAL DATA
-    // =================================================
-
-    const getAnimalImage = (animal) => {
-
-        // ---------------------------------------------
-        // 1. BACKEND IMAGE URL
-        // ---------------------------------------------
-
-        if (
-            animal?.imageUrl &&
-            animal.imageUrl.trim() !== ""
-        ) {
-
-            return animal.imageUrl;
-
-        }
-
-
-        // ---------------------------------------------
-        // CATEGORY
-        // ---------------------------------------------
-
-        const category =
-            String(
-                animal?.category || ""
-            )
-                .toLowerCase()
-                .trim();
-
-
-        // ---------------------------------------------
-        // BREED
-        // ---------------------------------------------
-
-        const breed =
-            String(
-                animal?.breed || ""
-            )
-                .toLowerCase()
-                .trim();
-
-
-        // ---------------------------------------------
-        // BREED FIRST
-        // ---------------------------------------------
-
-        if (breed.includes("boer")) {
-
-            return BoerGoat;
-
-        }
-
-        if (breed.includes("gaur")) {
-
-            return Gaur;
-
-        }
-
-        if (breed.includes("jersey")) {
-
-            return Jersey;
-
-        }
-
-        if (breed.includes("kathiawari")) {
-
-            return KathiawariHorse;
-
-        }
-
-        if (breed.includes("marwari")) {
-
-            return MarwariHorse;
-
-        }
-
-        if (breed.includes("murrah")) {
-
-            return MurrahBuffalo;
-
-        }
-
-        if (breed.includes("osmanabadi")) {
-
-            return OsmanabadiGoat;
-
-        }
-
-        if (breed.includes("pandharpuri")) {
-
-            return PandharpuriBuffalo;
-
-        }
-
-        if (breed.includes("sirohi")) {
-
-            return SirohiGoat;
-
-        }
-
-
-        // ---------------------------------------------
-        // CATEGORY IMAGE
-        // ---------------------------------------------
-
-        if (animalImages[category]) {
-
-            return animalImages[category];
-
-        }
-
-
-        // ---------------------------------------------
-        // DEFAULT IMAGE
-        // ---------------------------------------------
-
-        return cowImg;
-
-    };
-
-
-    // =================================================
-    // LOAD ALL ANIMALS
-    // =================================================
-
-    const loadAnimals = async () => {
-
-        try {
-
-            setLoading(true);
-
-            setError("");
-
-
-            const response =
-                await getAllAnimals();
-
-
-            console.log(
-                "HOME PAGE ANIMALS:",
-                response.data
-            );
-
-
-            if (
-                Array.isArray(
-                    response.data
-                )
-            ) {
-
-                setAnimals(
-                    response.data
-                );
-
-            } else {
-
-                setAnimals([]);
-
-            }
-
-        } catch (err) {
-
-            console.error(
-                "LOAD ANIMALS ERROR:",
-                err
-            );
-
-
-            setError(
-                "Unable to load animals from server."
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-
-    // =================================================
-    // LOAD WHEN HOME PAGE OPENS
-    // =================================================
-
     useEffect(() => {
+        let active = true;
+
+        const loadAnimals = async () => {
+            try {
+                setLoading(true);
+                const response = await getAllAnimals();
+
+                if (!active) return;
+
+                if (Array.isArray(response.data) && response.data.length > 0) {
+                    setAnimals(response.data);
+                    setUsingSamples(false);
+                } else {
+                    setAnimals(SAMPLE_ANIMALS);
+                    setUsingSamples(true);
+                }
+            } catch (err) {
+                // Backend unavailable — show samples so the page still looks complete.
+                console.error("LOAD ANIMALS ERROR:", err);
+                if (active) {
+                    setAnimals(SAMPLE_ANIMALS);
+                    setUsingSamples(true);
+                }
+            } finally {
+                if (active) setLoading(false);
+            }
+        };
 
         loadAnimals();
 
+        return () => {
+            active = false;
+        };
     }, []);
 
+    const openAnimal = (animal) => {
+        // Samples have no real detail page.
+        if (usingSamples) return;
+        navigate(`/animal/${animal.id}`);
+    };
 
-    // =================================================
-    // LOADING
-    // =================================================
+    const scrollRight = () => {
+        scrollRef.current?.scrollBy({ left: 320, behavior: "smooth" });
+    };
 
-    if (loading) {
+    const priceText = (price) =>
+        price ? `₹${Number(price).toLocaleString("en-IN")}` : "Price on request";
 
-        return (
-
-            <section className="py-5 bg-light">
-
-                <div className="container text-center">
-
-                    <div
-                        className="spinner-border text-success mb-3"
-                        role="status"
-                    >
-                    </div>
-
-                    <h5 className="fw-bold">
-                        Loading Animals...
-                    </h5>
-
-                    <p className="text-muted mb-0">
-                        Please wait while we load the latest animals.
-                    </p>
-
-                </div>
-
-            </section>
-
-        );
-
-    }
-
-
-    // =================================================
-    // ERROR
-    // =================================================
-
-    if (error) {
-
-        return (
-
-            <section className="py-5 bg-light">
-
-                <div className="container">
-
-                    <div className="alert alert-danger text-center">
-
-                        {error}
-
-                        <br />
-
-                        <button
-                            className="btn btn-outline-danger btn-sm mt-2"
-                            onClick={loadAnimals}
-                        >
-                            Try Again
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        );
-
-    }
-
-
-    // =================================================
-    // MAIN UI
-    // =================================================
+    const imageOf = (animal) => animal.image || animal.frontImageUrl;
 
     return (
-
-        <section
-            className="py-5 bg-light"
-            id="latest-animals"
-        >
-
+        <section className="as-section as-section-alt">
             <div className="container">
 
-
-                {/* =================================================
-                        SECTION HEADER
-                ================================================= */}
-
+                {/* HEADER */}
                 <div className="d-flex justify-content-between align-items-center mb-4">
-
-                    <div>
-
-                        <h2 className="fw-bold mb-1">
-                            Latest Animals
-                        </h2>
-
-                        <p className="text-muted mb-0">
-                            Find healthy animals from trusted sellers
-                        </p>
-
-                    </div>
-
-
-                    {animals.length > 0 && (
-
-                        <span className="badge bg-success fs-6">
-
-                            {animals.length} Animals
-
-                        </span>
-
-                    )}
-
+                    <h2 className="as-section-title">Featured Animals</h2>
+                    <button
+                        type="button"
+                        className="as-link-green btn btn-link p-0"
+                        onClick={() => navigate("/animals/all")}
+                    >
+                        View All Animals
+                    </button>
                 </div>
 
-
-                {/* =================================================
-                        NO ANIMALS
-                ================================================= */}
-
-                {animals.length === 0 ? (
-
+                {loading ? (
                     <div className="text-center py-5">
-
-                        <div
-                            style={{
-                                fontSize: "55px"
-                            }}
-                        >
-                            🐄
-                        </div>
-
-                        <h4 className="fw-bold mt-3">
-                            No Animals Available
-                        </h4>
-
-                        <p className="text-muted">
-                            Seller listings will appear here.
-                        </p>
-
+                        <div className="spinner-border as-text-green" role="status" />
                     </div>
-
                 ) : (
-
-
-                    /* =================================================
-                            MULTIPLE ANIMAL CARDS
-                    ================================================= */
-
-                    <div className="row g-4">
-
-
-                        {animals.map(
-                            (animal) => (
-
+                    <div className="position-relative">
+                        <div className="as-featured-scroll" ref={scrollRef}>
+                            {animals.map((animal) => (
                                 <div
-                                    className="col-xl-3 col-lg-4 col-md-6 col-sm-6"
+                                    className="as-animal-card"
                                     key={animal.id}
+                                    onClick={() => openAnimal(animal)}
                                 >
-
-                                    <div
-                                        className="card h-100 border-0 shadow-sm"
-                                        style={{
-                                            borderRadius: "12px",
-                                            overflow: "hidden",
-                                            cursor: "pointer"
-                                        }}
-                                        onClick={() =>
-                                            navigate(
-                                                `/animal/${animal.id}`
-                                            )
-                                        }
-                                    >
-
-
-                                        {/* =================================
-                                                ANIMAL IMAGE
-                                        ================================= */}
-
-                                        <div
-                                            style={{
-                                                height: "220px",
-                                                backgroundColor: "#f5f5f5",
-                                                overflow: "hidden"
-                                            }}
-                                        >
-
+                                    <div className="as-animal-media">
+                                        <span className="as-featured-badge">Featured</span>
+                                        {imageOf(animal) ? (
                                             <img
-                                                src={
-                                                    getAnimalImage(
-                                                        animal
-                                                    )
-                                                }
-                                                alt={
-                                                    animal.animalName ||
-                                                    animal.breed ||
-                                                    "Animal"
-                                                }
-                                                style={{
-                                                    width: "100%",
-                                                    height: "100%",
-                                                    objectFit: "cover"
-                                                }}
+                                                src={imageOf(animal)}
+                                                alt={animal.animalName || "Animal"}
                                                 onError={(e) => {
-
-                                                    e.currentTarget.src =
-                                                        cowImg;
-
+                                                    e.currentTarget.onerror = null;
+                                                    e.currentTarget.src = cowImg;
                                                 }}
                                             />
-
-                                        </div>
-
-
-                                        {/* =================================
-                                                CARD BODY
-                                        ================================= */}
-
-                                        <div className="card-body">
-
-
-                                            {/* CATEGORY */}
-
-                                            <div className="d-flex justify-content-between align-items-center mb-2">
-
-                                                <span
-                                                    className="badge bg-success"
-                                                >
-                                                    {animal.category ||
-                                                        "Animal"}
-                                                </span>
-
-
-                                                {animal.available !==
-                                                    false && (
-
-                                                    <small className="text-success fw-semibold">
-
-                                                        Available
-
-                                                    </small>
-
-                                                )}
-
+                                        ) : (
+                                            <div className="d-flex align-items-center justify-content-center h-100 text-muted">
+                                                No image
                                             </div>
-
-
-                                            {/* ANIMAL NAME */}
-
-                                            <h5
-                                                className="fw-bold mb-1"
-                                            >
-
-                                                {animal.animalName ||
-                                                    "Animal"}
-
-                                            </h5>
-
-
-                                            {/* BREED */}
-
-                                            {animal.breed && (
-
-                                                <p className="text-muted mb-2">
-
-                                                    Breed:{" "}
-
-                                                    <strong>
-                                                        {animal.breed}
-                                                    </strong>
-
-                                                </p>
-
-                                            )}
-
-
-                                            {/* AGE + GENDER */}
-
-                                            <div
-                                                className="d-flex gap-2 mb-2"
-                                            >
-
-                                                {animal.age && (
-
-                                                    <small
-                                                        className="text-muted"
-                                                    >
-                                                        Age:{" "}
-                                                        {animal.age}
-                                                    </small>
-
-                                                )}
-
-
-                                                {animal.gender && (
-
-                                                    <small
-                                                        className="text-muted"
-                                                    >
-                                                        •{" "}
-                                                        {animal.gender}
-                                                    </small>
-
-                                                )}
-
-                                            </div>
-
-
-                                            {/* PRICE */}
-
-                                            <h5
-                                                className="fw-bold text-success mb-2"
-                                            >
-
-                                                ₹
-                                                {animal.price
-                                                    ? Number(
-                                                        animal.price
-                                                    ).toLocaleString(
-                                                        "en-IN"
-                                                    )
-                                                    : "Price not available"
-                                                }
-
-                                            </h5>
-
-
-                                            {/* LOCATION */}
-
-                                            {(
-                                                animal.location ||
-                                                animal.city
-                                            ) && (
-
-                                                <p
-                                                    className="text-muted mb-3"
-                                                >
-
-                                                    📍{" "}
-
-                                                    {
-                                                        animal.location ||
-                                                        animal.city
-                                                    }
-
-                                                </p>
-
-                                            )}
-
-
-                                            {/* VIEW BUTTON */}
-
-                                            <button
-                                                type="button"
-                                                className="btn btn-success w-100 fw-semibold"
-                                                onClick={(e) => {
-
-                                                    e.stopPropagation();
-
-                                                    navigate(
-                                                        `/animal/${animal.id}`
-                                                    );
-
-                                                }}
-                                            >
-
-                                                View Animal
-
-                                            </button>
-
-                                        </div>
-
+                                        )}
                                     </div>
 
+                                    <div className="as-animal-body">
+                                        <h6 className="as-animal-name">
+                                            {animal.animalName || "Animal"}
+                                        </h6>
+                                        <div className="as-animal-price">
+                                            {priceText(animal.price)}
+                                        </div>
+                                        <p className="as-animal-meta">
+                                            {[animal.age, animal.gender]
+                                                .filter(Boolean)
+                                                .join(" • ")}
+                                        </p>
+                                        <p className="as-animal-meta">
+                                            {animal.location || animal.city || ""}
+                                        </p>
+                                    </div>
                                 </div>
+                            ))}
+                        </div>
 
-                            )
-                        )}
-
+                        {/* SCROLL RIGHT */}
+                        <button
+                            type="button"
+                            className="btn btn-light rounded-circle shadow position-absolute top-50 end-0 translate-middle-y d-flex align-items-center justify-content-center"
+                            style={{ width: 42, height: 42 }}
+                            onClick={scrollRight}
+                            aria-label="Scroll right"
+                        >
+                            <ChevronRight size={20} />
+                        </button>
                     </div>
-
                 )}
 
             </div>
-
         </section>
-
     );
-
 }
-
 
 export default FeaturedAnimals;

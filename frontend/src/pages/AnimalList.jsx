@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getAnimalsByCategory } from "../services/AnimalService";
+import { getAnimalsByCategory, getAllAnimals } from "../services/AnimalService";
 import AnimalCard from "../components/AnimalCard";
 
 function AnimalList() {
@@ -19,7 +19,12 @@ function AnimalList() {
 
                 setLoading(true);
 
-                const response = await getAnimalsByCategory(category);
+                // "all" is a virtual category used by the home page
+                // "View All" links — it lists every animal.
+                const response =
+                    category === "all"
+                        ? await getAllAnimals()
+                        : await getAnimalsByCategory(category);
 
                 setAnimals(response.data);
 
@@ -68,7 +73,7 @@ function AnimalList() {
         <div className="container py-5">
 
             <h2 className="text-success mb-4">
-                {category} Animals
+                {category === "all" ? "All Animals" : `${category} Animals`}
             </h2>
 
             <div className="row">

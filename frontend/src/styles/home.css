@@ -1,0 +1,817 @@
+/* ==========================================================
+   AnimalSale — Home Page Theme
+   Green marketplace styling layered on top of Bootstrap 5.
+   Classes are namespaced with `as-` to avoid clashing.
+========================================================== */
+
+:root {
+    --as-green: #16a34a;
+    --as-green-dark: #128a3e;
+    --as-green-darker: #0e7035;
+    --as-green-soft: #e7f7ee;
+    --as-green-tint: #f1faf4;
+    --as-dark: #123029;
+    --as-dark-2: #0d241e;
+    --as-ink: #1f2937;
+    --as-muted: #6b7280;
+    --as-border: #e5e7eb;
+}
+
+/* ---------- Buttons ---------- */
+
+.as-btn-green {
+    background-color: var(--as-green);
+    border-color: var(--as-green);
+    color: #fff;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.as-btn-green:hover,
+.as-btn-green:focus {
+    background-color: var(--as-green-dark);
+    border-color: var(--as-green-dark);
+    color: #fff;
+}
+
+.as-text-green {
+    color: var(--as-green) !important;
+}
+
+.as-link-green {
+    color: var(--as-green);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.as-link-green:hover {
+    color: var(--as-green-dark);
+    text-decoration: underline;
+}
+
+/* ==========================================================
+   TOP HEADER
+========================================================== */
+
+.as-header {
+    background: #fff;
+    border-bottom: 1px solid var(--as-border);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+}
+
+.as-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--as-ink);
+    white-space: nowrap;
+}
+
+.as-brand .as-brand-icon {
+    color: var(--as-green);
+}
+
+.as-location {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f3f4f6;
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--as-ink);
+    white-space: nowrap;
+}
+
+.as-search {
+    display: flex;
+    flex: 1;
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.as-search input {
+    border: none;
+    outline: none;
+    padding: 10px 14px;
+    flex: 1;
+    font-size: 14px;
+    min-width: 0;
+}
+
+.as-search .as-search-btn {
+    background: var(--as-green);
+    color: #fff;
+    border: none;
+    padding: 0 22px;
+    font-weight: 600;
+}
+
+.as-search .as-search-btn:hover {
+    background: var(--as-green-dark);
+}
+
+.as-header-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--as-ink);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+}
+
+.as-header-action:hover {
+    color: var(--as-green);
+}
+
+/* ==========================================================
+   CATEGORY NAV STRIP
+========================================================== */
+
+.as-catnav {
+    background: #fff;
+    border-bottom: 1px solid var(--as-border);
+    position: relative;
+    z-index: 1020;
+}
+
+.as-catnav-inner {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.as-catnav-all {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    font-weight: 700;
+    color: var(--as-ink);
+    padding: 12px 14px;
+    border-right: 1px solid var(--as-border);
+}
+
+.as-catnav-link {
+    background: none;
+    border: none;
+    color: #374151;
+    font-weight: 600;
+    padding: 12px 14px;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+}
+
+.as-catnav-link:hover {
+    color: var(--as-green);
+    border-bottom-color: var(--as-green);
+}
+
+.as-megamenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid var(--as-border);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    z-index: 2000;
+}
+
+.as-megamenu h6 {
+    color: var(--as-green);
+    font-weight: 700;
+}
+
+.as-megamenu button {
+    background: none;
+    border: none;
+    display: block;
+    text-align: left;
+    color: #374151;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.as-megamenu button:hover {
+    color: var(--as-green);
+    padding-left: 6px;
+    transition: padding-left 0.2s ease;
+}
+
+/* ==========================================================
+   HERO
+========================================================== */
+
+.as-hero {
+    position: relative;
+    /* Full-width green meadow banner (like the mockup): a warm sun glow at the
+       top-right, fading into a bright meadow that is light on the left — so the
+       dark heading/stats stay readable — and greener toward the bottom where it
+       grounds into grass. */
+    background:
+        radial-gradient(90% 85% at 82% 10%, rgba(255, 245, 190, 0.55), rgba(255, 245, 190, 0) 46%),
+        linear-gradient(115deg, #eef9f1 0%, #e1f4e6 38%, #c5e9cb 72%, #a6d9ac 100%);
+    padding: 60px 0;
+    overflow: hidden;
+}
+
+.as-hero .container {
+    position: relative;
+    z-index: 1;
+}
+
+.as-hero h1 {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--as-ink);
+}
+
+.as-hero-sub {
+    font-size: 18px;
+    color: #4b5563;
+    max-width: 460px;
+}
+
+.as-hero-search {
+    max-width: 520px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.as-stats {
+    display: flex;
+    gap: 36px;
+    flex-wrap: wrap;
+}
+
+.as-stat-num {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--as-green);
+    line-height: 1;
+}
+
+.as-stat-label {
+    font-size: 13px;
+    color: var(--as-muted);
+    font-weight: 600;
+}
+
+.as-hero-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    /* keep the full animal group visible — never crop it */
+    border-radius: 18px;
+    /* green-tinted shadow so the photo sits on the meadow instead of
+       floating in a white card */
+    box-shadow: 0 22px 45px rgba(20, 83, 45, 0.22);
+}
+
+/* ---------- Hero meadow scene (watermark-free, self-contained) ---------- */
+
+.as-hero-scene {
+    position: relative;
+    height: 380px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+    background:
+        radial-gradient(circle at 80% 20%, rgba(255, 244, 186, 0.95), rgba(255, 244, 186, 0) 26%),
+        radial-gradient(120% 70% at 20% 68%, #7fce97 0%, #7fce97 40%, rgba(127, 206, 151, 0) 41%),
+        radial-gradient(120% 70% at 85% 66%, #8bd3a1 0%, #8bd3a1 42%, rgba(139, 211, 161, 0) 43%),
+        linear-gradient(
+            #bfe6ff 0%,
+            #d9f2ff 34%,
+            #eafaf1 34%,
+            #eafaf1 58%,
+            #74c78c 58%,
+            #4fae6f 100%
+        );
+}
+
+/* grass foreground */
+.as-hero-scene::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 44%;
+    background: linear-gradient(#63bd80 0%, #4aa869 100%);
+}
+
+.as-hero-animals {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+.as-hero-animal {
+    position: absolute;
+    transform: translateX(-50%);
+    line-height: 1;
+    filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.28));
+}
+
+.as-hero-animal.cow {
+    left: 34%;
+    bottom: 20%;
+    font-size: 104px;
+}
+
+.as-hero-animal.dog {
+    left: 54%;
+    bottom: 16%;
+    font-size: 92px;
+}
+
+.as-hero-animal.goat {
+    left: 72%;
+    bottom: 21%;
+    font-size: 80px;
+}
+
+.as-hero-animal.rabbit {
+    left: 30%;
+    bottom: 7%;
+    font-size: 52px;
+}
+
+.as-hero-animal.cat {
+    left: 62%;
+    bottom: 6%;
+    font-size: 64px;
+}
+
+/* ==========================================================
+   TRUST BAR
+========================================================== */
+
+.as-trustbar {
+    background: #fff;
+    border-bottom: 1px solid var(--as-border);
+    padding: 26px 0;
+}
+
+.as-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.as-trust-icon {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: var(--as-green-soft);
+    color: var(--as-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.as-trust-item h6 {
+    margin: 0;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--as-ink);
+}
+
+.as-trust-item p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--as-muted);
+}
+
+/* ==========================================================
+   SECTION HELPERS
+========================================================== */
+
+.as-section {
+    padding: 56px 0;
+}
+
+.as-section-alt {
+    background: var(--as-green-tint);
+}
+
+.as-section-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: var(--as-ink);
+    margin: 0;
+}
+
+.as-section-title.center {
+    text-align: center;
+}
+
+/* ==========================================================
+   CATEGORY CARDS
+========================================================== */
+
+.as-cat-card {
+    background: #fff;
+    border: 1px solid var(--as-border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.as-cat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1);
+    border-color: var(--as-green);
+}
+
+.as-cat-thumb {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--as-green-tint);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.as-cat-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.as-cat-thumb .as-cat-emoji {
+    font-size: 46px;
+    line-height: 1;
+}
+
+.as-cat-name {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--as-ink);
+    margin: 0;
+}
+
+.as-cat-count {
+    font-size: 13px;
+    color: var(--as-green);
+    font-weight: 600;
+}
+
+/* ==========================================================
+   FEATURED ANIMALS
+========================================================== */
+
+.as-featured-scroll {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 6px 2px 16px;
+    scroll-behavior: smooth;
+}
+
+.as-animal-card {
+    flex: 0 0 240px;
+    width: 240px;
+    background: #fff;
+    border: 1px solid var(--as-border);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.as-animal-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+}
+
+.as-animal-media {
+    position: relative;
+    height: 170px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.as-animal-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.as-featured-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: var(--as-green);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+
+.as-animal-body {
+    padding: 14px;
+}
+
+.as-animal-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--as-ink);
+    margin: 0 0 4px;
+}
+
+.as-animal-price {
+    color: var(--as-green);
+    font-weight: 800;
+    font-size: 17px;
+    margin: 0 0 6px;
+}
+
+.as-animal-meta {
+    font-size: 13px;
+    color: var(--as-muted);
+    margin: 0 0 2px;
+}
+
+/* ==========================================================
+   HOW IT WORKS
+========================================================== */
+
+.as-steps {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: #fff;
+    border: 1px solid var(--as-border);
+    border-radius: 16px;
+    padding: 28px 16px;
+}
+
+.as-step {
+    flex: 1 1 180px;
+    text-align: center;
+    padding: 8px 12px;
+}
+
+.as-step-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 2px solid var(--as-green-soft);
+    background: var(--as-green-tint);
+    color: var(--as-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.as-step h6 {
+    font-weight: 700;
+    color: var(--as-ink);
+    margin-bottom: 6px;
+}
+
+.as-step p {
+    font-size: 13px;
+    color: var(--as-muted);
+    margin: 0;
+}
+
+.as-step-arrow {
+    display: flex;
+    align-items: center;
+    color: #cbd5e1;
+    flex: 0 0 auto;
+}
+
+/* ==========================================================
+   WHY CHOOSE
+========================================================== */
+
+.as-why-card {
+    background: #fff;
+    border: 1px solid var(--as-border);
+    border-radius: 14px;
+    padding: 24px 16px;
+    text-align: center;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.as-why-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.as-why-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--as-green-soft);
+    color: var(--as-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.as-why-card h6 {
+    font-weight: 700;
+    color: var(--as-ink);
+    margin-bottom: 6px;
+}
+
+.as-why-card p {
+    font-size: 13px;
+    color: var(--as-muted);
+    margin: 0;
+}
+
+/* ==========================================================
+   SELL CTA
+========================================================== */
+
+.as-cta {
+    background: linear-gradient(120deg, #d9f2e4 0%, #eafaf1 100%);
+    border-radius: 18px;
+    padding: 36px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    overflow: hidden;
+}
+
+.as-cta h3 {
+    font-weight: 800;
+    color: var(--as-ink);
+    margin-bottom: 8px;
+}
+
+.as-cta p {
+    color: #4b5563;
+    margin-bottom: 18px;
+    max-width: 520px;
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.as-footer {
+    background: var(--as-dark);
+    color: #cbd5cf;
+    padding: 52px 0 0;
+}
+
+.as-footer .as-brand {
+    color: #fff;
+}
+
+.as-footer h6 {
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.as-footer a {
+    color: #cbd5cf;
+    display: block;
+    padding: 4px 0;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.as-footer a:hover {
+    color: #fff;
+}
+
+.as-footer p {
+    font-size: 14px;
+    color: #a9b8b1;
+}
+
+.as-social {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.as-social a {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: #fff;
+}
+
+.as-social a:hover {
+    background: var(--as-green);
+}
+
+.as-store-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    margin: 4px 8px 4px 0;
+}
+
+.as-store-badge .store-sub {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.as-store-badge .store-main {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.as-footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin-top: 40px;
+    padding: 18px 0;
+    font-size: 13px;
+}
+
+.as-footer-bottom a {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width: 991px) {
+    .as-hero h1 {
+        font-size: 34px;
+    }
+
+    .as-hero {
+        padding: 40px 0;
+    }
+
+    .as-step-arrow {
+        display: none;
+    }
+
+    .as-cta {
+        flex-direction: column;
+        text-align: center;
+        padding: 28px 20px;
+    }
+}
+
+@media (max-width: 575px) {
+    .as-hero h1 {
+        font-size: 28px;
+    }
+
+    .as-hero-scene {
+        height: 260px;
+    }
+
+    .as-stats {
+        gap: 22px;
+    }
+
+    .as-section-title {
+        font-size: 24px;
+    }
+}

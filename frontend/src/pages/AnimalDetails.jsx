@@ -5,10 +5,13 @@ import { getAnimalById } from "../services/AnimalService";
 function AnimalDetails() {
 
     const { id } = useParams();
+
     const navigate = useNavigate();
 
     const [animal, setAnimal] = useState(null);
+
     const [loading, setLoading] = useState(true);
+
     const [errorMessage, setErrorMessage] = useState("");
 
     // ==========================================
@@ -22,13 +25,41 @@ function AnimalDetails() {
             try {
 
                 setLoading(true);
+
                 setErrorMessage("");
 
-                const response = await getAnimalById(id);
+                const response =
+                    await getAnimalById(id);
 
                 console.log(
-                    "Animal Details Response:",
+                    "================================="
+                );
+
+                console.log(
+                    "ANIMAL DETAILS RESPONSE"
+                );
+
+                console.log(
                     response.data
+                );
+
+                console.log(
+                    "Front Image URL:",
+                    response.data?.frontImageUrl
+                );
+
+                console.log(
+                    "Side Image URL:",
+                    response.data?.sideImageUrl
+                );
+
+                console.log(
+                    "Back Image URL:",
+                    response.data?.backImageUrl
+                );
+
+                console.log(
+                    "================================="
                 );
 
                 setAnimal(response.data);
@@ -41,6 +72,11 @@ function AnimalDetails() {
                 );
 
                 if (error.response) {
+
+                    console.error(
+                        "Backend Response:",
+                        error.response.data
+                    );
 
                     setErrorMessage(
                         error.response.data?.message ||
@@ -64,7 +100,6 @@ function AnimalDetails() {
 
     }, [id]);
 
-
     // ==========================================
     // LOADING
     // ==========================================
@@ -79,7 +114,8 @@ function AnimalDetails() {
                     <div
                         className="spinner-border text-success"
                         role="status"
-                    ></div>
+                    >
+                    </div>
 
                     <p className="mt-3">
                         Loading animal details...
@@ -90,7 +126,6 @@ function AnimalDetails() {
             </div>
         );
     }
-
 
     // ==========================================
     // ERROR
@@ -103,7 +138,10 @@ function AnimalDetails() {
 
                 <div className="alert alert-danger">
 
-                    <strong>Error:</strong>{" "}
+                    <strong>
+                        Error:
+                    </strong>{" "}
+
                     {errorMessage}
 
                 </div>
@@ -118,7 +156,6 @@ function AnimalDetails() {
             </div>
         );
     }
-
 
     // ==========================================
     // ANIMAL NOT FOUND
@@ -136,7 +173,6 @@ function AnimalDetails() {
             </div>
         );
     }
-
 
     // ==========================================
     // UI
@@ -157,7 +193,6 @@ function AnimalDetails() {
                 ← Back
             </button>
 
-
             {/* ==================================
                 MAIN CARD
             ================================== */}
@@ -170,7 +205,6 @@ function AnimalDetails() {
                         {animal.animalName}
                     </h2>
 
-
                     {/* ==================================
                         ANIMAL PHOTOS
                     ================================== */}
@@ -181,7 +215,9 @@ function AnimalDetails() {
 
                     <div className="row mb-4">
 
-                        {/* FRONT PHOTO */}
+                        {/* ==================================
+                            FRONT PHOTO
+                        ================================== */}
 
                         <div className="col-md-4 mb-3">
 
@@ -197,6 +233,15 @@ function AnimalDetails() {
                                             height: "250px",
                                             objectFit: "cover"
                                         }}
+                                        onError={(e) => {
+                                            console.error(
+                                                "Front image failed:",
+                                                animal.frontImageUrl
+                                            );
+
+                                            e.currentTarget.style.display =
+                                                "none";
+                                        }}
                                     />
 
                                 ) : (
@@ -209,7 +254,6 @@ function AnimalDetails() {
                                     >
                                         No Front Photo
                                     </div>
-
                                 )}
 
                                 <div className="card-body text-center">
@@ -224,8 +268,9 @@ function AnimalDetails() {
 
                         </div>
 
-
-                        {/* SIDE PHOTO */}
+                        {/* ==================================
+                            SIDE PHOTO
+                        ================================== */}
 
                         <div className="col-md-4 mb-3">
 
@@ -241,6 +286,15 @@ function AnimalDetails() {
                                             height: "250px",
                                             objectFit: "cover"
                                         }}
+                                        onError={(e) => {
+                                            console.error(
+                                                "Side image failed:",
+                                                animal.sideImageUrl
+                                            );
+
+                                            e.currentTarget.style.display =
+                                                "none";
+                                        }}
                                     />
 
                                 ) : (
@@ -253,7 +307,6 @@ function AnimalDetails() {
                                     >
                                         No Side Photo
                                     </div>
-
                                 )}
 
                                 <div className="card-body text-center">
@@ -268,8 +321,9 @@ function AnimalDetails() {
 
                         </div>
 
-
-                        {/* BACK PHOTO */}
+                        {/* ==================================
+                            BACK PHOTO
+                        ================================== */}
 
                         <div className="col-md-4 mb-3">
 
@@ -285,6 +339,15 @@ function AnimalDetails() {
                                             height: "250px",
                                             objectFit: "cover"
                                         }}
+                                        onError={(e) => {
+                                            console.error(
+                                                "Back image failed:",
+                                                animal.backImageUrl
+                                            );
+
+                                            e.currentTarget.style.display =
+                                                "none";
+                                        }}
                                     />
 
                                 ) : (
@@ -297,7 +360,6 @@ function AnimalDetails() {
                                     >
                                         No Back Photo
                                     </div>
-
                                 )}
 
                                 <div className="card-body text-center">
@@ -314,7 +376,6 @@ function AnimalDetails() {
 
                     </div>
 
-
                     {/* ==================================
                         ANIMAL DETAILS
                     ================================== */}
@@ -326,49 +387,83 @@ function AnimalDetails() {
                     <div className="row">
 
                         <div className="col-md-6 mb-3">
-                            <strong>Animal ID:</strong>
+
+                            <strong>
+                                Animal ID:
+                            </strong>
+
                             <br />
+
                             {animal.id}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Animal Name:</strong>
+
+                            <strong>
+                                Animal Name:
+                            </strong>
+
                             <br />
+
                             {animal.animalName}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Category:</strong>
+
+                            <strong>
+                                Category:
+                            </strong>
+
                             <br />
+
                             {animal.category}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Breed:</strong>
+
+                            <strong>
+                                Breed:
+                            </strong>
+
                             <br />
+
                             {animal.breed}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Age:</strong>
+
+                            <strong>
+                                Age:
+                            </strong>
+
                             <br />
+
                             {animal.age}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Gender:</strong>
+
+                            <strong>
+                                Gender:
+                            </strong>
+
                             <br />
+
                             {animal.gender}
+
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Price:</strong>
+
+                            <strong>
+                                Price:
+                            </strong>
+
                             <br />
 
                             <span className="text-success fw-bold">
@@ -377,13 +472,17 @@ function AnimalDetails() {
 
                         </div>
 
-
                         <div className="col-md-6 mb-3">
-                            <strong>Location:</strong>
-                            <br />
-                            {animal.location}
-                        </div>
 
+                            <strong>
+                                Location:
+                            </strong>
+
+                            <br />
+
+                            {animal.location}
+
+                        </div>
 
                         <div className="col-12 mb-3">
 
@@ -392,12 +491,13 @@ function AnimalDetails() {
                             </strong>
 
                             <p className="mt-2">
+
                                 {animal.description ||
                                     "No description available."}
+
                             </p>
 
                         </div>
-
 
                         <div className="col-12">
 

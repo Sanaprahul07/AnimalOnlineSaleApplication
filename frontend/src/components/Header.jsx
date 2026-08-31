@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import {
     PawIcon,
     LocationIcon,
@@ -10,25 +12,37 @@ import {
 
 // =====================================================
 // TOP HEADER
-// Brand · Location · Search · Wishlist · Login · Sell
+// Brand · Location · Search · Wishlist · Login · Admin · Sell
 // =====================================================
 
 function Header() {
+
     const navigate = useNavigate();
+
     const [query, setQuery] = useState("");
 
-    // Free-text search reuses the category list page as results.
+    // =====================================================
+    // SEARCH
+    // =====================================================
+
     const handleSearch = (e) => {
+
         e.preventDefault();
 
         const term = query.trim();
 
         if (term) {
-            navigate(`/animals/${encodeURIComponent(term)}`);
+
+            navigate(
+                `/animals/${encodeURIComponent(term)}`
+            );
+
         }
+
     };
 
     return (
+
         <header className="as-header">
 
             <div className="container py-2">
@@ -44,14 +58,19 @@ function Header() {
                         role="button"
                         onClick={() => navigate("/")}
                     >
+
                         <PawIcon size={26} />
 
                         <span>
+
                             Animal
+
                             <span className="as-text-green">
                                 Sale
                             </span>
+
                         </span>
+
                     </div>
 
                     {/* ==========================================
@@ -104,8 +123,11 @@ function Header() {
                         className="as-header-action d-none d-md-flex"
                         onClick={() => navigate("/login")}
                     >
+
                         <HeartIcon size={20} />
+
                         Wishlist
+
                     </button>
 
                     <button
@@ -113,13 +135,29 @@ function Header() {
                         className="as-header-action d-none d-md-flex"
                         onClick={() => navigate("/login")}
                     >
+
                         <UserIcon size={20} />
+
                         Login
+
+                    </button>
+
+                    {/* ==========================================
+                        ADMIN BUTTON
+                        ONLY NEW REQUIREMENT
+                    ========================================== */}
+
+                    <button
+                        type="button"
+                        className="btn btn-outline-dark px-3 py-2 text-nowrap fw-semibold"
+                        onClick={() => navigate("/admin/login")}
+                    >
+                        Admin
                     </button>
 
                     {/* ==========================================
                         SELL ANIMAL BUTTON
-                        ONLY BUTTON STYLE CHANGED
+                        EXISTING CODE - UNCHANGED
                     ========================================== */}
 
                     <button
@@ -137,7 +175,9 @@ function Header() {
                             whiteSpace: "nowrap",
                             boxShadow: "none"
                         }}
-                        onClick={() => navigate("/seller/register")}
+                        onClick={() =>
+                            navigate("/seller/register")
+                        }
                     >
                         + Sell Animal
                     </button>

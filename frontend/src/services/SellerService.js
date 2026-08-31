@@ -5,41 +5,11 @@ import axios from "axios";
 // =====================================================
 
 const BASE_URL = "http://localhost:8080/api/seller";
-
 const EMAIL_OTP_URL = "http://localhost:8080/api/email-otp";
-
 const ANIMAL_URL = "http://localhost:8080/api/animal";
 
 // =====================================================
 // SELLER REGISTER
-// =====================================================
-// This API receives FormData.
-//
-// FormData contains:
-// - sellerName
-// - ownerName
-// - email
-// - mobile
-// - password
-// - businessName
-// - farmName
-// - aadhaarNumber
-// - panNumber
-// - address
-// - city
-// - state
-// - pincode
-// - location
-// - profileImage
-// - aadhaarFrontFile
-// - aadhaarBackFile
-//
-// Backend should:
-// 1. Save seller information
-// 2. Save Aadhaar front image
-// 3. Save Aadhaar back image
-// 4. Generate email OTP
-// 5. Send OTP to seller email
 // =====================================================
 
 export const registerSeller = async (sellerData) => {
@@ -49,20 +19,12 @@ export const registerSeller = async (sellerData) => {
     return response;
   } catch (error) {
     console.error("Seller Registration API Error:", error);
-
     throw error;
   }
 };
 
 // =====================================================
 // SELLER LOGIN
-// =====================================================
-// Login with:
-// - email
-// - password
-//
-// Expected backend response should contain seller
-// information / seller id / login success information.
 // =====================================================
 
 export const loginSeller = async (loginData) => {
@@ -72,27 +34,12 @@ export const loginSeller = async (loginData) => {
     return response;
   } catch (error) {
     console.error("Seller Login API Error:", error);
-
     throw error;
   }
 };
 
 // =====================================================
 // VERIFY SELLER EMAIL OTP
-// =====================================================
-// Request:
-//
-// {
-//     email: "seller@gmail.com",
-//     otp: "123456"
-// }
-//
-// Backend should:
-// 1. Check email
-// 2. Check OTP
-// 3. Check expiry
-// 4. Mark seller email as verified
-// 5. Return success response
 // =====================================================
 
 export const verifyEmailOtp = async (email, otp) => {
@@ -112,15 +59,6 @@ export const verifyEmailOtp = async (email, otp) => {
 
 // =====================================================
 // RESEND SELLER EMAIL OTP
-// =====================================================
-// Request:
-//
-// {
-//     email: "seller@gmail.com"
-// }
-//
-// Backend should generate a new OTP and send it
-// to the seller's email.
 // =====================================================
 
 export const resendEmailOtp = async (email) => {
@@ -204,11 +142,6 @@ export const deleteSeller = async (id) => {
 // =====================================================
 // GET SELLER ANIMALS
 // =====================================================
-// Used by Seller Dashboard / My Animals.
-//
-// Example:
-// /api/animal/seller/1
-// =====================================================
 
 export const getSellerAnimals = async (sellerId) => {
   try {
@@ -217,6 +150,31 @@ export const getSellerAnimals = async (sellerId) => {
     return response;
   } catch (error) {
     console.error("Get Seller Animals API Error:", error);
+
+    throw error;
+  }
+};
+
+// =====================================================
+// SELLER FORGOT PASSWORD
+// =====================================================
+// Only password will be changed.
+// Email will remain unchanged.
+//
+// Backend endpoint expected:
+// PUT /api/seller/forgot-password
+// =====================================================
+
+export const forgotSellerPassword = async (email, newPassword) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/forgot-password`, {
+      email: email,
+      newPassword: newPassword,
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Seller Forgot Password API Error:", error);
 
     throw error;
   }

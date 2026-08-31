@@ -16,7 +16,7 @@ function AddAnimal() {
     const sellerId = localStorage.getItem("sellerId");
 
     // ==========================================
-    // 30 ANIMAL CATEGORIES + RELATED BREEDS
+    // ANIMAL CATEGORIES + RELATED BREEDS
     // ==========================================
     const animalCategories = [
         {
@@ -336,7 +336,6 @@ function AddAnimal() {
         gender: "",
         description: "",
         location: "",
-        imageUrl: "",
         sellerId: sellerId
     });
 
@@ -377,7 +376,8 @@ function AddAnimal() {
         const selectedCategory = e.target.value;
 
         const selectedAnimal = animalCategories.find(
-            (item) => item.categoryName === selectedCategory
+            (item) =>
+                item.categoryName === selectedCategory
         );
 
         setAnimal({
@@ -416,7 +416,9 @@ function AddAnimal() {
     // ==========================================
     const handlePhotoChange = (e) => {
 
-        const selectedFiles = Array.from(e.target.files);
+        const selectedFiles = Array.from(
+            e.target.files
+        );
 
         if (selectedFiles.length === 0) {
             return;
@@ -425,10 +427,10 @@ function AddAnimal() {
         // ======================================
         // MAXIMUM 3 PHOTOS
         // ======================================
-        if (selectedFiles.length > 3) {
+        if (selectedFiles.length !== 3) {
 
             setErrorMessage(
-                "Please select maximum 3 photos only."
+                "Please select exactly 3 photos: Front, Side and Back."
             );
 
             e.target.value = "";
@@ -446,7 +448,8 @@ function AddAnimal() {
         ];
 
         const invalidFile = selectedFiles.find(
-            (file) => !validTypes.includes(file.type)
+            (file) =>
+                !validTypes.includes(file.type)
         );
 
         if (invalidFile) {
@@ -463,9 +466,9 @@ function AddAnimal() {
         // SAVE FILES
         // ======================================
         const newPhotos = {
-            front: selectedFiles[0] || null,
-            side: selectedFiles[1] || null,
-            back: selectedFiles[2] || null
+            front: selectedFiles[0],
+            side: selectedFiles[1],
+            back: selectedFiles[2]
         };
 
         setPhotos(newPhotos);
@@ -474,20 +477,21 @@ function AddAnimal() {
         // CREATE PREVIEWS
         // ======================================
         const newPreview = {
-            front: selectedFiles[0]
-                ? URL.createObjectURL(selectedFiles[0])
-                : "",
+            front: URL.createObjectURL(
+                selectedFiles[0]
+            ),
 
-            side: selectedFiles[1]
-                ? URL.createObjectURL(selectedFiles[1])
-                : "",
+            side: URL.createObjectURL(
+                selectedFiles[1]
+            ),
 
-            back: selectedFiles[2]
-                ? URL.createObjectURL(selectedFiles[2])
-                : ""
+            back: URL.createObjectURL(
+                selectedFiles[2]
+            )
         };
 
         setPhotoPreview(newPreview);
+
         setErrorMessage("");
 
         // Same files can be selected again
@@ -532,6 +536,7 @@ function AddAnimal() {
             );
 
             navigate("/seller/login");
+
             return;
         }
 
@@ -647,11 +652,12 @@ function AddAnimal() {
                 );
 
             console.log(
-                "Photo Upload Response:",
+                "PHOTO UPLOAD RESPONSE:",
                 photoResponse.data
             );
 
             // ==================================
+            // STEP 2
             // GET PHOTO URLS
             // ==================================
             const frontPhotoUrl =
@@ -662,6 +668,21 @@ function AddAnimal() {
 
             const backPhotoUrl =
                 photoResponse.data?.backPhotoUrl;
+
+            console.log(
+                "FRONT PHOTO URL:",
+                frontPhotoUrl
+            );
+
+            console.log(
+                "SIDE PHOTO URL:",
+                sidePhotoUrl
+            );
+
+            console.log(
+                "BACK PHOTO URL:",
+                backPhotoUrl
+            );
 
             // ==================================
             // CHECK PHOTO URL RESPONSE
@@ -680,7 +701,7 @@ function AddAnimal() {
             }
 
             // ==================================
-            // STEP 2
+            // STEP 3
             // FINAL ANIMAL REQUEST
             // ==================================
             const finalRequestData = {
@@ -709,20 +730,28 @@ function AddAnimal() {
                 location:
                     animal.location,
 
-                imageUrl:
-                    animal.imageUrl,
-
-                // THREE PHOTO URLS
+                // ==================================
+                // FRONT IMAGE
+                // THIS IMAGE WILL BE USED ON HOME
+                // ==================================
                 frontPhotoUrl:
                     frontPhotoUrl,
 
+                // ==================================
+                // SIDE IMAGE
+                // ==================================
                 sidePhotoUrl:
                     sidePhotoUrl,
 
+                // ==================================
+                // BACK IMAGE
+                // ==================================
                 backPhotoUrl:
                     backPhotoUrl,
 
+                // ==================================
                 // DYNAMIC SELLER
+                // ==================================
                 sellerId:
                     Number(currentSellerId)
             };
@@ -733,7 +762,7 @@ function AddAnimal() {
             );
 
             // ==================================
-            // STEP 3
+            // STEP 4
             // ADD ANIMAL
             // ==================================
             const response =
@@ -742,7 +771,7 @@ function AddAnimal() {
                 );
 
             console.log(
-                "Add Animal Response:",
+                "ADD ANIMAL RESPONSE:",
                 response.data
             );
 
@@ -760,7 +789,7 @@ function AddAnimal() {
         } catch (error) {
 
             console.error(
-                "Error adding animal:",
+                "ERROR ADDING ANIMAL:",
                 error
             );
 
@@ -770,12 +799,12 @@ function AddAnimal() {
             if (error.response) {
 
                 console.error(
-                    "Backend Status:",
+                    "BACKEND STATUS:",
                     error.response.status
                 );
 
                 console.error(
-                    "Backend Response:",
+                    "BACKEND RESPONSE:",
                     error.response.data
                 );
 
@@ -818,6 +847,7 @@ function AddAnimal() {
     // UI
     // ==========================================
     return (
+
         <div className="container-fluid p-4">
 
             <div className="mb-4">
@@ -1120,8 +1150,21 @@ function AddAnimal() {
 
                                     <p className="mb-3 text-muted">
 
-                                        Select 3 photos:
-                                        Front, Side and Back
+                                        Select exactly 3 photos:
+
+                                        <br />
+
+                                        <strong>
+                                            1. Front
+                                        </strong>{" "}
+                                        -{" "}
+                                        <strong>
+                                            2. Side
+                                        </strong>{" "}
+                                        -{" "}
+                                        <strong>
+                                            3. Back
+                                        </strong>
 
                                     </p>
 
@@ -1146,7 +1189,7 @@ function AddAnimal() {
 
                                     <p className="small text-muted mt-2 mb-0">
 
-                                        Maximum 3 photos
+                                        Exactly 3 photos required
 
                                     </p>
 
@@ -1172,7 +1215,9 @@ function AddAnimal() {
 
                                     <div className="row">
 
+                                        {/* ================================= */}
                                         {/* FRONT */}
+                                        {/* ================================= */}
 
                                         <div className="col-md-4 mb-3">
 
@@ -1233,7 +1278,9 @@ function AddAnimal() {
 
                                         </div>
 
+                                        {/* ================================= */}
                                         {/* SIDE */}
+                                        {/* ================================= */}
 
                                         <div className="col-md-4 mb-3">
 
@@ -1294,7 +1341,9 @@ function AddAnimal() {
 
                                         </div>
 
+                                        {/* ================================= */}
                                         {/* BACK */}
+                                        {/* ================================= */}
 
                                         <div className="col-md-4 mb-3">
 
@@ -1368,7 +1417,9 @@ function AddAnimal() {
                             <div className="col-12 mb-3">
 
                                 <label className="form-label fw-bold">
+
                                     Description
+
                                 </label>
 
                                 <textarea

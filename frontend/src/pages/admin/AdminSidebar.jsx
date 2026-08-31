@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 function AdminSidebar() {
+
     const navigate = useNavigate();
 
     return (
@@ -15,12 +16,7 @@ function AdminSidebar() {
                 zIndex: 1000
             }}
         >
-            {/* =====================================================
-                BRAND
-            ===================================================== */}
-
             <div className="px-4 py-4 border-bottom">
-
                 <div
                     className="fw-bold text-success fs-4"
                     style={{ cursor: "pointer" }}
@@ -32,12 +28,7 @@ function AdminSidebar() {
                 <small className="text-muted">
                     Admin Panel
                 </small>
-
             </div>
-
-            {/* =====================================================
-                MENU
-            ===================================================== */}
 
             <div className="p-3">
 
@@ -144,7 +135,6 @@ function AdminSidebar() {
                 </button>
 
             </div>
-
         </div>
     );
 }

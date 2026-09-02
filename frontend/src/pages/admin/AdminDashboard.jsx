@@ -1,849 +1,809 @@
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import AdminSidebar from "./AdminSidebar";
-
+import AdminSidebar from "../../components/Admin/AdminSidebar";
+import AdminService from "../../services/AdminService";
 
 function AdminDashboard() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
+  // =====================================================
+  // STATE
+  // =====================================================
+
+  const [dashboard, setDashboard] = useState(null);
+  const [sellers, setSellers] = useState([]);
+
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // =====================================================
+  // LOAD ADMIN DATA
+  // =====================================================
+
+  const loadAdminData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setErrorMessage("");
+
+      // Dashboard data
+      const dashboardResponse = await AdminService.getDashboard();
+
+      // Seller data
+      const sellersResponse = await AdminService.getAllSellers();
+
+      console.log("Admin Dashboard Data:", dashboardResponse.data);
+
+      console.log("Admin Sellers:", sellersResponse.data);
+
+      // Save dashboard data
+      setDashboard(dashboardResponse.data);
+
+      // Save sellers
+      const sellerData = sellersResponse.data;
+
+      if (Array.isArray(sellerData)) {
+        setSellers(sellerData);
+      } else if (sellerData && Array.isArray(sellerData.data)) {
+        setSellers(sellerData.data);
+      } else if (sellerData && Array.isArray(sellerData.content)) {
+        setSellers(sellerData.content);
+      } else {
+        setSellers([]);
+      }
+    } catch (error) {
+      console.error("Admin Dashboard Loading Error:", error);
+
+      setErrorMessage(
+        error.response?.data?.message || "Unable to load admin dashboard data.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // =====================================================
+  // LOAD DATA WHEN DASHBOARD OPENS
+  // =====================================================
+
+  useEffect(() => {
+    loadAdminData();
+  }, [loadAdminData]);
+
+  // =====================================================
+  // REFRESH DASHBOARD
+  // =====================================================
+
+  const handleRefresh = () => {
+    loadAdminData();
+  };
+
+  // =====================================================
+  // GET SELLER ID
+  // =====================================================
+
+  const getSellerId = (seller) => {
+    return seller.sellerId || seller.id || seller.sellerID;
+  };
+
+  // =====================================================
+  // GET SELLER NAME
+  // =====================================================
+
+  const getSellerName = (seller) => {
     return (
+      seller.sellerName ||
+      seller.name ||
+      seller.ownerName ||
+      seller.farmerName ||
+      "Seller"
+    );
+  };
+
+  // =====================================================
+  // GET SELLER EMAIL
+  // =====================================================
+
+  const getSellerEmail = (seller) => {
+    return seller.email || seller.sellerEmail || "Email not available";
+  };
+
+  // =====================================================
+  // GET SELLER STATUS
+  // =====================================================
+
+  const getSellerStatus = (seller) => {
+    return seller.approvalStatus || seller.status || "PENDING";
+  };
+
+  // =====================================================
+  // GET STATUS CLASS
+  // =====================================================
+
+  const getStatusClass = (status) => {
+    const value = status?.toString().toUpperCase();
+
+    if (value === "APPROVED") {
+      return "badge bg-success";
+    }
+
+    if (value === "REJECTED") {
+      return "badge bg-danger";
+    }
+
+    return "badge bg-warning text-dark";
+  };
+
+  // =====================================================
+  // OPEN SELLER
+  // =====================================================
+
+  const handleViewSeller = (seller) => {
+    const sellerId = getSellerId(seller);
+
+    if (!sellerId) {
+      console.error("Seller ID not found:", seller);
+
+      return;
+    }
+
+    navigate(`/admin/sellers/${sellerId}`);
+  };
+
+  // =====================================================
+  // DASHBOARD
+  // =====================================================
+
+  return (
+    <div
+      className="d-flex"
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#f7f8fc",
+      }}
+    >
+      {/* =====================================================
+                SIDEBAR
+            ===================================================== */}
+
+      <AdminSidebar />
+
+      {/* =====================================================
+                MAIN CONTENT
+            ===================================================== */}
+
+      <div
+        style={{
+          marginLeft: "250px",
+          width: "calc(100% - 250px)",
+          minHeight: "100vh",
+        }}
+      >
+        {/* =================================================
+                    HEADER
+                ================================================= */}
+
         <div
-            className="d-flex"
-            style={{
-                minHeight: "100vh",
-                backgroundColor: "#f7f8fc"
-            }}
+          className="bg-white border-bottom d-flex justify-content-between align-items-center px-4 py-3"
+          style={{
+            minHeight: "70px",
+          }}
         >
-            {/* =====================================================
-                ADMIN SIDEBAR
-            ===================================================== */}
-            <AdminSidebar />
+          <div>
+            <div className="fw-bold fs-5">Welcome, Admin 👋</div>
 
-            {/* =====================================================
-                MAIN AREA
-            ===================================================== */}
-            <div
-                style={{
-                    marginLeft: "250px",
-                    width: "calc(100% - 250px)",
-                    minHeight: "100vh"
-                }}
+            <small className="text-muted">
+              Manage your AnimalSale platform
+            </small>
+          </div>
+
+          <div className="d-flex align-items-center gap-3">
+            {/* REFRESH BUTTON */}
+
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm"
+              onClick={handleRefresh}
+              disabled={loading}
             >
-                {/* =================================================
-                    TOP HEADER
+              {loading ? "Loading..." : "↻ Refresh"}
+            </button>
+
+            <div className="text-end">
+              <div className="fw-semibold">Admin</div>
+
+              <small className="text-muted">Administrator</small>
+            </div>
+
+            <div
+              className="rounded-circle d-flex align-items-center justify-content-center"
+              style={{
+                width: "42px",
+                height: "42px",
+                backgroundColor: "#e8f5e9",
+              }}
+            >
+              👤
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+                    CONTENT
                 ================================================= */}
-                <div
-                    className="bg-white border-bottom d-flex justify-content-between align-items-center px-4 py-3"
-                    style={{
-                        minHeight: "70px"
-                    }}
-                >
-                    <div className="d-flex align-items-center gap-3">
-                        <button
-                            type="button"
-                            className="btn btn-light"
-                        >
-                            ☰
-                        </button>
 
-                        <div>
-                            <div className="fw-bold fs-5">
-                                Welcome, Admin 👋
-                            </div>
-
-                            <small className="text-muted">
-                                Manage your AnimalSale platform
-                            </small>
-                        </div>
-                    </div>
-
-                    <div className="d-flex align-items-center gap-3">
-                        <button
-                            type="button"
-                            className="btn btn-light position-relative"
-                            onClick={() =>
-                                navigate("/admin/notifications")
-                            }
-                        >
-                            🔔
-
-                            <span
-                                className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                            >
-                                5
-                            </span>
-                        </button>
-
-                        <div className="d-flex align-items-center gap-2">
-                            <div
-                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                style={{
-                                    width: "38px",
-                                    height: "38px",
-                                    backgroundColor: "#e8f5e9"
-                                }}
-                            >
-                                👤
-                            </div>
-
-                            <div>
-                                <div className="fw-semibold">
-                                    Admin
-                                </div>
-
-                                <small className="text-muted">
-                                    Administrator
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* =================================================
-                    PAGE CONTENT
-                ================================================= */}
-                <div className="p-4">
-                    {/* =================================================
-                        PAGE TITLE
+        <div className="p-4">
+          {/* =================================================
+                        TITLE
                     ================================================= */}
-                    <div className="mb-4">
-                        <h2 className="fw-bold mb-1">
-                            Admin Dashboard
-                        </h2>
 
-                        <p className="text-muted mb-0">
-                            Overview of your AnimalSale platform.
-                        </p>
-                    </div>
+          <div className="mb-4">
+            <h2 className="fw-bold mb-1">Admin Dashboard</h2>
 
-                    {/* =================================================
+            <p className="text-muted mb-0">
+              Overview of your AnimalSale platform.
+            </p>
+          </div>
+
+          {/* =================================================
+                        ERROR
+                    ================================================= */}
+
+          {errorMessage && (
+            <div className="alert alert-danger">
+              <strong>Error:</strong> {errorMessage}
+              <button
+                type="button"
+                className="btn btn-sm btn-danger ms-3"
+                onClick={handleRefresh}
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* =================================================
                         SUMMARY CARDS
                     ================================================= */}
-                    <div className="row g-3 mb-4">
-                        {/* SELLERS */}
-                        <div className="col-xl-3 col-lg-6 col-md-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <small className="text-muted">
-                                                Total Sellers
-                                            </small>
 
-                                            <h3 className="fw-bold mt-2 mb-1">
-                                                128
-                                            </h3>
+          <div className="row g-3 mb-4">
+            {/* =================================================
+                            TOTAL SELLERS
+                        ================================================= */}
 
-                                            <small className="text-success">
-                                                +12 this month
-                                            </small>
-                                        </div>
+            <div className="col-xl-3 col-lg-6 col-md-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <small className="text-muted">Total Sellers</small>
 
-                                        <div
-                                            className="rounded-circle d-flex align-items-center justify-content-center"
-                                            style={{
-                                                width: "48px",
-                                                height: "48px",
-                                                backgroundColor: "#e8f1ff",
-                                                fontSize: "22px"
-                                            }}
-                                        >
-                                            👨‍🌾
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                      <h3 className="fw-bold mt-2 mb-1">
+                        {loading
+                          ? "..."
+                          : (dashboard?.totalSellers ?? sellers.length)}
+                      </h3>
 
-                        {/* BUYERS */}
-                        <div className="col-xl-3 col-lg-6 col-md-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <small className="text-muted">
-                                                Total Buyers
-                                            </small>
-
-                                            <h3 className="fw-bold mt-2 mb-1">
-                                                356
-                                            </h3>
-
-                                            <small className="text-success">
-                                                +25 this month
-                                            </small>
-                                        </div>
-
-                                        <div
-                                            className="rounded-circle d-flex align-items-center justify-content-center"
-                                            style={{
-                                                width: "48px",
-                                                height: "48px",
-                                                backgroundColor: "#eaf8ee",
-                                                fontSize: "22px"
-                                            }}
-                                        >
-                                            👤
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ANIMALS */}
-                        <div className="col-xl-3 col-lg-6 col-md-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <small className="text-muted">
-                                                Total Animals
-                                            </small>
-
-                                            <h3 className="fw-bold mt-2 mb-1">
-                                                542
-                                            </h3>
-
-                                            <small className="text-success">
-                                                +40 this month
-                                            </small>
-                                        </div>
-
-                                        <div
-                                            className="rounded-circle d-flex align-items-center justify-content-center"
-                                            style={{
-                                                width: "48px",
-                                                height: "48px",
-                                                backgroundColor: "#f0eaff",
-                                                fontSize: "22px"
-                                            }}
-                                        >
-                                            🐄
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* ORDERS */}
-                        <div className="col-xl-3 col-lg-6 col-md-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <small className="text-muted">
-                                                Total Orders
-                                            </small>
-
-                                            <h3 className="fw-bold mt-2 mb-1">
-                                                216
-                                            </h3>
-
-                                            <small className="text-success">
-                                                +18 this month
-                                            </small>
-                                        </div>
-
-                                        <div
-                                            className="rounded-circle d-flex align-items-center justify-content-center"
-                                            style={{
-                                                width: "48px",
-                                                height: "48px",
-                                                backgroundColor: "#fff4df",
-                                                fontSize: "22px"
-                                            }}
-                                        >
-                                            📦
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                      <small className="text-success">Registered Sellers</small>
                     </div>
 
-                    {/* =================================================
-                        REGISTRATION + QUICK ACTIONS
+                    <div
+                      className="rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        backgroundColor: "#e8f5e9",
+                      }}
+                    >
+                      👨‍🌾
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================
+                            TOTAL BUYERS
+                        ================================================= */}
+
+            <div className="col-xl-3 col-lg-6 col-md-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <small className="text-muted">Total Buyers</small>
+
+                      <h3 className="fw-bold mt-2 mb-1">
+                        {loading ? "..." : (dashboard?.totalBuyers ?? 0)}
+                      </h3>
+
+                      <small className="text-primary">Registered Buyers</small>
+                    </div>
+
+                    <div
+                      className="rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        backgroundColor: "#e3f2fd",
+                      }}
+                    >
+                      👤
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================
+                            TOTAL ANIMALS
+                        ================================================= */}
+
+            <div className="col-xl-3 col-lg-6 col-md-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <small className="text-muted">Total Animals</small>
+
+                      <h3 className="fw-bold mt-2 mb-1">
+                        {loading ? "..." : (dashboard?.totalAnimals ?? 0)}
+                      </h3>
+
+                      <small className="text-warning">Animals Listed</small>
+                    </div>
+
+                    <div
+                      className="rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        backgroundColor: "#fff8e1",
+                      }}
+                    >
+                      🐄
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================
+                            TOTAL ORDERS
+                        ================================================= */}
+
+            <div className="col-xl-3 col-lg-6 col-md-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <small className="text-muted">Total Orders</small>
+
+                      <h3 className="fw-bold mt-2 mb-1">
+                        {loading ? "..." : (dashboard?.totalOrders ?? 0)}
+                      </h3>
+
+                      <small className="text-info">Platform Orders</small>
+                    </div>
+
+                    <div
+                      className="rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "48px",
+                        height: "48px",
+                        backgroundColor: "#e0f7fa",
+                      }}
+                    >
+                      🛒
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =================================================
+                        REGISTRATION + SELLER SUMMARY
                     ================================================= */}
-                    <div className="row g-4 mb-4">
-                        {/* REGISTRATION OVERVIEW */}
-                        <div className="col-xl-8">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-4">
-                                        <h5 className="fw-bold mb-0">
-                                            Registration Overview
-                                        </h5>
 
-                                        <small className="text-muted">
-                                            This month
-                                        </small>
-                                    </div>
+          <div className="row g-4 mb-4">
+            {/* =================================================
+                            REGISTRATION OVERVIEW
+                        ================================================= */}
 
-                                    <div className="row g-3">
-                                        <div className="col-md-4">
-                                            <div
-                                                className="rounded p-4 text-center"
-                                                style={{
-                                                    backgroundColor: "#eef6ff"
-                                                }}
-                                            >
-                                                <div className="fw-bold fs-2 text-primary">
-                                                    128
-                                                </div>
+            <div className="col-xl-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body p-4">
+                  <h5 className="fw-bold mb-4">Registration Overview</h5>
 
-                                                <div className="text-muted">
-                                                    Sellers
-                                                </div>
-                                            </div>
-                                        </div>
+                  <div className="row g-3">
+                    {/* PENDING */}
 
-                                        <div className="col-md-4">
-                                            <div
-                                                className="rounded p-4 text-center"
-                                                style={{
-                                                    backgroundColor: "#effaf1"
-                                                }}
-                                            >
-                                                <div className="fw-bold fs-2 text-success">
-                                                    356
-                                                </div>
+                    <div className="col-md-6">
+                      <div
+                        className="p-3 rounded"
+                        style={{
+                          backgroundColor: "#fff8e1",
+                        }}
+                      >
+                        <small className="text-muted">Pending Sellers</small>
 
-                                                <div className="text-muted">
-                                                    Buyers
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-md-4">
-                                            <div
-                                                className="rounded p-4 text-center"
-                                                style={{
-                                                    backgroundColor: "#fff7e8"
-                                                }}
-                                            >
-                                                <div className="fw-bold fs-2 text-warning">
-                                                    58
-                                                </div>
-
-                                                <div className="text-muted">
-                                                    Pending
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-4">
-                                        <div
-                                            className="progress"
-                                            style={{
-                                                height: "28px",
-                                                borderRadius: "20px"
-                                            }}
-                                        >
-                                            <div
-                                                className="progress-bar bg-primary"
-                                                style={{
-                                                    width: "45%"
-                                                }}
-                                            >
-                                                Sellers
-                                            </div>
-
-                                            <div
-                                                className="progress-bar bg-success"
-                                                style={{
-                                                    width: "35%"
-                                                }}
-                                            >
-                                                Buyers
-                                            </div>
-
-                                            <div
-                                                className="progress-bar bg-warning"
-                                                style={{
-                                                    width: "20%"
-                                                }}
-                                            >
-                                                Pending
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* QUICK ACTIONS */}
-                        <div className="col-xl-4">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4">
-                                        Quick Actions
-                                    </h5>
-
-                                    <div className="d-grid gap-2">
-                                        <button
-                                            type="button"
-                                            className="btn btn-success"
-                                            onClick={() =>
-                                                navigate("/admin/sellers")
-                                            }
-                                        >
-                                            ✓ Approve Sellers
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary"
-                                            onClick={() =>
-                                                navigate("/admin/orders")
-                                            }
-                                        >
-                                            📋 View All Orders
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-warning"
-                                            onClick={() =>
-                                                navigate("/admin/categories")
-                                            }
-                                        >
-                                            ➕ Add New Category
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-dark"
-                                            onClick={() =>
-                                                navigate(
-                                                    "/admin/subscriptions"
-                                                )
-                                            }
-                                        >
-                                            ⚙ Manage Subscriptions
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h4 className="fw-bold mt-2 mb-0">
+                          {loading
+                            ? "..."
+                            : (dashboard?.pendingSellerApprovals ??
+                              sellers.filter(
+                                (seller) =>
+                                  getSellerStatus(seller)
+                                    .toString()
+                                    .toUpperCase() === "PENDING",
+                              ).length)}
+                        </h4>
+                      </div>
                     </div>
 
-                    {/* =================================================
+                    {/* APPROVED */}
+
+                    <div className="col-md-6">
+                      <div
+                        className="p-3 rounded"
+                        style={{
+                          backgroundColor: "#e8f5e9",
+                        }}
+                      >
+                        <small className="text-muted">Approved Sellers</small>
+
+                        <h4 className="fw-bold mt-2 mb-0">
+                          {loading
+                            ? "..."
+                            : (dashboard?.approvedSellers ??
+                              sellers.filter(
+                                (seller) =>
+                                  getSellerStatus(seller)
+                                    .toString()
+                                    .toUpperCase() === "APPROVED",
+                              ).length)}
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* =================================================
+                            SELLER ANIMAL SUMMARY
+                        ================================================= */}
+
+            <div className="col-xl-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body p-4">
+                  <h5 className="fw-bold mb-4">Seller Animal Summary</h5>
+
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <span className="text-muted">Total Sellers</span>
+
+                    <strong>
+                      {loading
+                        ? "..."
+                        : (dashboard?.totalSellers ?? sellers.length)}
+                    </strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <span className="text-muted">Total Animals</span>
+
+                    <strong>
+                      {loading ? "..." : (dashboard?.totalAnimals ?? 0)}
+                    </strong>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-outline-success w-100"
+                    onClick={() => navigate("/admin/sellers")}
+                  >
+                    View Sellers & Animals
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =================================================
                         RECENT REGISTRATIONS
                     ================================================= */}
-                    <div className="row g-4 mb-4">
-                        <div className="col-xl-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
+
+          <div className="row g-4 mb-4">
+            <div className="col-xl-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body p-4">
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="fw-bold mb-0">Recent Registrations</h5>
+
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline-success"
+                      onClick={() => navigate("/admin/sellers")}
+                    >
+                      View All
+                    </button>
+                  </div>
+
+                  <div className="list-group list-group-flush">
+                    {/* LOADING */}
+
+                    {loading && (
+                      <div className="py-4 text-center text-muted">
+                        Loading sellers...
+                      </div>
+                    )}
+
+                    {/* NO SELLERS */}
+
+                    {!loading && sellers.length === 0 && (
+                      <div className="py-4 text-center text-muted">
+                        No sellers found.
+                      </div>
+                    )}
+
+                    {/* SELLERS */}
+
+                    {!loading &&
+                      sellers.slice(0, 5).map((seller, index) => {
+                        const sellerId = getSellerId(seller);
+
+                        const sellerName = getSellerName(seller);
+
+                        const sellerEmail = getSellerEmail(seller);
+
+                        const sellerStatus = getSellerStatus(seller);
+
+                        return (
+                          <div
+                            key={sellerId || index}
+                            className="list-group-item px-0 py-3 d-flex justify-content-between align-items-center"
+                          >
+                            <div className="d-flex align-items-center gap-3">
+                              <div
+                                className="rounded-circle d-flex align-items-center justify-content-center"
                                 style={{
-                                    borderRadius: "14px"
+                                  width: "42px",
+                                  height: "42px",
+                                  backgroundColor: "#e8f5e9",
                                 }}
-                            >
-                                <div className="card-body p-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 className="fw-bold mb-0">
-                                            Recent Registrations
-                                        </h5>
+                              >
+                                👨‍🌾
+                              </div>
 
-                                        <button
-                                            type="button"
-                                            className="btn btn-sm btn-outline-success"
-                                            onClick={() =>
-                                                navigate("/admin/sellers")
-                                            }
-                                        >
-                                            View All
-                                        </button>
-                                    </div>
+                              <div>
+                                <div className="fw-semibold">{sellerName}</div>
 
-                                    <div className="list-group list-group-flush">
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Rahul Farms
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Seller
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    rahulf farms@gmail.com
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-warning">
-                                                Pending
-                                            </span>
-                                        </div>
-
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Green Valley Farm
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Seller
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    greenvalley@gmail.com
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-success">
-                                                Verified
-                                            </span>
-                                        </div>
-
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Paws & Claws
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Seller
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    pawsclaws@gmail.com
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-success">
-                                                Verified
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <small className="text-muted">
+                                  {sellerEmail}
+                                </small>
+                              </div>
                             </div>
-                        </div>
 
-                        {/* =================================================
-                            RECENT ORDERS
-                        ================================================= */}
-                        <div className="col-xl-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 className="fw-bold mb-0">
-                                            Recent Orders
-                                        </h5>
+                            <div className="d-flex align-items-center gap-2">
+                              <span className={getStatusClass(sellerStatus)}>
+                                {sellerStatus}
+                              </span>
 
-                                        <button
-                                            type="button"
-                                            className="btn btn-sm btn-outline-success"
-                                            onClick={() =>
-                                                navigate("/admin/orders")
-                                            }
-                                        >
-                                            View All
-                                        </button>
-                                    </div>
-
-                                    <div className="list-group list-group-flush">
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Order #101
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Labrador Puppy
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    ₹15,000
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-success">
-                                                Paid
-                                            </span>
-                                        </div>
-
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Order #102
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Persian Cat
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    ₹20,000
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-primary">
-                                                Confirmed
-                                            </span>
-                                        </div>
-
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Order #103
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Golden Retriever
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    ₹18,000
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-warning">
-                                                Pending
-                                            </span>
-                                        </div>
-
-                                        <div className="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>
-                                                    Order #104
-                                                </strong>
-
-                                                <div className="small text-muted">
-                                                    Beagle Puppy
-                                                </div>
-
-                                                <div className="small text-muted">
-                                                    ₹12,000
-                                                </div>
-                                            </div>
-
-                                            <span className="badge bg-success">
-                                                Paid
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={() => handleViewSeller(seller)}
+                              >
+                                View
+                              </button>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* =================================================
-                        LOWER DASHBOARD CARDS
-                    ================================================= */}
-                    <div className="row g-4">
-                        {/* SUBSCRIPTION OVERVIEW */}
-                        <div className="col-xl-4 col-lg-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4">
-                                        Subscription Overview
-                                    </h5>
-
-                                    <div className="row align-items-center">
-                                        <div className="col-6">
-                                            <div
-                                                className="mx-auto rounded-circle"
-                                                style={{
-                                                    width: "120px",
-                                                    height: "120px",
-                                                    background:
-                                                        "conic-gradient(#198754 0deg 212deg, #0d6efd 212deg 360deg)",
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    justifyContent: "center"
-                                                }}
-                                            >
-                                                <div
-                                                    className="rounded-circle bg-white d-flex align-items-center justify-content-center"
-                                                    style={{
-                                                        width: "75px",
-                                                        height: "75px"
-                                                    }}
-                                                >
-                                                    <strong>
-                                                        76
-                                                    </strong>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-6">
-                                            <div className="fw-bold fs-4">
-                                                76
-                                            </div>
-
-                                            <small className="text-muted">
-                                                Active subscriptions
-                                            </small>
-
-                                            <div className="mt-3 small">
-                                                🔵 6 Months — 45
-                                            </div>
-
-                                            <div className="small">
-                                                🟢 1 Year — 31
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* REVENUE OVERVIEW */}
-                        <div className="col-xl-4 col-lg-6">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4">
-                                        Revenue Overview
-                                    </h5>
-
-                                    <div className="d-flex align-items-end justify-content-between gap-2">
-                                        {[60, 100, 125, 155, 190, 165].map(
-                                            (height, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="d-flex flex-column align-items-center"
-                                                    style={{
-                                                        width: "14%"
-                                                    }}
-                                                >
-                                                    <div
-                                                        className="bg-primary rounded-top"
-                                                        style={{
-                                                            width: "100%",
-                                                            height: `${height}px`,
-                                                            opacity: 0.8
-                                                        }}
-                                                    />
-                                                    <small className="mt-2 text-muted">
-                                                        {
-                                                            [
-                                                                "Jan",
-                                                                "Feb",
-                                                                "Mar",
-                                                                "Apr",
-                                                                "May",
-                                                                "Jun"
-                                                            ][index]
-                                                        }
-                                                    </small>
-                                                </div>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* QUICK NAVIGATION */}
-                        <div className="col-xl-4">
-                            <div
-                                className="card border-0 shadow-sm h-100"
-                                style={{
-                                    borderRadius: "14px"
-                                }}
-                            >
-                                <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4">
-                                        Admin Management
-                                    </h5>
-
-                                    <div className="d-grid gap-2">
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-success"
-                                            onClick={() =>
-                                                navigate("/admin/sellers")
-                                            }
-                                        >
-                                            Seller Management
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-primary"
-                                            onClick={() =>
-                                                navigate("/admin/buyers")
-                                            }
-                                        >
-                                            Buyer Management
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-dark"
-                                            onClick={() =>
-                                                navigate("/admin/animals")
-                                            }
-                                        >
-                                            Animal Management
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-warning"
-                                            onClick={() =>
-                                                navigate("/admin/categories")
-                                            }
-                                        >
-                                            Category Management
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
+              </div>
             </div>
+
+            {/* =================================================
+                            QUICK ACTIONS
+                        ================================================= */}
+
+            <div className="col-xl-6">
+              <div
+                className="card border-0 shadow-sm h-100"
+                style={{
+                  borderRadius: "14px",
+                }}
+              >
+                <div className="card-body p-4">
+                  <h5 className="fw-bold mb-4">Quick Actions</h5>
+
+                  <div className="d-grid gap-2">
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={() => navigate("/admin/sellers")}
+                    >
+                      ✓ Approve Sellers
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => navigate("/admin/orders")}
+                    >
+                      📦 View Orders
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-success"
+                      onClick={() => navigate("/admin/animals")}
+                    >
+                      🐄 Animal Management
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-warning"
+                      onClick={() => navigate("/admin/categories")}
+                    >
+                      Category Management
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-primary"
+                      onClick={() => navigate("/admin/subscriptions")}
+                    >
+                      ⚙ Manage Subscriptions
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* =================================================
+                        ALL SELLERS PREVIEW
+                    ================================================= */}
+
+          <div className="card border-0 shadow-sm">
+            <div className="card-body p-4">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h5 className="fw-bold mb-1">Sellers</h5>
+
+                  <small className="text-muted">
+                    Sellers currently registered in the database
+                  </small>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={() => navigate("/admin/sellers")}
+                >
+                  Manage Sellers
+                </button>
+              </div>
+
+              {/* LOADING */}
+
+              {loading && (
+                <div className="text-center py-4 text-muted">
+                  Loading sellers...
+                </div>
+              )}
+
+              {/* EMPTY */}
+
+              {!loading && sellers.length === 0 && (
+                <div className="text-center py-4 text-muted">
+                  No sellers available.
+                </div>
+              )}
+
+              {/* SELLER TABLE */}
+
+              {!loading && sellers.length > 0 && (
+                <div className="table-responsive">
+                  <table className="table align-middle">
+                    <thead>
+                      <tr>
+                        <th>Seller</th>
+
+                        <th>Email</th>
+
+                        <th>Status</th>
+
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {sellers.map((seller, index) => {
+                        const sellerId = getSellerId(seller);
+
+                        const sellerName = getSellerName(seller);
+
+                        const sellerEmail = getSellerEmail(seller);
+
+                        const sellerStatus = getSellerStatus(seller);
+
+                        return (
+                          <tr key={sellerId || index}>
+                            <td>
+                              <strong>{sellerName}</strong>
+                            </td>
+
+                            <td>{sellerEmail}</td>
+
+                            <td>
+                              <span className={getStatusClass(sellerStatus)}>
+                                {sellerStatus}
+                              </span>
+                            </td>
+
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-primary"
+                                onClick={() => handleViewSeller(seller)}
+                              >
+                                View Seller
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default AdminDashboard;

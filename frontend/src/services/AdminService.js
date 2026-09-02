@@ -37,6 +37,26 @@ const AdminService = {
     },
 
     // =================================================
+    // GET ADMIN DASHBOARD DATA
+    // =================================================
+
+    getDashboard: async () => {
+        return axios.get(
+            `${BASE_URL}/admin/dashboard`
+        );
+    },
+
+    // =================================================
+    // GET SELLER DETAILS WITH ANIMALS
+    // =================================================
+
+    getAdminSellerById: async (id) => {
+        return axios.get(
+            `${BASE_URL}/admin/sellers/${id}`
+        );
+    },
+
+    // =================================================
     // GET SELLER BY ID
     // =================================================
 
@@ -147,6 +167,11 @@ const AdminService = {
             `${BASE_URL}/category/delete/${id}`
         );
     }
+
 };
+
+// =====================================================
+// EXPORT
+// =====================================================
 
 export default AdminService;

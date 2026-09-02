@@ -42,12 +42,36 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRegister from "./pages/admin/AdminRegister";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
+// =====================================================
+// ADMIN SELLER
+// =====================================================
+
+import ManageSeller from "./pages/admin/ManageSeller";
+import AdminSellerDetails from "./pages/admin/AdminSellerDetails";
+
+// =====================================================
+// ADMIN OTHER MODULES
+// =====================================================
+
+import AdminBuyers from "./pages/admin/AdminBuyers";
+import ManageAnimals from "./pages/admin/ManageAnimals";
+import ManageCategories from "./pages/admin/ManageCategories";
+import AdminSubscriptionPlans from "./pages/admin/AdminSubscriptionPlans";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminPayments from "./pages/admin/AdminPayments";
+import AdminReports from "./pages/admin/AdminReports";
+import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminSettings from "./pages/admin/AdminSettings";
+
+
 function App() {
+
   return (
+
     <Routes>
 
       {/* =================================================
-                    PUBLIC ROUTES
+                          PUBLIC ROUTES
       ================================================= */}
 
       <Route
@@ -75,8 +99,9 @@ function App() {
         element={<AnimalDetails />}
       />
 
+
       {/* =================================================
-                    SELLER ROUTES
+                          SELLER ROUTES
       ================================================= */}
 
       <Route
@@ -89,6 +114,7 @@ function App() {
         element={<SellerRegister />}
       />
 
+
       {/* =================================================
                     SELLER FORGOT PASSWORD
       ================================================= */}
@@ -97,6 +123,7 @@ function App() {
         path="/seller/forgot-password"
         element={<ForgotPassword />}
       />
+
 
       <Route
         path="/seller/dashboard"
@@ -143,24 +170,117 @@ function App() {
         }
       />
 
+
       {/* =================================================
-                    ADMIN ROUTES
+                          ADMIN ROUTES
       ================================================= */}
+
+      {/* ADMIN LOGIN */}
 
       <Route
         path="/admin/login"
         element={<AdminLogin />}
       />
 
+      {/* ADMIN REGISTER */}
+
       <Route
         path="/admin/register"
         element={<AdminRegister />}
       />
 
-      {/* ADMIN DASHBOARD - ADDED */}
+      {/* ADMIN DASHBOARD */}
+
       <Route
         path="/admin/dashboard"
         element={<AdminDashboard />}
+      />
+
+
+      {/* =================================================
+                       ADMIN SELLER MODULE
+      ================================================= */}
+
+      {/* ALL SELLERS LIST */}
+
+      <Route
+        path="/admin/sellers"
+        element={<ManageSeller />}
+      />
+
+      {/* PARTICULAR SELLER DETAILS */}
+
+      <Route
+        path="/admin/sellers/:id"
+        element={<AdminSellerDetails />}
+      />
+
+
+      {/* =================================================
+                       ADMIN OTHER MODULES
+      ================================================= */}
+
+      {/* BUYERS */}
+
+      <Route
+        path="/admin/buyers"
+        element={<AdminBuyers />}
+      />
+
+      {/* ANIMALS */}
+
+      <Route
+        path="/admin/animals"
+        element={<ManageAnimals />}
+      />
+
+      {/* CATEGORIES */}
+
+      <Route
+        path="/admin/categories"
+        element={<ManageCategories />}
+      />
+
+      {/* SUBSCRIPTION PLANS */}
+
+      <Route
+        path="/admin/subscriptions"
+        element={<AdminSubscriptionPlans />}
+      />
+
+      {/* ORDERS */}
+
+      <Route
+        path="/admin/orders"
+        element={<AdminOrders />}
+      />
+
+      {/* PAYMENTS */}
+
+      <Route
+        path="/admin/payments"
+        element={<AdminPayments />}
+      />
+
+      {/* REPORTS */}
+
+      <Route
+        path="/admin/reports"
+        element={<AdminReports />}
+      />
+
+      {/* NOTIFICATIONS */}
+
+      <Route
+        path="/admin/notifications"
+        element={<AdminNotifications />}
+      />
+
+      {/* SETTINGS */}
+
+      <Route
+        path="/admin/settings"
+        element={<AdminSettings />}
       />
 
     </Routes>

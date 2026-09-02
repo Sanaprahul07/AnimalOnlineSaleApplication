@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AdminSidebar from "../../components/admin/AdminSidebar";
+import AdminSidebar from "../../components/Admin/AdminSidebar";
 
 function ManageCategories() {
     const navigate = useNavigate();

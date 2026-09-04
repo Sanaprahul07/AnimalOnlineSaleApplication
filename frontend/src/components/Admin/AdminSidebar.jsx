@@ -46,6 +46,14 @@ function AdminSidebar() {
         <button
           type="button"
           className="btn btn-light w-100 text-start mb-2"
+          onClick={() => navigate("/admin/sellers")}
+        >
+          👨‍🌾 Sellers
+        </button>
+
+        <button
+          type="button"
+          className="btn btn-light w-100 text-start mb-2"
           onClick={() => navigate("/admin/categories")}
         >
           🗂️ Categories

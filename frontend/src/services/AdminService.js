@@ -166,8 +166,62 @@ const AdminService = {
         return axios.delete(
             `${BASE_URL}/category/delete/${id}`
         );
-    }
+    },
 
+    // =================================================
+    // SUBSCRIPTION PLAN MODULE
+    // =================================================
+
+    // GET ALL SUBSCRIPTION PLANS
+    getAllSubscriptionPlans: async () => {
+        return axios.get(
+            `${BASE_URL}/admin/subscriptions/plans`
+        );
+    },
+
+    // GET SUBSCRIPTION PLAN BY ID
+    getSubscriptionPlanById: async (id) => {
+        return axios.get(
+            `${BASE_URL}/admin/subscriptions/plans/${id}`
+        );
+    },
+
+    // ADD SUBSCRIPTION PLAN
+    addSubscriptionPlan: async (planData) => {
+        return axios.post(
+            `${BASE_URL}/admin/subscriptions/plans`,
+            planData
+        );
+    },
+
+    // UPDATE SUBSCRIPTION PLAN
+    updateSubscriptionPlan: async (id, planData) => {
+        return axios.put(
+            `${BASE_URL}/admin/subscriptions/plans/${id}`,
+            planData
+        );
+    },
+
+    // ACTIVATE SUBSCRIPTION PLAN
+    activateSubscriptionPlan: async (id) => {
+        return axios.put(
+            `${BASE_URL}/admin/subscriptions/plans/${id}/activate`
+        );
+    },
+
+    // DEACTIVATE SUBSCRIPTION PLAN
+    deactivateSubscriptionPlan: async (id) => {
+        return axios.put(
+            `${BASE_URL}/admin/subscriptions/plans/${id}/deactivate`
+        );
+    },
+
+    // DELETE SUBSCRIPTION PLAN
+    deleteSubscriptionPlan: async (id) => {
+        return axios.delete(
+            `${BASE_URL}/admin/subscriptions/plans/${id}`
+        );
+    }
 };
 
 // =====================================================

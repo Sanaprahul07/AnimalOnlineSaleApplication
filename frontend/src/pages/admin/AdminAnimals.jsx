@@ -4,434 +4,606 @@ import AdminService from "../../services/AdminService";
 
 function AdminAnimals() {
 
-  const [animals, setAnimals] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
+    // =====================================================
+    // STATES
+    // =====================================================
 
-  useEffect(() => {
+    const [animals, setAnimals] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    const loadAnimals = async () => {
 
-      try {
+    // =====================================================
+    // LOAD ANIMALS FROM DATABASE
+    // =====================================================
 
-        setLoading(true);
-        setErrorMessage("");
+    useEffect(() => {
 
-        const response = await AdminService.getAllAnimals();
+        const loadAnimals = async () => {
 
-        const data = response.data;
+            try {
 
-        if (Array.isArray(data)) {
+                setLoading(true);
+                setError("");
 
-          setAnimals(data);
+                const response =
+                    await AdminService.getAllAnimals();
 
-        } else if (data?.data && Array.isArray(data.data)) {
+                console.log(
+                    "Admin Animals API Response:",
+                    response.data
+                );
 
-          setAnimals(data.data);
+                if (Array.isArray(response.data)) {
 
-        } else {
+                    setAnimals(response.data);
 
-          setAnimals([]);
+                } else {
+
+                    setAnimals([]);
+
+                }
+
+            } catch (err) {
+
+                console.error(
+                    "Admin Animals Error:",
+                    err
+                );
+
+                setError(
+                    err?.response?.data?.message ||
+                    "Unable to load animals from database."
+                );
+
+                setAnimals([]);
+
+            } finally {
+
+                setLoading(false);
+
+            }
+
+        };
+
+        loadAnimals();
+
+    }, []);
+
+
+    // =====================================================
+    // ANIMAL IMAGE
+    // =====================================================
+
+    const getAnimalImage = (animal) => {
+
+        const image =
+            animal.imageUrl ||
+            animal.frontImageUrl ||
+            animal.animalImage;
+
+        if (!image) {
+            return null;
         }
 
-      } catch (error) {
+        if (
+            image.startsWith("http://") ||
+            image.startsWith("https://")
+        ) {
+            return image;
+        }
 
-        console.error("Animals Loading Error:", error);
+        return `http://localhost:8080${
+            image.startsWith("/")
+                ? ""
+                : "/"
+        }${image}`;
 
-        setErrorMessage(
-          error.response?.data?.message ||
-          "Unable to load animals."
-        );
-
-      } finally {
-
-        setLoading(false);
-      }
     };
 
-    loadAnimals();
 
-  }, []);
+    // =====================================================
+    // FORMAT PRICE
+    // =====================================================
 
-  // =========================================
-  // GET ANIMAL IMAGE
-  // =========================================
+    const formatPrice = (price) => {
 
-  const getAnimalImage = (animal) => {
+        if (
+            price === null ||
+            price === undefined ||
+            price === ""
+        ) {
+            return "-";
+        }
 
-    const image =
-      animal.frontImageUrl ||
-      animal.imageUrl ||
-      animal.sideImageUrl ||
-      animal.backImageUrl;
+        return `₹${Number(price).toLocaleString("en-IN")}`;
 
-    if (!image) {
-      return "https://via.placeholder.com/100x80?text=Animal";
-    }
+    };
 
-    // If backend already returns complete URL
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://")
-    ) {
-      return image;
-    }
 
-    // If image is stored as backend path
-    return `http://localhost:8080${image.startsWith("/") ? "" : "/"}${image}`;
-  };
+    // =====================================================
+    // STATUS
+    // =====================================================
 
-  // =========================================
-  // AVAILABLE STATUS
-  // =========================================
+    const getStatus = (available) => {
 
-  const getAvailableStatus = (available) => {
+        if (available === true) {
 
-    if (available === true) {
-      return (
-        <span className="badge bg-success">
-          AVAILABLE
-        </span>
-      );
-    }
+            return (
+                <span className="badge bg-success">
+                    Available
+                </span>
+            );
 
-    return (
-      <span className="badge bg-secondary">
-        NOT AVAILABLE
-      </span>
-    );
-  };
+        }
 
-  // =========================================
-  // APPROVAL STATUS
-  // =========================================
+        return (
+            <span className="badge bg-danger">
+                Sold
+            </span>
+        );
 
-  const getApprovalStatus = (status) => {
+    };
 
-    const value = status?.toUpperCase();
 
-    if (value === "APPROVED") {
+    // =====================================================
+    // LOADING
+    // =====================================================
 
-      return (
-        <span className="badge bg-success">
-          APPROVED
-        </span>
-      );
-    }
+    if (loading) {
 
-    if (value === "REJECTED") {
+        return (
 
-      return (
-        <span className="badge bg-danger">
-          REJECTED
-        </span>
-      );
-    }
+            <div className="d-flex">
 
-    return (
-      <span className="badge bg-warning text-dark">
-        PENDING
-      </span>
-    );
-  };
+                <AdminSidebar />
 
-  return (
+                <div
+                    className="flex-grow-1 p-4"
+                    style={{
+                        marginLeft: "250px"
+                    }}
+                >
 
-    <div
-      className="d-flex"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fc"
-      }}
-    >
+                    <div className="text-center py-5">
 
-      <AdminSidebar />
+                        <div
+                            className="spinner-border text-success"
+                            role="status"
+                        >
+                        </div>
 
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "calc(100% - 250px)"
-        }}
-      >
+                        <p className="mt-3">
+                            Loading animals from database...
+                        </p>
 
-        {/* =========================================
-            HEADER
-        ========================================= */}
-
-        <div className="bg-white border-bottom px-4 py-3">
-
-          <h3 className="fw-bold mb-1">
-            Animal Management
-          </h3>
-
-          <small className="text-muted">
-            All animals registered by sellers
-          </small>
-
-        </div>
-
-        {/* =========================================
-            CONTENT
-        ========================================= */}
-
-        <div className="p-4">
-
-          {errorMessage && (
-
-            <div className="alert alert-danger">
-              {errorMessage}
-            </div>
-
-          )}
-
-          <div className="card border-0 shadow-sm">
-
-            <div className="card-body">
-
-              {/* =========================================
-                  LOADING
-              ========================================= */}
-
-              {loading ? (
-
-                <div className="text-center py-5">
-
-                  <div
-                    className="spinner-border text-success"
-                    role="status"
-                  />
-
-                  <p className="mt-3 text-muted">
-                    Loading animals...
-                  </p>
+                    </div>
 
                 </div>
-
-              ) : animals.length === 0 ? (
-
-                <div className="alert alert-info mb-0">
-
-                  No animals found.
-
-                </div>
-
-              ) : (
-
-                <div className="table-responsive">
-
-                  <table className="table table-hover align-middle">
-
-                    <thead className="table-light">
-
-                      <tr>
-
-                        <th>ID</th>
-
-                        <th>Animal</th>
-
-                        <th>Category</th>
-
-                        <th>Breed</th>
-
-                        <th>Age</th>
-
-                        <th>Price</th>
-
-                        <th>Seller</th>
-
-                        <th>Seller Contact</th>
-
-                        <th>Location</th>
-
-                        <th>Status</th>
-
-                        <th>Approval</th>
-
-                      </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                      {animals.map((animal) => (
-
-                        <tr key={animal.id}>
-
-                          {/* ID */}
-
-                          <td>
-                            <strong>
-                              #{animal.id}
-                            </strong>
-                          </td>
-
-                          {/* ANIMAL */}
-
-                          <td>
-
-                            <div
-                              className="d-flex align-items-center"
-                              style={{
-                                minWidth: "180px"
-                              }}
-                            >
-
-                              <img
-                                src={getAnimalImage(animal)}
-                                alt={animal.animalName || "Animal"}
-                                style={{
-                                  width: "75px",
-                                  height: "60px",
-                                  objectFit: "cover",
-                                  borderRadius: "8px",
-                                  marginRight: "12px"
-                                }}
-                                onError={(e) => {
-                                  e.currentTarget.src =
-                                    "https://via.placeholder.com/100x80?text=Animal";
-                                }}
-                              />
-
-                              <div>
-
-                                <div className="fw-bold">
-                                  {animal.animalName || "-"}
-                                </div>
-
-                                <small className="text-muted">
-                                  {animal.gender || "-"}
-                                </small>
-
-                              </div>
-
-                            </div>
-
-                          </td>
-
-                          {/* CATEGORY */}
-
-                          <td>
-                            {animal.category || "-"}
-                          </td>
-
-                          {/* BREED */}
-
-                          <td>
-                            {animal.breed || "-"}
-                          </td>
-
-                          {/* AGE */}
-
-                          <td>
-                            {animal.age != null
-                              ? `${animal.age} Years`
-                              : "-"}
-                          </td>
-
-                          {/* PRICE */}
-
-                          <td>
-
-                            <strong>
-                              {animal.price != null
-                                ? `₹${animal.price}`
-                                : "-"}
-                            </strong>
-
-                          </td>
-
-                          {/* SELLER */}
-
-                          <td>
-
-                            <div
-                              className="fw-semibold"
-                              style={{
-                                minWidth: "150px"
-                              }}
-                            >
-                              {animal.sellerName || "-"}
-                            </div>
-
-                            <small className="text-muted">
-                              Seller ID:{" "}
-                              {animal.sellerId || "-"}
-                            </small>
-
-                          </td>
-
-                          {/* SELLER CONTACT */}
-
-                          <td>
-
-                            <div>
-                              {animal.sellerMobile || "-"}
-                            </div>
-
-                            <small className="text-muted">
-                              {animal.sellerEmail || "-"}
-                            </small>
-
-                          </td>
-
-                          {/* LOCATION */}
-
-                          <td>
-
-                            <div
-                              style={{
-                                minWidth: "150px"
-                              }}
-                            >
-                              {animal.sellerLocation ||
-                                animal.location ||
-                                "-"}
-                            </div>
-
-                          </td>
-
-                          {/* AVAILABLE */}
-
-                          <td>
-
-                            {getAvailableStatus(
-                              animal.available
-                            )}
-
-                          </td>
-
-                          {/* APPROVAL */}
-
-                          <td>
-
-                            {getApprovalStatus(
-                              animal.approvalStatus
-                            )}
-
-                          </td>
-
-                        </tr>
-
-                      ))}
-
-                    </tbody>
-
-                  </table>
-
-                </div>
-
-              )}
 
             </div>
 
-          </div>
+        );
+
+    }
+
+
+    // =====================================================
+    // MAIN PAGE
+    // =====================================================
+
+    return (
+
+        <div
+            className="d-flex"
+            style={{
+                minHeight: "100vh",
+                backgroundColor: "#f7f8fc"
+            }}
+        >
+
+            {/* =================================================
+                ADMIN SIDEBAR
+            ================================================= */}
+
+            <AdminSidebar />
+
+
+            {/* =================================================
+                MAIN CONTENT
+            ================================================= */}
+
+            <div
+                className="flex-grow-1"
+                style={{
+                    marginLeft: "250px"
+                }}
+            >
+
+                {/* =================================================
+                    PAGE HEADER
+                ================================================= */}
+
+                <div
+                    className="bg-white border-bottom px-4 py-3"
+                >
+
+                    <h3 className="mb-1 fw-bold">
+                        Manage Animals
+                    </h3>
+
+                    <p className="mb-0 text-muted">
+                        Animals available in database.
+                    </p>
+
+                </div>
+
+
+                {/* =================================================
+                    PAGE CONTENT
+                ================================================= */}
+
+                <div className="p-4">
+
+
+                    {/* =================================================
+                        ERROR
+                    ================================================= */}
+
+                    {error && (
+
+                        <div className="alert alert-danger">
+
+                            {error}
+
+                        </div>
+
+                    )}
+
+
+                    {/* =================================================
+                        ANIMAL COUNT
+                    ================================================= */}
+
+                    <div
+                        className="d-flex justify-content-end mb-3"
+                    >
+
+                        <strong>
+                            Total Animals: {animals.length}
+                        </strong>
+
+                    </div>
+
+
+                    {/* =================================================
+                        ANIMAL TABLE
+                    ================================================= */}
+
+                    <div className="card border-0 shadow-sm">
+
+                        <div className="card-body p-0">
+
+                            <div className="table-responsive">
+
+                                <table
+                                    className="table table-hover align-middle mb-0"
+                                >
+
+                                    <thead className="table-light">
+
+                                        <tr>
+
+                                            <th>
+                                                ID
+                                            </th>
+
+                                            <th>
+                                                Animal
+                                            </th>
+
+                                            <th>
+                                                Category
+                                            </th>
+
+                                            <th>
+                                                Breed
+                                            </th>
+
+                                            <th>
+                                                Age
+                                            </th>
+
+                                            <th>
+                                                Price
+                                            </th>
+
+                                            <th>
+                                                Seller
+                                            </th>
+
+                                            <th>
+                                                Location
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {animals.length === 0 ? (
+
+                                            <tr>
+
+                                                <td
+                                                    colSpan="9"
+                                                    className="text-center py-5"
+                                                >
+
+                                                    No animals found
+                                                    in database.
+
+                                                </td>
+
+                                            </tr>
+
+                                        ) : (
+
+                                            animals.map((animal) => (
+
+                                                <tr
+                                                    key={
+                                                        animal.animalId
+                                                    }
+                                                >
+
+                                                    {/* =================================
+                                                        DATABASE ID
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        <strong>
+                                                            {
+                                                                animal.animalId
+                                                            }
+                                                        </strong>
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        ANIMAL
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        <div
+                                                            className="d-flex align-items-center"
+                                                        >
+
+                                                            {getAnimalImage(
+                                                                animal
+                                                            ) && (
+
+                                                                <img
+                                                                    src={getAnimalImage(
+                                                                        animal
+                                                                    )}
+                                                                    alt={
+                                                                        animal.animalName ||
+                                                                        "Animal"
+                                                                    }
+                                                                    style={{
+                                                                        width: "60px",
+                                                                        height: "50px",
+                                                                        objectFit:
+                                                                            "cover",
+                                                                        borderRadius:
+                                                                            "8px",
+                                                                        marginRight:
+                                                                            "10px"
+                                                                    }}
+                                                                />
+
+                                                            )}
+
+                                                            <div>
+
+                                                                <div className="fw-bold">
+
+                                                                    {
+                                                                        animal.animalName ||
+                                                                        "-"
+                                                                    }
+
+                                                                </div>
+
+                                                                <small className="text-muted">
+
+                                                                    {
+                                                                        animal.gender ||
+                                                                        "-"
+                                                                    }
+
+                                                                </small>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        CATEGORY
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        {
+                                                            animal.categoryName ||
+                                                            "-"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        BREED
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        {
+                                                            animal.breed ||
+                                                            "-"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        AGE
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        {
+                                                            animal.age !==
+                                                                null &&
+                                                            animal.age !==
+                                                                undefined
+                                                                ? `${animal.age} Years`
+                                                                : "-"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        PRICE
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        <strong className="text-success">
+
+                                                            {
+                                                                formatPrice(
+                                                                    animal.price
+                                                                )
+                                                            }
+
+                                                        </strong>
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        SELLER
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        <div className="fw-semibold">
+
+                                                            {
+                                                                animal.sellerName ||
+                                                                "-"
+                                                            }
+
+                                                        </div>
+
+                                                        {animal.sellerId && (
+
+                                                            <small className="text-muted">
+
+                                                                Seller ID:{" "}
+                                                                {
+                                                                    animal.sellerId
+                                                                }
+
+                                                            </small>
+
+                                                        )}
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        LOCATION
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        {
+                                                            animal.location ||
+                                                            "-"
+                                                        }
+
+                                                    </td>
+
+
+                                                    {/* =================================
+                                                        STATUS
+                                                    ================================= */}
+
+                                                    <td>
+
+                                                        {
+                                                            getStatus(
+                                                                animal.available
+                                                            )
+                                                        }
+
+                                                    </td>
+
+                                                </tr>
+
+                                            ))
+
+                                        )}
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* =================================================
+                        FOOTER COUNT
+                    ================================================= */}
+
+                    <div className="mt-3 text-muted">
+
+                        Showing{" "}
+                        <strong>
+                            {animals.length}
+                        </strong>{" "}
+                        animals from database.
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-      </div>
+    );
 
-    </div>
-  );
 }
 
 export default AdminAnimals;

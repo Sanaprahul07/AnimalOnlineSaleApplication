@@ -1,655 +1,703 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/Admin/AdminSidebar";
-import axios from "axios";
+import AdminService from "../../services/AdminService";
 
 function AdminPayments() {
 
-  const [payments, setPayments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+    const [payments, setPayments] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [message, setMessage] = useState("");
 
-  const BASE_URL = "http://localhost:8080/api/payments";
+    // =====================================================
+    // LOAD PENDING PAYMENTS
+    // =====================================================
 
-  // =====================================================
-  // LOAD PENDING PAYMENTS
-  // =====================================================
+    const loadPayments = async () => {
 
-  const loadPayments = async () => {
+        try {
 
-    try {
+            setLoading(true);
+            setError("");
 
-      setLoading(true);
-      setError("");
+            const response =
+                await AdminService.getPendingPayments();
 
-      const response = await axios.get(
-        `${BASE_URL}/admin/pending`
-      );
+            setPayments(response.data || []);
 
-      setPayments(response.data || []);
+        } catch (err) {
 
-    } catch (err) {
+            console.error(
+                "Get Pending Payments Error:",
+                err
+            );
 
-      console.error(
-        "Get Pending Payments Error:",
-        err
-      );
+            setError(
+                err.response?.data?.message ||
+                "Failed to load pending payments."
+            );
 
-      setError(
-        err.response?.data?.message ||
-        "Failed to load pending payments."
-      );
+        } finally {
 
-    } finally {
+            setLoading(false);
+        }
+    };
 
-      setLoading(false);
-    }
-  };
+    // =====================================================
+    // LOAD ON PAGE OPEN
+    // =====================================================
 
-  // =====================================================
-  // LOAD ON PAGE OPEN
-  // =====================================================
+    useEffect(() => {
+        loadPayments();
+    }, []);
 
-  useEffect(() => {
+    // =====================================================
+    // APPROVE PAYMENT
+    // =====================================================
 
-    loadPayments();
+    const handleApprove = async (paymentId) => {
 
-  }, []);
+        const confirmApprove =
+            window.confirm(
+                "Are you sure you want to approve this payment?"
+            );
 
-  // =====================================================
-  // APPROVE PAYMENT
-  // =====================================================
+        if (!confirmApprove) {
+            return;
+        }
 
-  const handleApprove = async (paymentId) => {
+        try {
 
-    const confirmApprove = window.confirm(
-      "Are you sure you want to approve this payment?"
-    );
+            setActionLoading(true);
+            setError("");
+            setMessage("");
 
-    if (!confirmApprove) {
-      return;
-    }
+            await AdminService.approveSellerPayment(
+                paymentId
+            );
 
-    try {
+            setMessage(
+                "Payment approved successfully."
+            );
 
-      setActionLoading(true);
-      setError("");
-      setMessage("");
+            // Remove approved payment
+            // from pending list
+            setPayments((prevPayments) =>
+                prevPayments.filter(
+                    (payment) =>
+                        payment.id !== paymentId
+                )
+            );
 
-      await axios.put(
-        `${BASE_URL}/admin/${paymentId}/approve`
-      );
+        } catch (err) {
 
-      setMessage(
-        "Payment approved successfully."
-      );
+            console.error(
+                "Approve Payment Error:",
+                err
+            );
 
-      // Remove approved payment from pending list
-      setPayments((prevPayments) =>
-        prevPayments.filter(
-          (payment) => payment.id !== paymentId
-        )
-      );
+            setError(
+                err.response?.data?.message ||
+                "Failed to approve payment."
+            );
 
-    } catch (err) {
+        } finally {
 
-      console.error(
-        "Approve Payment Error:",
-        err
-      );
+            setActionLoading(false);
+        }
+    };
 
-      setError(
-        err.response?.data?.message ||
-        "Failed to approve payment."
-      );
+    // =====================================================
+    // REJECT PAYMENT
+    // =====================================================
 
-    } finally {
+    const handleReject = async (paymentId) => {
+
+        const confirmReject =
+            window.confirm(
+                "Are you sure you want to reject this payment?"
+            );
+
+        if (!confirmReject) {
+            return;
+        }
 
-      setActionLoading(false);
-    }
-  };
+        try {
 
-  // =====================================================
-  // REJECT PAYMENT
-  // =====================================================
-
-  const handleReject = async (paymentId) => {
-
-    const confirmReject = window.confirm(
-      "Are you sure you want to reject this payment?"
-    );
-
-    if (!confirmReject) {
-      return;
-    }
-
-    try {
-
-      setActionLoading(true);
-      setError("");
-      setMessage("");
-
-      await axios.put(
-        `${BASE_URL}/admin/${paymentId}/reject`
-      );
-
-      setMessage(
-        "Payment rejected successfully."
-      );
-
-      // Remove rejected payment from pending list
-      setPayments((prevPayments) =>
-        prevPayments.filter(
-          (payment) => payment.id !== paymentId
-        )
-      );
-
-    } catch (err) {
-
-      console.error(
-        "Reject Payment Error:",
-        err
-      );
-
-      setError(
-        err.response?.data?.message ||
-        "Failed to reject payment."
-      );
-
-    } finally {
-
-      setActionLoading(false);
-    }
-  };
-
-  // =====================================================
-  // FORMAT DATE
-  // =====================================================
-
-  const formatDate = (date) => {
-
-    if (!date) {
-      return "-";
-    }
-
-    return new Date(date).toLocaleString();
-  };
-
-  // =====================================================
-  // PAYMENT SCREENSHOT URL
-  // =====================================================
-
-  const getScreenshotUrl = (path) => {
-
-    if (!path) {
-      return "";
-    }
-
-    if (path.startsWith("http")) {
-      return path;
-    }
-
-    return `http://localhost:8080/${path}`;
-  };
-
-  return (
-
-    <div
-      className="d-flex"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fc",
-      }}
-    >
-
-      {/* =================================================
-          SIDEBAR
-      ================================================= */}
-
-      <AdminSidebar />
-
-      {/* =================================================
-          MAIN CONTENT
-      ================================================= */}
-
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "calc(100% - 250px)",
-        }}
-      >
-
-        {/* =================================================
-            HEADER
-        ================================================= */}
-
-        <div className="bg-white border-bottom px-4 py-3">
-
-          <h3 className="fw-bold mb-1">
-            Payments
-          </h3>
-
-          <small className="text-muted">
-            Verify seller subscription payments
-          </small>
-
-        </div>
-
-        {/* =================================================
-            CONTENT
-        ================================================= */}
-
-        <div className="p-4">
-
-          {/* SUCCESS MESSAGE */}
-
-          {message && (
+            setActionLoading(true);
+            setError("");
+            setMessage("");
+
+            await AdminService.rejectSellerPayment(
+                paymentId
+            );
+
+            setMessage(
+                "Payment rejected successfully."
+            );
+
+            // Remove rejected payment
+            // from pending list
+            setPayments((prevPayments) =>
+                prevPayments.filter(
+                    (payment) =>
+                        payment.id !== paymentId
+                )
+            );
+
+        } catch (err) {
+
+            console.error(
+                "Reject Payment Error:",
+                err
+            );
+
+            setError(
+                err.response?.data?.message ||
+                "Failed to reject payment."
+            );
+
+        } finally {
+
+            setActionLoading(false);
+        }
+    };
+
+    // =====================================================
+    // FORMAT DATE
+    // =====================================================
+
+    const formatDate = (date) => {
+
+        if (!date) {
+            return "-";
+        }
+
+        return new Date(date).toLocaleString();
+    };
+
+    // =====================================================
+    // PAYMENT SCREENSHOT URL
+    // =====================================================
+
+    const getScreenshotUrl = (path) => {
+
+        if (!path) {
+            return "";
+        }
+
+        if (
+            path.startsWith("http://") ||
+            path.startsWith("https://")
+        ) {
+            return path;
+        }
+
+        const cleanPath =
+            path.startsWith("/")
+                ? path
+                : `/${path}`;
+
+        return `http://localhost:8080${cleanPath}`;
+    };
+
+    // =====================================================
+    // MAIN UI
+    // =====================================================
+
+    return (
+
+        <div
+            className="d-flex"
+            style={{
+                minHeight: "100vh",
+                backgroundColor: "#f7f8fc"
+            }}
+        >
+
+            {/* =================================================
+                SIDEBAR
+            ================================================= */}
+
+            <AdminSidebar />
+
+            {/* =================================================
+                MAIN CONTENT
+            ================================================= */}
 
             <div
-              className="alert alert-success"
-              role="alert"
+                style={{
+                    marginLeft: "250px",
+                    width: "calc(100% - 250px)"
+                }}
             >
-              {message}
-            </div>
 
-          )}
+                {/* =================================================
+                    HEADER
+                ================================================= */}
 
-          {/* ERROR MESSAGE */}
-
-          {error && (
-
-            <div
-              className="alert alert-danger"
-              role="alert"
-            >
-              {error}
-            </div>
-
-          )}
-
-          {/* =================================================
-              SUMMARY
-          ================================================= */}
-
-          <div className="row g-3 mb-4">
-
-            <div className="col-md-4">
-
-              <div className="card border-0 shadow-sm">
-
-                <div className="card-body">
-
-                  <small className="text-muted">
-                    Pending Payments
-                  </small>
-
-                  <h3 className="fw-bold mb-0">
-                    {payments.length}
-                  </h3>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <div className="col-md-4">
-
-              <div className="card border-0 shadow-sm">
-
-                <div className="card-body">
-
-                  <small className="text-muted">
-                    Awaiting Verification
-                  </small>
-
-                  <h3 className="fw-bold mb-0">
-                    {payments.length}
-                  </h3>
-
-                </div>
-
-              </div>
-
-            </div>
-
-            <div className="col-md-4">
-
-              <div className="card border-0 shadow-sm">
-
-                <div className="card-body">
-
-                  <small className="text-muted">
-                    Payment Verification
-                  </small>
-
-                  <h6 className="fw-bold mb-0 mt-1">
-                    Admin Review Required
-                  </h6>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* =================================================
-              PAYMENT TABLE
-          ================================================= */}
-
-          <div className="card border-0 shadow-sm">
-
-            <div className="card-body">
-
-              <div className="d-flex justify-content-between align-items-center mb-3">
-
-                <div>
-
-                  <h5 className="fw-bold mb-1">
-                    Pending Subscription Payments
-                  </h5>
-
-                  <small className="text-muted">
-                    Review UTR and payment screenshot before approval
-                  </small>
-
-                </div>
-
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={loadPayments}
-                  disabled={loading}
+                <div
+                    className="bg-white border-bottom px-4 py-3"
                 >
-                  {loading ? "Loading..." : "Refresh"}
-                </button>
 
-              </div>
+                    <h3 className="fw-bold mb-1">
+                        Payments
+                    </h3>
 
-              {/* =================================================
-                  LOADING
-              ================================================= */}
-
-              {loading && (
-
-                <div className="text-center py-5">
-
-                  <div
-                    className="spinner-border text-primary"
-                    role="status"
-                  />
-
-                  <p className="text-muted mt-3 mb-0">
-                    Loading payments...
-                  </p>
+                    <small className="text-muted">
+                        Verify seller subscription payments
+                    </small>
 
                 </div>
 
-              )}
+                {/* =================================================
+                    CONTENT
+                ================================================= */}
 
-              {/* =================================================
-                  EMPTY
-              ================================================= */}
+                <div className="p-4">
 
-              {!loading && payments.length === 0 && (
+                    {/* SUCCESS MESSAGE */}
 
-                <div className="text-center py-5">
+                    {message && (
 
-                  <h5 className="fw-bold">
-                    No Pending Payments
-                  </h5>
+                        <div
+                            className="alert alert-success"
+                            role="alert"
+                        >
+                            {message}
+                        </div>
 
-                  <p className="text-muted mb-0">
-                    There are currently no payments waiting for verification.
-                  </p>
+                    )}
 
-                </div>
+                    {/* ERROR MESSAGE */}
 
-              )}
+                    {error && (
 
-              {/* =================================================
-                  TABLE
-              ================================================= */}
+                        <div
+                            className="alert alert-danger"
+                            role="alert"
+                        >
+                            {error}
+                        </div>
 
-              {!loading && payments.length > 0 && (
+                    )}
 
-                <div className="table-responsive">
+                    {/* =================================================
+                        SUMMARY
+                    ================================================= */}
 
-                  <table className="table table-hover align-middle">
+                    <div className="row g-3 mb-4">
 
-                    <thead className="table-light">
+                        {/* PENDING */}
 
-                      <tr>
+                        <div className="col-md-4">
 
-                        <th>
-                          #
-                        </th>
+                            <div className="card border-0 shadow-sm">
 
-                        <th>
-                          Seller
-                        </th>
+                                <div className="card-body">
 
-                        <th>
-                          Subscription
-                        </th>
+                                    <small className="text-muted">
+                                        Pending Payments
+                                    </small>
 
-                        <th>
-                          Amount
-                        </th>
+                                    <h3 className="fw-bold mb-0">
+                                        {payments.length}
+                                    </h3>
 
-                        <th>
-                          UTR / Transaction ID
-                        </th>
+                                </div>
 
-                        <th>
-                          Screenshot
-                        </th>
+                            </div>
 
-                        <th>
-                          Submitted
-                        </th>
+                        </div>
 
-                        <th>
-                          Status
-                        </th>
+                        {/* AWAITING VERIFICATION */}
 
-                        <th>
-                          Action
-                        </th>
+                        <div className="col-md-4">
 
-                      </tr>
+                            <div className="card border-0 shadow-sm">
 
-                    </thead>
+                                <div className="card-body">
 
-                    <tbody>
+                                    <small className="text-muted">
+                                        Awaiting Verification
+                                    </small>
 
-                      {payments.map(
-                        (payment, index) => (
+                                    <h3 className="fw-bold mb-0">
+                                        {payments.length}
+                                    </h3>
 
-                          <tr key={payment.id}>
+                                </div>
 
-                            {/* NUMBER */}
+                            </div>
 
-                            <td>
-                              {index + 1}
-                            </td>
+                        </div>
 
-                            {/* SELLER */}
+                        {/* REVIEW */}
 
-                            <td>
+                        <div className="col-md-4">
 
-                              <div className="fw-semibold">
-                                Seller #{payment.sellerId}
-                              </div>
+                            <div className="card border-0 shadow-sm">
 
-                              <small className="text-muted">
-                                Seller ID: {payment.sellerId}
-                              </small>
+                                <div className="card-body">
 
-                            </td>
+                                    <small className="text-muted">
+                                        Payment Verification
+                                    </small>
 
-                            {/* PLAN */}
+                                    <h6 className="fw-bold mb-0 mt-1">
+                                        Admin Review Required
+                                    </h6>
 
-                            <td>
+                                </div>
 
-                              <div className="fw-semibold">
-                                {payment.planName || "-"}
-                              </div>
+                            </div>
 
-                              <small className="text-muted">
+                        </div>
 
-                                {payment.durationMonths
-                                  ? `${payment.durationMonths} Months`
-                                  : "-"
-                                }
+                    </div>
 
-                              </small>
+                    {/* =================================================
+                        PAYMENT TABLE
+                    ================================================= */}
 
-                            </td>
+                    <div className="card border-0 shadow-sm">
 
-                            {/* AMOUNT */}
+                        <div className="card-body">
 
-                            <td>
+                            <div
+                                className="d-flex justify-content-between align-items-center mb-3"
+                            >
 
-                              <span className="fw-bold">
-                                ₹{payment.amount}
-                              </span>
+                                <div>
 
-                            </td>
+                                    <h5 className="fw-bold mb-1">
+                                        Pending Subscription Payments
+                                    </h5>
 
-                            {/* UTR */}
+                                    <small className="text-muted">
+                                        Review payment screenshot before approval
+                                    </small>
 
-                            <td>
+                                </div>
 
-                              <span
-                                className="text-break"
-                                style={{
-                                  maxWidth: "160px",
-                                  display: "block",
-                                }}
-                              >
-                                {payment.transactionId}
-                              </span>
-
-                            </td>
-
-                            {/* SCREENSHOT */}
-
-                            <td>
-
-                              {payment.paymentScreenshot ? (
-
-                                <a
-                                  href={getScreenshotUrl(
-                                    payment.paymentScreenshot
-                                  )}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="btn btn-sm btn-outline-secondary"
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-primary"
+                                    onClick={loadPayments}
+                                    disabled={
+                                        loading ||
+                                        actionLoading
+                                    }
                                 >
-                                  View Screenshot
-                                </a>
+                                    {loading
+                                        ? "Loading..."
+                                        : "Refresh"}
+                                </button>
 
-                              ) : (
+                            </div>
 
-                                <span className="text-muted">
-                                  Not Available
-                                </span>
+                            {/* =================================================
+                                LOADING
+                            ================================================= */}
 
-                              )}
+                            {loading && (
 
-                            </td>
+                                <div className="text-center py-5">
 
-                            {/* DATE */}
+                                    <div
+                                        className="spinner-border text-primary"
+                                        role="status"
+                                    />
 
-                            <td>
+                                    <p className="text-muted mt-3 mb-0">
+                                        Loading payments...
+                                    </p>
 
-                              <small>
-                                {formatDate(
-                                  payment.createdAt
+                                </div>
+
+                            )}
+
+                            {/* =================================================
+                                EMPTY
+                            ================================================= */}
+
+                            {!loading &&
+                                payments.length === 0 && (
+
+                                    <div
+                                        className="text-center py-5"
+                                    >
+
+                                        <h5 className="fw-bold">
+                                            No Pending Payments
+                                        </h5>
+
+                                        <p className="text-muted mb-0">
+                                            There are currently no
+                                            payments waiting for
+                                            verification.
+                                        </p>
+
+                                    </div>
+
                                 )}
-                              </small>
 
-                            </td>
+                            {/* =================================================
+                                TABLE
+                            ================================================= */}
 
-                            {/* STATUS */}
+                            {!loading &&
+                                payments.length > 0 && (
 
-                            <td>
+                                    <div className="table-responsive">
 
-                              <span className="badge bg-warning text-dark">
-                                {payment.paymentStatus}
-                              </span>
+                                        <table
+                                            className="table table-hover align-middle"
+                                        >
 
-                            </td>
+                                            <thead className="table-light">
 
-                            {/* ACTION */}
+                                                <tr>
 
-                            <td>
+                                                    <th>
+                                                        #
+                                                    </th>
 
-                              <div
-                                className="d-flex gap-2"
-                                style={{
-                                  minWidth: "180px",
-                                }}
-                              >
+                                                    <th>
+                                                        Seller
+                                                    </th>
 
-                                <button
-                                  className="btn btn-sm btn-success"
-                                  onClick={() =>
-                                    handleApprove(
-                                      payment.id
-                                    )
-                                  }
-                                  disabled={
-                                    actionLoading
-                                  }
-                                >
-                                  Approve
-                                </button>
+                                                    <th>
+                                                        Subscription
+                                                    </th>
 
-                                <button
-                                  className="btn btn-sm btn-danger"
-                                  onClick={() =>
-                                    handleReject(
-                                      payment.id
-                                    )
-                                  }
-                                  disabled={
-                                    actionLoading
-                                  }
-                                >
-                                  Reject
-                                </button>
+                                                    <th>
+                                                        Amount
+                                                    </th>
 
-                              </div>
+                                                    <th>
+                                                        Screenshot
+                                                    </th>
 
-                            </td>
+                                                    <th>
+                                                        Submitted
+                                                    </th>
 
-                          </tr>
+                                                    <th>
+                                                        Status
+                                                    </th>
 
-                        )
-                      )}
+                                                    <th>
+                                                        Action
+                                                    </th>
 
-                    </tbody>
+                                                </tr>
 
-                  </table>
+                                            </thead>
+
+                                            <tbody>
+
+                                                {payments.map(
+                                                    (
+                                                        payment,
+                                                        index
+                                                    ) => (
+
+                                                        <tr
+                                                            key={
+                                                                payment.id
+                                                            }
+                                                        >
+
+                                                            {/* NUMBER */}
+
+                                                            <td>
+                                                                {index + 1}
+                                                            </td>
+
+                                                            {/* SELLER */}
+
+                                                            <td>
+
+                                                                <div className="fw-semibold">
+                                                                    Seller #
+                                                                    {
+                                                                        payment.sellerId
+                                                                    }
+                                                                </div>
+
+                                                                <small className="text-muted">
+                                                                    Seller ID:{" "}
+                                                                    {
+                                                                        payment.sellerId
+                                                                    }
+                                                                </small>
+
+                                                            </td>
+
+                                                            {/* PLAN */}
+
+                                                            <td>
+
+                                                                <div className="fw-semibold">
+                                                                    {
+                                                                        payment.planName ||
+                                                                        "-"
+                                                                    }
+                                                                </div>
+
+                                                                <small className="text-muted">
+
+                                                                    {payment.durationMonths
+                                                                        ? `${payment.durationMonths} Months`
+                                                                        : "-"}
+
+                                                                </small>
+
+                                                            </td>
+
+                                                            {/* AMOUNT */}
+
+                                                            <td>
+
+                                                                <span className="fw-bold">
+
+                                                                    ₹
+                                                                    {
+                                                                        payment.amount !=
+                                                                        null
+                                                                            ? payment.amount
+                                                                            : "-"
+                                                                    }
+
+                                                                </span>
+
+                                                            </td>
+
+                                                            {/* SCREENSHOT */}
+
+                                                            <td>
+
+                                                                {payment.paymentScreenshot ? (
+
+                                                                    <a
+                                                                        href={getScreenshotUrl(
+                                                                            payment.paymentScreenshot
+                                                                        )}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="btn btn-sm btn-outline-secondary"
+                                                                    >
+                                                                        View Screenshot
+                                                                    </a>
+
+                                                                ) : (
+
+                                                                    <span className="text-muted">
+                                                                        Not Available
+                                                                    </span>
+
+                                                                )}
+
+                                                            </td>
+
+                                                            {/* DATE */}
+
+                                                            <td>
+
+                                                                <small>
+                                                                    {formatDate(
+                                                                        payment.createdAt
+                                                                    )}
+                                                                </small>
+
+                                                            </td>
+
+                                                            {/* STATUS */}
+
+                                                            <td>
+
+                                                                <span className="badge bg-warning text-dark">
+
+                                                                    {
+                                                                        payment.paymentStatus ||
+                                                                        "PENDING"
+                                                                    }
+
+                                                                </span>
+
+                                                            </td>
+
+                                                            {/* ACTION */}
+
+                                                            <td>
+
+                                                                <div
+                                                                    className="d-flex gap-2"
+                                                                    style={{
+                                                                        minWidth:
+                                                                            "180px"
+                                                                    }}
+                                                                >
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-sm btn-success"
+                                                                        onClick={() =>
+                                                                            handleApprove(
+                                                                                payment.id
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            actionLoading
+                                                                        }
+                                                                    >
+                                                                        Approve
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="btn btn-sm btn-danger"
+                                                                        onClick={() =>
+                                                                            handleReject(
+                                                                                payment.id
+                                                                            )
+                                                                        }
+                                                                        disabled={
+                                                                            actionLoading
+                                                                        }
+                                                                    >
+                                                                        Reject
+                                                                    </button>
+
+                                                                </div>
+
+                                                            </td>
+
+                                                        </tr>
+
+                                                    )
+                                                )}
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                )}
+
+                        </div>
+
+                    </div>
 
                 </div>
-
-              )}
 
             </div>
 
-          </div>
-
         </div>
-
-      </div>
-
-    </div>
-  );
+    );
 }
 
 export default AdminPayments;

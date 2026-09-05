@@ -173,6 +173,7 @@ const AdminService = {
     // =================================================
 
     // GET ALL SUBSCRIPTION PLANS
+
     getAllSubscriptionPlans: async () => {
         return axios.get(
             `${BASE_URL}/admin/subscriptions/plans`
@@ -180,6 +181,7 @@ const AdminService = {
     },
 
     // GET SUBSCRIPTION PLAN BY ID
+
     getSubscriptionPlanById: async (id) => {
         return axios.get(
             `${BASE_URL}/admin/subscriptions/plans/${id}`
@@ -187,6 +189,7 @@ const AdminService = {
     },
 
     // ADD SUBSCRIPTION PLAN
+
     addSubscriptionPlan: async (planData) => {
         return axios.post(
             `${BASE_URL}/admin/subscriptions/plans`,
@@ -195,6 +198,7 @@ const AdminService = {
     },
 
     // UPDATE SUBSCRIPTION PLAN
+
     updateSubscriptionPlan: async (id, planData) => {
         return axios.put(
             `${BASE_URL}/admin/subscriptions/plans/${id}`,
@@ -203,6 +207,7 @@ const AdminService = {
     },
 
     // ACTIVATE SUBSCRIPTION PLAN
+
     activateSubscriptionPlan: async (id) => {
         return axios.put(
             `${BASE_URL}/admin/subscriptions/plans/${id}/activate`
@@ -210,6 +215,7 @@ const AdminService = {
     },
 
     // DEACTIVATE SUBSCRIPTION PLAN
+
     deactivateSubscriptionPlan: async (id) => {
         return axios.put(
             `${BASE_URL}/admin/subscriptions/plans/${id}/deactivate`
@@ -217,9 +223,56 @@ const AdminService = {
     },
 
     // DELETE SUBSCRIPTION PLAN
+
     deleteSubscriptionPlan: async (id) => {
         return axios.delete(
             `${BASE_URL}/admin/subscriptions/plans/${id}`
+        );
+    },
+
+    // =================================================
+    // SELLER PAYMENT MODULE
+    // =================================================
+
+    // GET SELLER LATEST PAYMENT
+    // Payment screenshot + payment status +
+    // subscription details
+
+    getSellerLatestPayment: async (sellerId) => {
+        return axios.get(
+            `${BASE_URL}/payments/seller/${sellerId}/latest`
+        );
+    },
+
+    // GET ALL PAYMENTS OF SELLER
+
+    getSellerPayments: async (sellerId) => {
+        return axios.get(
+            `${BASE_URL}/payments/seller/${sellerId}`
+        );
+    },
+
+    // GET ALL PENDING PAYMENTS FOR ADMIN
+
+    getPendingPayments: async () => {
+        return axios.get(
+            `${BASE_URL}/payments/admin/pending`
+        );
+    },
+
+    // APPROVE SELLER PAYMENT
+
+    approveSellerPayment: async (paymentId) => {
+        return axios.put(
+            `${BASE_URL}/payments/admin/${paymentId}/approve`
+        );
+    },
+
+    // REJECT SELLER PAYMENT
+
+    rejectSellerPayment: async (paymentId) => {
+        return axios.put(
+            `${BASE_URL}/payments/admin/${paymentId}/reject`
         );
     }
 };

@@ -109,8 +109,7 @@ function SellerRegister() {
         console.error("Subscription Plan Error:", err);
 
         setError(
-          err?.response?.data?.message ||
-            "Unable to load subscription plans."
+          err?.response?.data?.message || "Unable to load subscription plans.",
         );
       } finally {
         setPlansLoading(false);
@@ -125,7 +124,7 @@ function SellerRegister() {
   // =========================================================
 
   const selectedPlan = subscriptionPlans.find(
-    (plan) => String(plan.id) === String(selectedPlanId)
+    (plan) => String(plan.id) === String(selectedPlanId),
   );
 
   // =========================================================
@@ -160,11 +159,7 @@ function SellerRegister() {
       return `${fieldName} is required.`;
     }
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
       return `${fieldName} must be JPG, PNG or WEBP.`;
@@ -191,10 +186,7 @@ function SellerRegister() {
       return;
     }
 
-    const validationError = validateImageFile(
-      file,
-      "Payment screenshot"
-    );
+    const validationError = validateImageFile(file, "Payment screenshot");
 
     if (validationError) {
       setError(validationError);
@@ -355,11 +347,7 @@ function SellerRegister() {
     // PAN VALIDATION
     // =======================================================
 
-    if (
-      !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(
-        panNumber.trim().toUpperCase()
-      )
-    ) {
+    if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber.trim().toUpperCase())) {
       setError("Please enter a valid PAN number.");
       return;
     }
@@ -379,7 +367,7 @@ function SellerRegister() {
 
     const frontError = validateImageFile(
       aadhaarFrontFile,
-      "Aadhaar front image"
+      "Aadhaar front image",
     );
 
     if (frontError) {
@@ -391,10 +379,7 @@ function SellerRegister() {
     // AADHAAR BACK
     // =======================================================
 
-    const backError = validateImageFile(
-      aadhaarBackFile,
-      "Aadhaar back image"
-    );
+    const backError = validateImageFile(aadhaarBackFile, "Aadhaar back image");
 
     if (backError) {
       setError(backError);
@@ -426,111 +411,51 @@ function SellerRegister() {
 
     const formData = new FormData();
 
-    formData.append(
-      "sellerName",
-      sellerName.trim()
-    );
+    formData.append("sellerName", sellerName.trim());
 
-    formData.append(
-      "businessName",
-      businessName.trim()
-    );
+    formData.append("businessName", businessName.trim());
 
-    formData.append(
-      "farmName",
-      farmName.trim()
-    );
+    formData.append("farmName", farmName.trim());
 
-    formData.append(
-      "email",
-      email.trim().toLowerCase()
-    );
+    formData.append("email", email.trim().toLowerCase());
 
-    formData.append(
-      "mobile",
-      mobile.trim()
-    );
+    formData.append("mobile", mobile.trim());
 
-    formData.append(
-      "password",
-      password
-    );
+    formData.append("password", password);
 
-    formData.append(
-      "address",
-      address.trim()
-    );
+    formData.append("address", address.trim());
 
-    formData.append(
-      "city",
-      city.trim()
-    );
+    formData.append("city", city.trim());
 
-    formData.append(
-      "state",
-      state.trim()
-    );
+    formData.append("state", state.trim());
 
-    formData.append(
-      "district",
-      district.trim()
-    );
+    formData.append("district", district.trim());
 
-    formData.append(
-      "subDistrict",
-      subDistrict.trim()
-    );
+    formData.append("subDistrict", subDistrict.trim());
 
-    formData.append(
-      "village",
-      village.trim()
-    );
+    formData.append("village", village.trim());
 
-    formData.append(
-      "pincode",
-      pincode.trim()
-    );
+    formData.append("pincode", pincode.trim());
 
-    formData.append(
-      "location",
-      location.trim()
-    );
+    formData.append("location", location.trim());
 
-    formData.append(
-      "aadhaarNumber",
-      aadhaarNumber.trim()
-    );
+    formData.append("aadhaarNumber", aadhaarNumber.trim());
 
-    formData.append(
-      "panNumber",
-      panNumber.trim().toUpperCase()
-    );
+    formData.append("panNumber", panNumber.trim().toUpperCase());
 
-    formData.append(
-      "aadhaarFrontFile",
-      aadhaarFrontFile
-    );
+    formData.append("aadhaarFrontFile", aadhaarFrontFile);
 
-    formData.append(
-      "aadhaarBackFile",
-      aadhaarBackFile
-    );
+    formData.append("aadhaarBackFile", aadhaarBackFile);
 
     if (profileImage) {
-      formData.append(
-        "profileImage",
-        profileImage
-      );
+      formData.append("profileImage", profileImage);
     }
 
     // =======================================================
     // SUBSCRIPTION PLAN ID
     // =======================================================
 
-    formData.append(
-      "subscriptionPlanId",
-      selectedPlanId
-    );
+    formData.append("subscriptionPlanId", selectedPlanId);
 
     // =======================================================
     // REGISTER SELLER
@@ -545,7 +470,7 @@ function SellerRegister() {
 
       if (!sellerData || !sellerData.id) {
         setError(
-          "Seller registration completed, but seller ID was not returned."
+          "Seller registration completed, but seller ID was not returned.",
         );
         return;
       }
@@ -560,21 +485,16 @@ function SellerRegister() {
 
       try {
         const subscriptionResponse = await fetch(
-          `http://localhost:8080/api/seller/subscriptions/current/${sellerId}`
+          `http://localhost:8080/api/seller/subscriptions/current/${sellerId}`,
         );
 
         if (subscriptionResponse.ok) {
-          const subscriptionData =
-            await subscriptionResponse.json();
+          const subscriptionData = await subscriptionResponse.json();
 
-          subscriptionId =
-            subscriptionData?.id || null;
+          subscriptionId = subscriptionData?.id || null;
         }
       } catch (subscriptionError) {
-        console.error(
-          "Subscription Fetch Error:",
-          subscriptionError
-        );
+        console.error("Subscription Fetch Error:", subscriptionError);
       }
 
       // =====================================================
@@ -583,7 +503,7 @@ function SellerRegister() {
 
       if (!subscriptionId) {
         setError(
-          "Seller registered, but subscription information could not be found."
+          "Seller registered, but subscription information could not be found.",
         );
         return;
       }
@@ -596,7 +516,7 @@ function SellerRegister() {
         sellerId,
         subscriptionId,
         transactionId.trim(),
-        paymentScreenshot
+        paymentScreenshot,
       );
 
       // =====================================================
@@ -616,18 +536,15 @@ function SellerRegister() {
       setMessage(
         `Registration and payment submitted successfully. OTP has been sent to ${email
           .trim()
-          .toLowerCase()}.`
+          .toLowerCase()}.`,
       );
     } catch (err) {
-      console.error(
-        "Seller Registration / Payment Error:",
-        err
-      );
+      console.error("Seller Registration / Payment Error:", err);
 
       setError(
         err?.response?.data?.message ||
           err?.response?.data ||
-          "Seller registration failed."
+          "Seller registration failed.",
       );
     } finally {
       setLoading(false);
@@ -657,14 +574,9 @@ function SellerRegister() {
     try {
       setLoading(true);
 
-      await verifyEmailOtp(
-        email.trim().toLowerCase(),
-        otp.trim()
-      );
+      await verifyEmailOtp(email.trim().toLowerCase(), otp.trim());
 
-      setMessage(
-        "Email verified successfully. Redirecting to seller login..."
-      );
+      setMessage("Email verified successfully. Redirecting to seller login...");
 
       setTimeout(() => {
         navigate("/seller/login", {
@@ -672,15 +584,12 @@ function SellerRegister() {
         });
       }, 1000);
     } catch (err) {
-      console.error(
-        "OTP Verification Error:",
-        err
-      );
+      console.error("OTP Verification Error:", err);
 
       setError(
         err?.response?.data?.message ||
           err?.response?.data ||
-          "Invalid OTP. Please try again."
+          "Invalid OTP. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -698,25 +607,16 @@ function SellerRegister() {
     try {
       setResendLoading(true);
 
-      await resendEmailOtp(
-        email.trim().toLowerCase()
-      );
+      await resendEmailOtp(email.trim().toLowerCase());
 
-      setMessage(
-        `OTP sent again to ${email
-          .trim()
-          .toLowerCase()}.`
-      );
+      setMessage(`OTP sent again to ${email.trim().toLowerCase()}.`);
     } catch (err) {
-      console.error(
-        "Resend OTP Error:",
-        err
-      );
+      console.error("Resend OTP Error:", err);
 
       setError(
         err?.response?.data?.message ||
           err?.response?.data ||
-          "Unable to resend OTP."
+          "Unable to resend OTP.",
       );
     } finally {
       setResendLoading(false);
@@ -731,14 +631,10 @@ function SellerRegister() {
     return (
       <div className="seller-register-page">
         <div className="seller-register-layout">
-
           {/* LEFT SIDE */}
           <aside className="seller-info-panel">
-
             <div className="seller-brand">
-              <div className="seller-brand-name">
-                🐄 AnimalSale
-              </div>
+              <div className="seller-brand-name">🐄 AnimalSale</div>
 
               <div className="seller-brand-tagline">
                 Buy & Sell Healthy Animals Online
@@ -746,27 +642,32 @@ function SellerRegister() {
             </div>
 
             <div className="seller-info-content">
-
               <h1>Become a Seller</h1>
 
               <p>
-                Create your seller account and start
-                selling healthy animals online.
+                Create your seller account and start selling healthy animals
+                online.
               </p>
 
               <div className="seller-info-list">
+                <div className="seller-info-item">
+                  <span>✓</span>
+
+                  <div>
+                    <strong>Sell Animals Online</strong>
+
+                    <small>List your healthy animals for customers.</small>
+                  </div>
+                </div>
 
                 <div className="seller-info-item">
                   <span>✓</span>
 
                   <div>
-                    <strong>
-                      Sell Animals Online
-                    </strong>
+                    <strong>Manage Your Animals</strong>
 
                     <small>
-                      List your healthy animals
-                      for customers.
+                      Easily add, update and manage your animal listings.
                     </small>
                   </div>
                 </div>
@@ -775,95 +676,42 @@ function SellerRegister() {
                   <span>✓</span>
 
                   <div>
-                    <strong>
-                      Manage Your Animals
-                    </strong>
+                    <strong>Reach More Customers</strong>
 
-                    <small>
-                      Easily add, update and manage
-                      your animal listings.
-                    </small>
+                    <small>Connect your animals with interested buyers.</small>
                   </div>
                 </div>
-
-                <div className="seller-info-item">
-                  <span>✓</span>
-
-                  <div>
-                    <strong>
-                      Reach More Customers
-                    </strong>
-
-                    <small>
-                      Connect your animals with
-                      interested buyers.
-                    </small>
-                  </div>
-                </div>
-
               </div>
-
             </div>
-
           </aside>
 
           {/* RIGHT SIDE */}
           <main className="seller-form-panel">
-
             <div className="seller-register-card otp-card">
-
               <div className="seller-card-header">
+                <h2>Email Verification</h2>
 
-                <h2>
-                  Email Verification
-                </h2>
+                <p>Enter the OTP sent to</p>
 
-                <p>
-                  Enter the OTP sent to
-                </p>
-
-                <strong>
-                  {email}
-                </strong>
-
+                <strong>{email}</strong>
               </div>
 
-              {error && (
-                <div className="alert alert-danger">
-                  {error}
-                </div>
-              )}
+              {error && <div className="alert alert-danger">{error}</div>}
 
-              {message && (
-                <div className="alert alert-success">
-                  {message}
-                </div>
-              )}
+              {message && <div className="alert alert-success">{message}</div>}
 
               <form onSubmit={handleVerifyOtp}>
-
                 <div className="form-group">
-
-                  <label>
-                    Enter OTP *
-                  </label>
+                  <label>Enter OTP *</label>
 
                   <input
                     type="text"
                     className="form-control otp-input"
                     value={otp}
                     maxLength="6"
-                    onChange={(e) =>
-                      setOtp(
-                        e.target.value.replace(
-                          /\D/g,
-                          ""
-                        )
-                      )
-                    }
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
                     placeholder="Enter 6 digit OTP"
                   />
-
                 </div>
 
                 <button
@@ -871,11 +719,8 @@ function SellerRegister() {
                   className="register-button"
                   disabled={loading}
                 >
-                  {loading
-                    ? "Verifying..."
-                    : "Verify OTP"}
+                  {loading ? "Verifying..." : "Verify OTP"}
                 </button>
-
               </form>
 
               <button
@@ -884,15 +729,10 @@ function SellerRegister() {
                 onClick={handleResendOtp}
                 disabled={resendLoading}
               >
-                {resendLoading
-                  ? "Sending..."
-                  : "Resend OTP"}
+                {resendLoading ? "Sending..." : "Resend OTP"}
               </button>
-
             </div>
-
           </main>
-
         </div>
       </div>
     );
@@ -904,121 +744,77 @@ function SellerRegister() {
 
   return (
     <div className="seller-register-page">
-
       <div className="seller-register-layout">
-
         {/* ===================================================
             LEFT SIDE - ANIMAL SALE INFORMATION
         =================================================== */}
 
         <aside className="seller-info-panel">
-
           <div className="seller-brand">
-
-            <div className="seller-brand-name">
-              🐄 AnimalSale
-            </div>
+            <div className="seller-brand-name">🐄 AnimalSale</div>
 
             <div className="seller-brand-tagline">
               Buy & Sell Healthy Animals Online
             </div>
-
           </div>
 
           <div className="seller-info-content">
-
-            <h1>
-              Become a Seller
-            </h1>
+            <h1>Become a Seller</h1>
 
             <p>
-              Create your seller account and start
-              selling healthy animals online.
+              Create your seller account and start selling healthy animals
+              online.
             </p>
 
             <div className="seller-info-list">
-
               <div className="seller-info-item">
-
                 <span>✓</span>
 
                 <div>
-                  <strong>
-                    Sell Animals Online
-                  </strong>
+                  <strong>Sell Animals Online</strong>
 
-                  <small>
-                    List your healthy animals
-                    for customers.
-                  </small>
+                  <small>List your healthy animals for customers.</small>
                 </div>
-
               </div>
 
               <div className="seller-info-item">
-
                 <span>✓</span>
 
                 <div>
-                  <strong>
-                    Manage Your Animals
-                  </strong>
+                  <strong>Manage Your Animals</strong>
 
                   <small>
-                    Easily add, update and manage
-                    your animal listings.
+                    Easily add, update and manage your animal listings.
                   </small>
                 </div>
-
               </div>
 
               <div className="seller-info-item">
-
                 <span>✓</span>
 
                 <div>
-                  <strong>
-                    Reach More Customers
-                  </strong>
+                  <strong>Reach More Customers</strong>
 
-                  <small>
-                    Connect your animals with
-                    interested buyers.
-                  </small>
+                  <small>Connect your animals with interested buyers.</small>
                 </div>
-
               </div>
-
             </div>
 
             <div className="seller-info-note">
-
-              <strong>
-                Why become a seller?
-              </strong>
+              <strong>Why become a seller?</strong>
 
               <p>
-                Join AnimalSale and showcase your
-                animals to customers looking for
-                healthy livestock.
+                Join AnimalSale and showcase your animals to customers looking
+                for healthy livestock.
               </p>
-
             </div>
-
           </div>
 
           <div className="seller-info-login">
+            <span>Already have an account?</span>
 
-            <span>
-              Already have an account?
-            </span>
-
-            <Link to="/seller/login">
-              Login
-            </Link>
-
+            <Link to="/seller/login">Login</Link>
           </div>
-
         </aside>
 
         {/* ===================================================
@@ -1026,94 +822,54 @@ function SellerRegister() {
         =================================================== */}
 
         <main className="seller-form-panel">
-
           <div className="seller-register-card">
-
             {/* HEADER */}
 
             <div className="seller-card-header">
+              <h2>Seller Registration</h2>
 
-              <h2>
-                Seller Registration
-              </h2>
-
-              <p>
-                Create your seller account
-              </p>
-
+              <p>Create your seller account</p>
             </div>
 
-            {error && (
-              <div className="alert alert-danger">
-                {error}
-              </div>
-            )}
+            {error && <div className="alert alert-danger">{error}</div>}
 
-            {message && (
-              <div className="alert alert-success">
-                {message}
-              </div>
-            )}
+            {message && <div className="alert alert-success">{message}</div>}
 
             <form onSubmit={handleRegister}>
-
               {/* =================================================
                   BASIC INFORMATION
               ================================================= */}
 
               <section className="form-section">
-
-                <h3>
-                  Basic Information
-                </h3>
+                <h3>Basic Information</h3>
 
                 <div className="form-grid">
-
                   <div className="form-group">
-
-                    <label>
-                      Seller Name *
-                    </label>
+                    <label>Seller Name *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={sellerName}
-                      onChange={(e) =>
-                        setSellerName(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setSellerName(e.target.value)}
                       placeholder="Enter seller name"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Email *
-                    </label>
+                    <label>Email *</label>
 
                     <input
                       type="email"
                       className="form-control"
                       value={email}
-                      onChange={(e) =>
-                        setEmail(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter email"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Mobile *
-                    </label>
+                    <label>Mobile *</label>
 
                     <input
                       type="text"
@@ -1121,40 +877,24 @@ function SellerRegister() {
                       value={mobile}
                       maxLength="10"
                       onChange={(e) =>
-                        setMobile(
-                          e.target.value.replace(
-                            /\D/g,
-                            ""
-                          )
-                        )
+                        setMobile(e.target.value.replace(/\D/g, ""))
                       }
                       placeholder="Enter 10 digit mobile"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Password *
-                    </label>
+                    <label>Password *</label>
 
                     <input
                       type="password"
                       className="form-control"
                       value={password}
-                      onChange={(e) =>
-                        setPassword(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter password"
                     />
-
                   </div>
-
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1162,55 +902,33 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section">
-
-                <h3>
-                  Business Information
-                </h3>
+                <h3>Business Information</h3>
 
                 <div className="form-grid">
-
                   <div className="form-group">
-
-                    <label>
-                      Business Name *
-                    </label>
+                    <label>Business Name *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={businessName}
-                      onChange={(e) =>
-                        setBusinessName(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setBusinessName(e.target.value)}
                       placeholder="Enter business name"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Farm Name *
-                    </label>
+                    <label>Farm Name *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={farmName}
-                      onChange={(e) =>
-                        setFarmName(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setFarmName(e.target.value)}
                       placeholder="Enter farm name"
                     />
-
                   </div>
-
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1218,18 +936,11 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section">
-
-                <h3>
-                  KYC Information
-                </h3>
+                <h3>KYC Information</h3>
 
                 <div className="form-grid">
-
                   <div className="form-group">
-
-                    <label>
-                      Aadhaar Number *
-                    </label>
+                    <label>Aadhaar Number *</label>
 
                     <input
                       type="text"
@@ -1237,23 +948,14 @@ function SellerRegister() {
                       value={aadhaarNumber}
                       maxLength="12"
                       onChange={(e) =>
-                        setAadhaarNumber(
-                          e.target.value.replace(
-                            /\D/g,
-                            ""
-                          )
-                        )
+                        setAadhaarNumber(e.target.value.replace(/\D/g, ""))
                       }
                       placeholder="Enter 12 digit Aadhaar"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      PAN Number *
-                    </label>
+                    <label>PAN Number *</label>
 
                     <input
                       type="text"
@@ -1261,65 +963,42 @@ function SellerRegister() {
                       value={panNumber}
                       maxLength="10"
                       onChange={(e) =>
-                        setPanNumber(
-                          e.target.value.toUpperCase()
-                        )
+                        setPanNumber(e.target.value.toUpperCase())
                       }
                       placeholder="Enter PAN number"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Aadhaar Front *
-                    </label>
+                    <label>Aadhaar Front *</label>
 
                     <input
                       type="file"
                       className="form-control"
                       accept="image/jpeg,image/png,image/webp"
                       onChange={(e) =>
-                        setAadhaarFrontFile(
-                          e.target.files?.[0] ||
-                            null
-                        )
+                        setAadhaarFrontFile(e.target.files?.[0] || null)
                       }
                     />
 
-                    <small>
-                      JPG, PNG or WEBP. Max 5MB.
-                    </small>
-
+                    <small>JPG, PNG or WEBP. Max 5MB.</small>
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Aadhaar Back *
-                    </label>
+                    <label>Aadhaar Back *</label>
 
                     <input
                       type="file"
                       className="form-control"
                       accept="image/jpeg,image/png,image/webp"
                       onChange={(e) =>
-                        setAadhaarBackFile(
-                          e.target.files?.[0] ||
-                            null
-                        )
+                        setAadhaarBackFile(e.target.files?.[0] || null)
                       }
                     />
 
-                    <small>
-                      JPG, PNG or WEBP. Max 5MB.
-                    </small>
-
+                    <small>JPG, PNG or WEBP. Max 5MB.</small>
                   </div>
-
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1327,138 +1006,83 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section">
-
-                <h3>
-                  Address Information
-                </h3>
+                <h3>Address Information</h3>
 
                 <div className="form-group">
-
-                  <label>
-                    Address *
-                  </label>
+                  <label>Address *</label>
 
                   <textarea
                     className="form-control"
                     value={address}
-                    onChange={(e) =>
-                      setAddress(
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => setAddress(e.target.value)}
                     placeholder="Enter address"
                     rows="3"
                   />
-
                 </div>
 
                 <div className="form-grid">
-
                   <div className="form-group">
-
-                    <label>
-                      City *
-                    </label>
+                    <label>City *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={city}
-                      onChange={(e) =>
-                        setCity(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setCity(e.target.value)}
                       placeholder="Enter city"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      State *
-                    </label>
+                    <label>State *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={state}
-                      onChange={(e) =>
-                        setState(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setState(e.target.value)}
                       placeholder="Enter state"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      District *
-                    </label>
+                    <label>District *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={district}
-                      onChange={(e) =>
-                        setDistrict(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setDistrict(e.target.value)}
                       placeholder="Enter district"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Sub District *
-                    </label>
+                    <label>Sub District *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={subDistrict}
-                      onChange={(e) =>
-                        setSubDistrict(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setSubDistrict(e.target.value)}
                       placeholder="Enter sub district"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Village *
-                    </label>
+                    <label>Village *</label>
 
                     <input
                       type="text"
                       className="form-control"
                       value={village}
-                      onChange={(e) =>
-                        setVillage(
-                          e.target.value
-                        )
-                      }
+                      onChange={(e) => setVillage(e.target.value)}
                       placeholder="Enter village"
                     />
-
                   </div>
 
                   <div className="form-group">
-
-                    <label>
-                      Pincode *
-                    </label>
+                    <label>Pincode *</label>
 
                     <input
                       type="text"
@@ -1466,40 +1090,24 @@ function SellerRegister() {
                       value={pincode}
                       maxLength="6"
                       onChange={(e) =>
-                        setPincode(
-                          e.target.value.replace(
-                            /\D/g,
-                            ""
-                          )
-                        )
+                        setPincode(e.target.value.replace(/\D/g, ""))
                       }
                       placeholder="Enter 6 digit pincode"
                     />
-
                   </div>
-
                 </div>
 
                 <div className="form-group">
-
-                  <label>
-                    Location *
-                  </label>
+                  <label>Location *</label>
 
                   <input
                     type="text"
                     className="form-control"
                     value={location}
-                    onChange={(e) =>
-                      setLocation(
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => setLocation(e.target.value)}
                     placeholder="Enter location"
                   />
-
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1507,31 +1115,20 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section">
-
-                <h3>
-                  Profile Image
-                </h3>
+                <h3>Profile Image</h3>
 
                 <div className="form-group">
-
                   <input
                     type="file"
                     className="form-control"
                     accept="image/jpeg,image/png,image/webp"
                     onChange={(e) =>
-                      setProfileImage(
-                        e.target.files?.[0] ||
-                          null
-                      )
+                      setProfileImage(e.target.files?.[0] || null)
                     }
                   />
 
-                  <small>
-                    JPG, PNG or WEBP. Max 5MB.
-                  </small>
-
+                  <small>JPG, PNG or WEBP. Max 5MB.</small>
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1539,102 +1136,59 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section subscription-section">
-
-                <h3>
-                  Select Subscription Plan
-                </h3>
+                <h3>Select Subscription Plan</h3>
 
                 {plansLoading ? (
-
                   <div className="plan-loading">
                     Loading subscription plans...
                   </div>
-
                 ) : subscriptionPlans.length === 0 ? (
-
                   <div className="alert alert-warning">
-                    No active subscription plans
-                    available.
+                    No active subscription plans available.
                   </div>
-
                 ) : (
-
                   <div className="subscription-grid">
-
-                    {subscriptionPlans.map(
-                      (plan) => (
-
-                        <div
-                          key={plan.id}
-                          className={`subscription-plan-card ${
-                            String(selectedPlanId) ===
-                            String(plan.id)
-                              ? "selected"
-                              : ""
-                          }`}
-                          onClick={() =>
-                            setSelectedPlanId(
-                              String(plan.id)
-                            )
-                          }
-                        >
-
-                          <div className="plan-radio">
-
-                            <input
-                              type="radio"
-                              name="subscriptionPlan"
-                              checked={
-                                String(
-                                  selectedPlanId
-                                ) ===
-                                String(plan.id)
-                              }
-                              onChange={() =>
-                                setSelectedPlanId(
-                                  String(plan.id)
-                                )
-                              }
-                            />
-
-                          </div>
-
-                          <div className="plan-content">
-
-                            <div className="plan-title-row">
-
-                              <h4>
-                                {plan.planName}
-                              </h4>
-
-                              <span>
-                                {plan.durationMonths === 12
-                                  ? "1 Year"
-                                  : `${plan.durationMonths} Months`}
-                              </span>
-
-                            </div>
-
-                            <div className="plan-price">
-                              ₹{plan.price}
-                            </div>
-
-                            <p>
-                              {plan.description ||
-                                `Access all seller features for ${plan.durationMonths} months.`}
-                            </p>
-
-                          </div>
-
+                    {subscriptionPlans.map((plan) => (
+                      <div
+                        key={plan.id}
+                        className={`subscription-plan-card ${
+                          String(selectedPlanId) === String(plan.id)
+                            ? "selected"
+                            : ""
+                        }`}
+                        onClick={() => setSelectedPlanId(String(plan.id))}
+                      >
+                        <div className="plan-radio">
+                          <input
+                            type="radio"
+                            name="subscriptionPlan"
+                            checked={String(selectedPlanId) === String(plan.id)}
+                            onChange={() => setSelectedPlanId(String(plan.id))}
+                          />
                         </div>
 
-                      )
-                    )}
+                        <div className="plan-content">
+                          <div className="plan-title-row">
+                            <h4>{plan.planName}</h4>
 
+                            <span>
+                              {plan.durationMonths === 12
+                                ? "1 Year"
+                                : `${plan.durationMonths} Months`}
+                            </span>
+                          </div>
+
+                          <div className="plan-price">₹{plan.price}</div>
+
+                          <p>
+                            {plan.description ||
+                              `Access all seller features for ${plan.durationMonths} months.`}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-
                 )}
-
               </section>
 
               {/* =================================================
@@ -1642,22 +1196,12 @@ function SellerRegister() {
               ================================================= */}
 
               <section className="form-section payment-section">
-
-                <h3>
-                  Payment Details
-                </h3>
+                <h3>Payment Details</h3>
 
                 <div className="payment-instruction">
+                  <strong>Scan & Pay</strong>
 
-                  <strong>
-                    Scan & Pay
-                  </strong>
-
-                  <span>
-                    Scan the Admin QR and complete
-                    the payment.
-                  </span>
-
+                  <span>Scan the Admin QR and complete the payment.</span>
                 </div>
 
                 {/* =================================================
@@ -1666,19 +1210,14 @@ function SellerRegister() {
                     12 MONTHS -> admin-qr.png999.png
                 ================================================= */}
 
-                {selectedPlan &&
-                  getPaymentQrImage() && (
-
-                    <div className="qr-container">
-
-                      <img
-                        src={getPaymentQrImage()}
-                        alt={`${selectedPlan.planName} Payment QR`}
-                      />
-
-                    </div>
-
-                  )}
+                {selectedPlan && getPaymentQrImage() && (
+                  <div className="qr-container">
+                    <img
+                      src={getPaymentQrImage()}
+                      alt={`${selectedPlan.planName} Payment QR`}
+                    />
+                  </div>
+                )}
 
                 {/* =================================================
                     DYNAMIC PRICE
@@ -1686,60 +1225,36 @@ function SellerRegister() {
                 ================================================= */}
 
                 {selectedPlan && (
-
                   <div className="pay-amount">
-
                     Pay Exactly:
-
-                    <strong>
-                      ₹{selectedPlan.price}
-                    </strong>
-
+                    <strong>₹{selectedPlan.price}</strong>
                   </div>
-
                 )}
 
                 <div className="form-group">
-
-                  <label>
-                    UTR / Transaction Number *
-                  </label>
+                  <label>UTR / Transaction Number</label>
 
                   <input
                     type="text"
                     className="form-control"
                     value={transactionId}
-                    onChange={(e) =>
-                      setTransactionId(
-                        e.target.value
-                      )
-                    }
+                    onChange={(e) => setTransactionId(e.target.value)}
                     placeholder="Enter UTR / Transaction Number"
                   />
-
                 </div>
 
                 <div className="form-group">
-
-                  <label>
-                    Payment Screenshot *
-                  </label>
+                  <label>Payment Screenshot *</label>
 
                   <input
                     type="file"
                     className="form-control"
                     accept="image/jpeg,image/png,image/webp"
-                    onChange={
-                      handlePaymentScreenshotChange
-                    }
+                    onChange={handlePaymentScreenshotChange}
                   />
 
-                  <small>
-                    JPG, PNG or WEBP. Max 5MB.
-                  </small>
-
+                  <small>JPG, PNG or WEBP. Max 5MB.</small>
                 </div>
-
               </section>
 
               {/* =================================================
@@ -1750,36 +1265,20 @@ function SellerRegister() {
                 type="submit"
                 className="register-button"
                 disabled={
-                  loading ||
-                  plansLoading ||
-                  subscriptionPlans.length === 0
+                  loading || plansLoading || subscriptionPlans.length === 0
                 }
               >
-
-                {loading
-                  ? "Registering Seller..."
-                  : "Register Seller"}
-
+                {loading ? "Registering Seller..." : "Register Seller"}
               </button>
 
               <div className="mobile-login-link">
-
                 Already have an account?
-
-                <Link to="/seller/login">
-                  Login
-                </Link>
-
+                <Link to="/seller/login">Login</Link>
               </div>
-
             </form>
-
           </div>
-
         </main>
-
       </div>
-
     </div>
   );
 }

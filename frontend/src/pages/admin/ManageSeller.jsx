@@ -153,28 +153,6 @@ function ManageSeller() {
   };
 
   // =====================================================
-  // PAYMENT STATUS BADGE
-  // =====================================================
-
-  const getPaymentStatusClass = (status) => {
-    const currentStatus = status ? status.toUpperCase() : "";
-
-    if (currentStatus === "APPROVED") {
-      return "badge bg-success";
-    }
-
-    if (currentStatus === "REJECTED") {
-      return "badge bg-danger";
-    }
-
-    if (currentStatus === "PENDING") {
-      return "badge bg-warning text-dark";
-    }
-
-    return "badge bg-secondary";
-  };
-
-  // =====================================================
   // SUBSCRIPTION STATUS BADGE
   // =====================================================
 
@@ -250,14 +228,14 @@ function ManageSeller() {
       }}
     >
       {/* =====================================================
-                SIDEBAR
-            ===================================================== */}
+          SIDEBAR
+      ===================================================== */}
 
       <AdminSidebar />
 
       {/* =====================================================
-                MAIN AREA
-            ===================================================== */}
+          MAIN AREA
+      ===================================================== */}
 
       <div
         style={{
@@ -267,8 +245,8 @@ function ManageSeller() {
         }}
       >
         {/* =================================================
-                    TOP HEADER
-                ================================================= */}
+            TOP HEADER
+        ================================================= */}
 
         <div
           className="bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center"
@@ -294,13 +272,13 @@ function ManageSeller() {
         </div>
 
         {/* =================================================
-                    CONTENT
-                ================================================= */}
+            CONTENT
+        ================================================= */}
 
         <div className="p-4">
           {/* =================================================
-                        TITLE
-                    ================================================= */}
+              TITLE
+          ================================================= */}
 
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -317,8 +295,8 @@ function ManageSeller() {
           </div>
 
           {/* =================================================
-                        ERROR
-                    ================================================= */}
+              ERROR
+          ================================================= */}
 
           {error && (
             <div className="alert alert-danger" role="alert">
@@ -335,8 +313,8 @@ function ManageSeller() {
           )}
 
           {/* =================================================
-                        FILTER CARD
-                    ================================================= */}
+              FILTER CARD
+          ================================================= */}
 
           <div
             className="card border-0 shadow-sm mb-4"
@@ -403,8 +381,8 @@ function ManageSeller() {
           </div>
 
           {/* =================================================
-                        SELLER TABLE
-                    ================================================= */}
+              SELLER TABLE
+          ================================================= */}
 
           <div
             className="card border-0 shadow-sm"
@@ -414,8 +392,8 @@ function ManageSeller() {
           >
             <div className="card-body p-0">
               {/* =================================================
-                                TABLE SCROLL AREA
-                            ================================================= */}
+                  TABLE SCROLL AREA
+              ================================================= */}
 
               <div
                 className="table-responsive"
@@ -431,8 +409,8 @@ function ManageSeller() {
                   }}
                 >
                   {/* =================================================
-                                        FIXED COLUMN WIDTHS
-                                    ================================================= */}
+                      FIXED COLUMN WIDTHS
+                  ================================================= */}
 
                   <colgroup>
                     <col
@@ -497,8 +475,8 @@ function ManageSeller() {
                   </colgroup>
 
                   {/* =================================================
-                                        TABLE HEADER
-                                    ================================================= */}
+                      TABLE HEADER
+                  ================================================= */}
 
                   <thead>
                     <tr
@@ -620,13 +598,13 @@ function ManageSeller() {
                   </thead>
 
                   {/* =================================================
-                                        TABLE BODY
-                                    ================================================= */}
+                      TABLE BODY
+                  ================================================= */}
 
                   <tbody>
                     {/* =================================================
-                                            NO SELLER
-                                        ================================================= */}
+                        NO SELLER
+                    ================================================= */}
 
                     {filteredSellers.length === 0 ? (
                       <tr>
@@ -795,49 +773,41 @@ function ManageSeller() {
                               )}
                             </td>
 
-                            {/* PAYMENT */}
+                            {/* =================================================
+                                  PAYMENT
+                                  ONLY PAYMENT SCREENSHOT
+                              ================================================= */}
 
                             <td>
                               {payment ? (
-                                <div className="d-flex align-items-center gap-2">
-                                  {paymentScreenshot ? (
-                                    <img
-                                      src={paymentScreenshot}
-                                      alt="Payment Screenshot"
-                                      title="View Payment Screenshot"
-                                      onClick={() =>
-                                        window.open(paymentScreenshot, "_blank")
-                                      }
-                                      style={{
-                                        width: "62px",
-                                        height: "62px",
-                                        objectFit: "contain",
-                                        borderRadius: "8px",
-                                        border: "1px solid #dee2e6",
-                                        cursor: "pointer",
-                                        backgroundColor: "#f8f9fa",
-                                        flexShrink: "0",
-                                      }}
-                                    />
-                                  ) : (
-                                    <span className="text-muted">
-                                      No Screenshot
-                                    </span>
-                                  )}
-
-                                  <span
-                                    className={getPaymentStatusClass(
-                                      payment.paymentStatus,
-                                    )}
+                                paymentScreenshot ? (
+                                  <img
+                                    src={paymentScreenshot}
+                                    alt="Payment Screenshot"
+                                    title="View Payment Screenshot"
+                                    onClick={() =>
+                                      window.open(paymentScreenshot, "_blank")
+                                    }
                                     style={{
-                                      whiteSpace: "nowrap",
+                                      width: "80px",
+                                      height: "80px",
+                                      objectFit: "contain",
+                                      borderRadius: "10px",
+                                      border: "1px solid #dee2e6",
+                                      cursor: "pointer",
+                                      backgroundColor: "#f8f9fa",
+                                      display: "block",
                                     }}
-                                  >
-                                    {payment.paymentStatus || "N/A"}
+                                  />
+                                ) : (
+                                  <span className="text-muted">
+                                    No Screenshot
                                   </span>
-                                </div>
+                                )
                               ) : (
-                                <span className="text-muted">No Payment</span>
+                                <span className="text-muted">
+                                  No Screenshot
+                                </span>
                               )}
                             </td>
 

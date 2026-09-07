@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+// import { Link, useNavigate } from "react-router-dom";
+
+import { Link } from "react-router-dom";
 
 import {
   registerSeller,
@@ -12,7 +14,7 @@ import {
 import "./SellerRegister.css";
 
 function SellerRegister() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // =========================================================
   // SELLER INFORMATION
@@ -557,7 +559,6 @@ function SellerRegister() {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-
     setError("");
     setMessage("");
 
@@ -576,13 +577,11 @@ function SellerRegister() {
 
       await verifyEmailOtp(email.trim().toLowerCase(), otp.trim());
 
-      setMessage("Email verified successfully. Redirecting to seller login...");
+      setMessage(
+        "Email verified successfully. Your seller account is now pending Admin approval.",
+      );
 
-      setTimeout(() => {
-        navigate("/seller/login", {
-          replace: true,
-        });
-      }, 1000);
+      setOtp("");
     } catch (err) {
       console.error("OTP Verification Error:", err);
 

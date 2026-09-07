@@ -22,6 +22,7 @@ import SellerLayout from "./components/seller/SellerLayout";
 
 import SellerLogin from "./pages/seller/SellerLogin";
 import SellerRegister from "./pages/seller/SellerRegister";
+import SellerRegistrationSuccess from "./pages/seller/SellerRegistrationSuccess";
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerProfile from "./pages/seller/SellerProfile";
 import MyAnimals from "./pages/seller/MyAnimals";
@@ -66,9 +67,10 @@ import AdminSettings from "./pages/admin/AdminSettings";
 function App() {
   return (
     <Routes>
+
       {/* =================================================
                           PUBLIC ROUTES
-      ================================================= */}
+          ================================================= */}
 
       <Route path="/" element={<Home />} />
 
@@ -76,23 +78,47 @@ function App() {
 
       <Route path="/register" element={<Register />} />
 
-      <Route path="/animals/:category" element={<AnimalList />} />
+      <Route
+        path="/animals/:category"
+        element={<AnimalList />}
+      />
 
-      <Route path="/animal/:id" element={<AnimalDetails />} />
+      <Route
+        path="/animal/:id"
+        element={<AnimalDetails />}
+      />
 
       {/* =================================================
                           SELLER ROUTES
-      ================================================= */}
+          ================================================= */}
 
-      <Route path="/seller/login" element={<SellerLogin />} />
+      <Route
+        path="/seller/login"
+        element={<SellerLogin />}
+      />
 
-      <Route path="/seller/register" element={<SellerRegister />} />
+      <Route
+        path="/seller/register"
+        element={<SellerRegister />}
+      />
+
+      {/* =================================================
+                  SELLER REGISTRATION SUCCESS
+          ================================================= */}
+
+      <Route
+        path="/seller/registration-success"
+        element={<SellerRegistrationSuccess />}
+      />
 
       {/* =================================================
                     SELLER FORGOT PASSWORD
-      ================================================= */}
+          ================================================= */}
 
-      <Route path="/seller/forgot-password" element={<ForgotPassword />} />
+      <Route
+        path="/seller/forgot-password"
+        element={<ForgotPassword />}
+      />
 
       <Route
         path="/seller/dashboard"
@@ -141,71 +167,114 @@ function App() {
 
       {/* =================================================
                           ADMIN ROUTES
-      ================================================= */}
+          ================================================= */}
 
       {/* ADMIN LOGIN */}
 
-      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin/login"
+        element={<AdminLogin />}
+      />
 
       {/* ADMIN REGISTER */}
 
-      <Route path="/admin/register" element={<AdminRegister />} />
+      <Route
+        path="/admin/register"
+        element={<AdminRegister />}
+      />
 
       {/* ADMIN DASHBOARD */}
 
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route
+        path="/admin/dashboard"
+        element={<AdminDashboard />}
+      />
 
       {/* =================================================
                        ADMIN SELLER MODULE
-      ================================================= */}
+          ================================================= */}
 
       {/* ALL SELLERS LIST */}
 
-      <Route path="/admin/sellers" element={<ManageSeller />} />
+      <Route
+        path="/admin/sellers"
+        element={<ManageSeller />}
+      />
 
       {/* PARTICULAR SELLER DETAILS */}
 
-      <Route path="/admin/sellers/:id" element={<AdminSellerDetails />} />
+      <Route
+        path="/admin/sellers/:id"
+        element={<AdminSellerDetails />}
+      />
 
       {/* =================================================
                        ADMIN OTHER MODULES
-      ================================================= */}
+          ================================================= */}
 
       {/* BUYERS */}
 
-      <Route path="/admin/buyers" element={<AdminBuyers />} />
+      <Route
+        path="/admin/buyers"
+        element={<AdminBuyers />}
+      />
 
       {/* ANIMALS */}
 
-      <Route path="/admin/animals" element={<AdminAnimals />} />
+      <Route
+        path="/admin/animals"
+        element={<AdminAnimals />}
+      />
 
       {/* CATEGORIES */}
 
-      <Route path="/admin/categories" element={<ManageCategories />} />
+      <Route
+        path="/admin/categories"
+        element={<ManageCategories />}
+      />
 
       {/* SUBSCRIPTION PLANS */}
 
-      <Route path="/admin/subscriptions" element={<AdminSubscriptionPlans />} />
+      <Route
+        path="/admin/subscriptions"
+        element={<AdminSubscriptionPlans />}
+      />
 
       {/* ORDERS */}
 
-      <Route path="/admin/orders" element={<AdminOrders />} />
+      <Route
+        path="/admin/orders"
+        element={<AdminOrders />}
+      />
 
       {/* PAYMENTS */}
 
-      <Route path="/admin/payments" element={<AdminPayments />} />
+      <Route
+        path="/admin/payments"
+        element={<AdminPayments />}
+      />
 
       {/* REPORTS */}
 
-      <Route path="/admin/reports" element={<AdminReports />} />
+      <Route
+        path="/admin/reports"
+        element={<AdminReports />}
+      />
 
       {/* NOTIFICATIONS */}
 
-      <Route path="/admin/notifications" element={<AdminNotifications />} />
+      <Route
+        path="/admin/notifications"
+        element={<AdminNotifications />}
+      />
 
       {/* SETTINGS */}
 
-      <Route path="/admin/settings" element={<AdminSettings />} />
+      <Route
+        path="/admin/settings"
+        element={<AdminSettings />}
+      />
+
     </Routes>
   );
 }

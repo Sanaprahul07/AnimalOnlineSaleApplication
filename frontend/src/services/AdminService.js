@@ -57,6 +57,38 @@ const AdminService = {
     },
 
     // =================================================
+    // SELLER APPROVAL / STATUS ACTIONS
+    // =================================================
+
+    // APPROVE SELLER
+    approveSeller: async (sellerId) => {
+        return axios.put(
+            `${BASE_URL}/admin/sellers/${sellerId}/approve`
+        );
+    },
+
+    // BLOCK SELLER
+    blockSeller: async (sellerId) => {
+        return axios.put(
+            `${BASE_URL}/admin/sellers/${sellerId}/block`
+        );
+    },
+
+    // ACTIVATE SELLER
+    activateSeller: async (sellerId) => {
+        return axios.put(
+            `${BASE_URL}/admin/sellers/${sellerId}/activate`
+        );
+    },
+
+    // REJECT SELLER
+    rejectSeller: async (sellerId) => {
+        return axios.put(
+            `${BASE_URL}/admin/sellers/${sellerId}/reject`
+        );
+    },
+
+    // =================================================
     // GET SELLER BY ID
     // =================================================
 
@@ -235,7 +267,8 @@ const AdminService = {
     // =================================================
 
     // GET SELLER LATEST PAYMENT
-    // Payment screenshot + payment status +
+    // Payment screenshot +
+    // payment status +
     // subscription details
 
     getSellerLatestPayment: async (sellerId) => {
@@ -275,6 +308,7 @@ const AdminService = {
             `${BASE_URL}/payments/admin/${paymentId}/reject`
         );
     }
+
 };
 
 // =====================================================

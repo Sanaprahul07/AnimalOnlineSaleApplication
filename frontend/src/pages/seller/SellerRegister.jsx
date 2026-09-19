@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 // import { Link, useNavigate } from "react-router-dom";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import {
   registerSeller,
@@ -14,7 +14,7 @@ import {
 import "./SellerRegister.css";
 
 function SellerRegister() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   // =========================================================
   // SELLER INFORMATION
@@ -574,7 +574,6 @@ function SellerRegister() {
 
     try {
       setLoading(true);
-
       await verifyEmailOtp(email.trim().toLowerCase(), otp.trim());
 
       setMessage(
@@ -582,9 +581,12 @@ function SellerRegister() {
       );
 
       setOtp("");
+
+      setTimeout(() => {
+        navigate("/seller/registration-success");
+      }, 1500);
     } catch (err) {
       console.error("OTP Verification Error:", err);
-
       setError(
         err?.response?.data?.message ||
           err?.response?.data ||

@@ -1,13 +1,22 @@
-
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function SellerRegistrationSuccess() {
   const navigate = useNavigate();
 
-  return (
-    <div className="container d-flex justify-content-center align-items-center"
-         style={{ minHeight: "100vh" }}>
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigate("/");
+    }, 1500);
 
+    return () => clearTimeout(timer);
+  }, [navigate]);
+
+  return (
+    <div
+      className="container d-flex justify-content-center align-items-center"
+      style={{ minHeight: "100vh" }}
+    >
       <div
         className="card shadow p-5 text-center"
         style={{ maxWidth: "550px", width: "100%" }}
@@ -29,9 +38,9 @@ function SellerRegistrationSuccess() {
 
         <button
           className="btn btn-success mt-3"
-          onClick={() => navigate("/seller/login")}
+          onClick={() => navigate("/")}
         >
-          Go to Seller Login
+          Go to Home
         </button>
       </div>
     </div>

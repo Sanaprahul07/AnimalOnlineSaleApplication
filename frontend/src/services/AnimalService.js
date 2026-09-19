@@ -18,6 +18,16 @@ export const getAnimalsBySeller = (sellerId) => {
     return axios.get(`${BASE_URL}/seller/${sellerId}`);
 };
 
+
+// =====================================================
+// BUYER - APPROVED AND AVAILABLE ANIMALS
+// =====================================================
+
+export const getApprovedAndAvailableAnimals = () => {
+    return axios.get(`${BASE_URL}/approved-available`);
+};
+
+
 // ADD ANIMAL
 export const addAnimal = (animal) => {
     return axios.post(`${BASE_URL}/add`, animal);

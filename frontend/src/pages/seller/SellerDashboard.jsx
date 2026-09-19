@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import { getAnimalsBySeller } from "../../services/AnimalService";
 
 function SellerDashboard() {
@@ -12,6 +13,7 @@ function SellerDashboard() {
     const [availableAnimals, setAvailableAnimals] = useState(0);
     const [orders, setOrders] = useState(0);
     const [cancelledOrders, setCancelledOrders] = useState(0);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -20,7 +22,7 @@ function SellerDashboard() {
     // LOAD DASHBOARD
     // =====================================
 
-    const loadDashboard = () => {
+    const loadDashboard = async () => {
 
         // -------------------------------------
         // GET LOGGED-IN SELLER ID
@@ -54,49 +56,52 @@ function SellerDashboard() {
         setError("");
 
 
-        // -------------------------------------
-        // GET SELLER ANIMALS
-        // -------------------------------------
+        try {
 
-        getAnimalsBySeller(sellerId)
+            // =====================================
+            // 1. GET SELLER ANIMALS
+            // =====================================
 
-            .then((response) => {
+            const animalResponse =
+                await getAnimalsBySeller(sellerId);
 
-                console.log(
-                    "Seller Dashboard Animals:",
-                    response.data
-                );
+            console.log(
+                "Seller Dashboard Animals:",
+                animalResponse.data
+            );
 
 
-                // -------------------------------------
-                // RESPONSE DATA
-                // -------------------------------------
+            // -------------------------------------
+            // RESPONSE DATA
+            // -------------------------------------
 
-                const animals = Array.isArray(response.data)
-                    ? response.data
+            const animals =
+                Array.isArray(animalResponse.data)
+                    ? animalResponse.data
                     : [];
 
 
-                console.log(
-                    "Total Animals For Seller:",
-                    animals.length
-                );
+            console.log(
+                "Total Animals For Seller:",
+                animals.length
+            );
 
 
-                // -------------------------------------
-                // TOTAL ANIMALS
-                // -------------------------------------
+            // -------------------------------------
+            // TOTAL ANIMALS
+            // -------------------------------------
 
-                setTotalAnimals(
-                    animals.length
-                );
+            setTotalAnimals(
+                animals.length
+            );
 
 
-                // -------------------------------------
-                // AVAILABLE ANIMALS
-                // -------------------------------------
+            // -------------------------------------
+            // AVAILABLE ANIMALS
+            // -------------------------------------
 
-                const availableCount = animals.filter(
+            const availableCount =
+                animals.filter(
                     (animal) =>
                         animal.available === true ||
                         animal.status === "AVAILABLE" ||
@@ -104,60 +109,124 @@ function SellerDashboard() {
                 ).length;
 
 
-                console.log(
-                    "Available Animals:",
-                    availableCount
+            console.log(
+                "Available Animals:",
+                availableCount
+            );
+
+
+            setAvailableAnimals(
+                availableCount
+            );
+
+
+            // =====================================
+            // 2. GET SELLER ORDERS
+            // =====================================
+
+            console.log(
+                "Getting Orders For Seller:",
+                sellerId
+            );
+
+
+            const orderResponse =
+                await axios.get(
+                    `http://localhost:8080/api/orders/seller/${sellerId}`
                 );
 
 
-                setAvailableAnimals(
-                    availableCount
-                );
+            console.log(
+                "Seller Orders:",
+                orderResponse.data
+            );
 
 
-                // -------------------------------------
-                // ORDERS
-                // -------------------------------------
+            // -------------------------------------
+            // ORDER RESPONSE
+            // -------------------------------------
 
-                // Order API is not created yet.
+            const sellerOrders =
+                Array.isArray(orderResponse.data)
+                    ? orderResponse.data
+                    : [];
 
-                setOrders(0);
+
+            console.log(
+                "Total Seller Orders:",
+                sellerOrders.length
+            );
 
 
-                // -------------------------------------
-                // CANCELLED ORDERS
-                // -------------------------------------
+            // -------------------------------------
+            // TOTAL ORDERS
+            // -------------------------------------
 
-                // Order API is not created yet.
+            setOrders(
+                sellerOrders.length
+            );
 
-                setCancelledOrders(0);
 
-            })
+            // -------------------------------------
+            // CANCELLED ORDERS
+            // -------------------------------------
 
-            .catch((error) => {
+            const cancelledCount =
+                sellerOrders.filter(
+                    (order) =>
+                        order.status &&
+                        order.status.toUpperCase() === "CANCELLED"
+                ).length;
+
+
+            console.log(
+                "Cancelled Seller Orders:",
+                cancelledCount
+            );
+
+
+            setCancelledOrders(
+                cancelledCount
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Error loading seller dashboard:",
+                error
+            );
+
+
+            // -------------------------------------
+            // BACKEND ERROR
+            // -------------------------------------
+
+            if (error.response) {
 
                 console.error(
-                    "Error loading seller dashboard:",
-                    error
+                    "Backend Response:",
+                    error.response.data
                 );
 
-
-                setError(
-                    "Unable to load seller dashboard data."
-                );
+            }
 
 
-                setTotalAnimals(0);
+            setError(
+                "Unable to load seller dashboard data."
+            );
 
-                setAvailableAnimals(0);
 
-            })
+            setTotalAnimals(0);
+            setAvailableAnimals(0);
+            setOrders(0);
+            setCancelledOrders(0);
 
-            .finally(() => {
+        } finally {
 
-                setLoading(false);
+            setLoading(false);
 
-            });
+        }
     };
 
 
@@ -179,7 +248,6 @@ function SellerDashboard() {
     return (
 
         <div className="container-fluid p-4">
-
 
             {/* =====================================
                     PAGE TITLE
@@ -205,9 +273,7 @@ function SellerDashboard() {
             {error && (
 
                 <div className="alert alert-danger">
-
                     {error}
-
                 </div>
 
             )}
@@ -428,7 +494,12 @@ function SellerDashboard() {
                         <div className="card-body p-4">
 
                             <h1 className="fw-bold text-warning">
-                                {orders}
+
+                                {loading
+                                    ? "..."
+                                    : orders
+                                }
+
                             </h1>
 
                             <p className="text-muted mb-0">
@@ -491,7 +562,12 @@ function SellerDashboard() {
                         <div className="card-body p-4">
 
                             <h1 className="fw-bold text-danger">
-                                {cancelledOrders}
+
+                                {loading
+                                    ? "..."
+                                    : cancelledOrders
+                                }
+
                             </h1>
 
                             <p className="text-muted mb-0">
@@ -521,9 +597,7 @@ function SellerDashboard() {
                 <div className="row g-3">
 
 
-                    {/* =====================================
-                            HOME
-                    ===================================== */}
+                    {/* HOME */}
 
                     <div className="col-md-4">
 
@@ -537,9 +611,7 @@ function SellerDashboard() {
                     </div>
 
 
-                    {/* =====================================
-                            MY ANIMALS
-                    ===================================== */}
+                    {/* MY ANIMALS */}
 
                     <div className="col-md-4">
 
@@ -553,9 +625,7 @@ function SellerDashboard() {
                     </div>
 
 
-                    {/* =====================================
-                            PROFILE
-                    ===================================== */}
+                    {/* PROFILE */}
 
                     <div className="col-md-4">
 
@@ -572,11 +642,8 @@ function SellerDashboard() {
 
             </div>
 
-
         </div>
-
     );
-
 }
 
 export default SellerDashboard;

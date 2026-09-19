@@ -3,530 +3,460 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getAnimalById } from "../services/AnimalService";
 
 function AnimalDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-    const { id } = useParams();
+  const [animal, setAnimal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
-    const navigate = useNavigate();
+  // ==========================================
+  // GET ANIMAL DETAILS
+  // ==========================================
 
-    const [animal, setAnimal] = useState(null);
+  useEffect(() => {
+    const fetchAnimal = async () => {
+      try {
+        setLoading(true);
+        setErrorMessage("");
 
-    const [loading, setLoading] = useState(true);
+        const response = await getAnimalById(id);
 
-    const [errorMessage, setErrorMessage] = useState("");
+        console.log("=================================");
+        console.log("ANIMAL DETAILS RESPONSE");
+        console.log(response.data);
+        console.log("Front Image URL:", response.data?.frontImageUrl);
+        console.log("Side Image URL:", response.data?.sideImageUrl);
+        console.log("Back Image URL:", response.data?.backImageUrl);
+        console.log("=================================");
 
-    // ==========================================
-    // GET ANIMAL DETAILS
-    // ==========================================
+        setAnimal(response.data);
+      } catch (error) {
+        console.error("Error getting animal details:", error);
 
-    useEffect(() => {
+        if (error.response) {
+          console.error("Backend Response:", error.response.data);
 
-        const fetchAnimal = async () => {
+          setErrorMessage(
+            error.response.data?.message ||
+              "Animal details not found."
+          );
+        } else {
+          setErrorMessage("Backend server is not running.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
 
-            try {
+    fetchAnimal();
+  }, [id]);
 
-                setLoading(true);
+  // ==========================================
+  // LOADING
+  // ==========================================
 
-                setErrorMessage("");
+  if (loading) {
+    return (
+      <div className="container mt-5">
+        <div className="text-center">
+          <div
+            className="spinner-border text-success"
+            role="status"
+          ></div>
 
-                const response =
-                    await getAnimalById(id);
+          <p className="mt-3">
+            Loading animal details...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-                console.log(
-                    "================================="
-                );
+  // ==========================================
+  // ERROR
+  // ==========================================
 
-                console.log(
-                    "ANIMAL DETAILS RESPONSE"
-                );
+  if (errorMessage) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger">
+          <strong>Error:</strong> {errorMessage}
+        </div>
 
-                console.log(
-                    response.data
-                );
+        <button
+          className="btn btn-secondary"
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </button>
+      </div>
+    );
+  }
 
-                console.log(
-                    "Front Image URL:",
-                    response.data?.frontImageUrl
-                );
+  // ==========================================
+  // ANIMAL NOT FOUND
+  // ==========================================
 
-                console.log(
-                    "Side Image URL:",
-                    response.data?.sideImageUrl
-                );
+  if (!animal) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-warning">
+          Animal not found.
+        </div>
+      </div>
+    );
+  }
 
-                console.log(
-                    "Back Image URL:",
-                    response.data?.backImageUrl
-                );
+  // ==========================================
+  // UI
+  // ==========================================
 
-                console.log(
-                    "================================="
-                );
+  return (
+    <div className="container mt-4 mb-5">
 
-                setAnimal(response.data);
+      {/* ==================================
+                  BACK BUTTON
+          ================================== */}
 
-            } catch (error) {
+      <button
+        className="btn btn-secondary mb-3"
+        onClick={() => navigate(-1)}
+      >
+        ← Back
+      </button>
 
-                console.error(
-                    "Error getting animal details:",
-                    error
-                );
+      {/* ==================================
+                  MAIN CARD
+          ================================== */}
 
-                if (error.response) {
+      <div className="card shadow border-0">
+        <div className="card-body p-4">
 
-                    console.error(
-                        "Backend Response:",
-                        error.response.data
-                    );
+          <h2 className="text-success fw-bold mb-4">
+            {animal.animalName}
+          </h2>
 
-                    setErrorMessage(
-                        error.response.data?.message ||
-                        "Animal details not found."
-                    );
+          {/* ==================================
+                      ANIMAL PHOTOS
+              ================================== */}
 
-                } else {
+          <h5 className="fw-bold mb-3">
+            Animal Photos
+          </h5>
 
-                    setErrorMessage(
-                        "Backend server is not running."
-                    );
-                }
+          <div className="row mb-4">
 
-            } finally {
+            {/* ==================================
+                        FRONT PHOTO
+                ================================== */}
 
-                setLoading(false);
-            }
-        };
+            <div className="col-md-4 mb-3">
+              <div className="card h-100">
 
-        fetchAnimal();
+                {animal.frontImageUrl ? (
+                  <img
+                    src={animal.frontImageUrl}
+                    className="card-img-top"
+                    alt="Front Animal"
+                    style={{
+                      height: "250px",
+                      objectFit: "cover",
+                    }}
+                    onError={(e) => {
+                      console.error(
+                        "Front image failed:",
+                        animal.frontImageUrl
+                      );
 
-    }, [id]);
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="d-flex align-items-center justify-content-center bg-light"
+                    style={{
+                      height: "250px",
+                    }}
+                  >
+                    No Front Photo
+                  </div>
+                )}
 
-    // ==========================================
-    // LOADING
-    // ==========================================
-
-    if (loading) {
-
-        return (
-            <div className="container mt-5">
-
-                <div className="text-center">
-
-                    <div
-                        className="spinner-border text-success"
-                        role="status"
-                    >
-                    </div>
-
-                    <p className="mt-3">
-                        Loading animal details...
-                    </p>
-
+                <div className="card-body text-center">
+                  <strong>Front Photo</strong>
                 </div>
 
+              </div>
             </div>
-        );
-    }
 
-    // ==========================================
-    // ERROR
-    // ==========================================
+            {/* ==================================
+                        SIDE PHOTO
+                ================================== */}
 
-    if (errorMessage) {
+            <div className="col-md-4 mb-3">
+              <div className="card h-100">
 
-        return (
-            <div className="container mt-5">
+                {animal.sideImageUrl ? (
+                  <img
+                    src={animal.sideImageUrl}
+                    className="card-img-top"
+                    alt="Side Animal"
+                    style={{
+                      height: "250px",
+                      objectFit: "cover",
+                    }}
+                    onError={(e) => {
+                      console.error(
+                        "Side image failed:",
+                        animal.sideImageUrl
+                      );
 
-                <div className="alert alert-danger">
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="d-flex align-items-center justify-content-center bg-light"
+                    style={{
+                      height: "250px",
+                    }}
+                  >
+                    No Side Photo
+                  </div>
+                )}
 
-                    <strong>
-                        Error:
-                    </strong>{" "}
-
-                    {errorMessage}
-
+                <div className="card-body text-center">
+                  <strong>Side Photo</strong>
                 </div>
+
+              </div>
+            </div>
+
+            {/* ==================================
+                        BACK PHOTO
+                ================================== */}
+
+            <div className="col-md-4 mb-3">
+              <div className="card h-100">
+
+                {animal.backImageUrl ? (
+                  <img
+                    src={animal.backImageUrl}
+                    className="card-img-top"
+                    alt="Back Animal"
+                    style={{
+                      height: "250px",
+                      objectFit: "cover",
+                    }}
+                    onError={(e) => {
+                      console.error(
+                        "Back image failed:",
+                        animal.backImageUrl
+                      );
+
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div
+                    className="d-flex align-items-center justify-content-center bg-light"
+                    style={{
+                      height: "250px",
+                    }}
+                  >
+                    No Back Photo
+                  </div>
+                )}
+
+                <div className="card-body text-center">
+                  <strong>Back Photo</strong>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          {/* ==================================
+                    ANIMAL DETAILS
+              ================================== */}
+
+          <h5 className="fw-bold text-success mb-3">
+            Animal Details
+          </h5>
+
+          <div className="row">
+
+            <div className="col-md-6 mb-3">
+              <strong>Animal ID:</strong>
+              <br />
+              {animal.id}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Animal Name:</strong>
+              <br />
+              {animal.animalName}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Category:</strong>
+              <br />
+              {animal.category}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Breed:</strong>
+              <br />
+              {animal.breed}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Age:</strong>
+              <br />
+              {animal.age}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Gender:</strong>
+              <br />
+              {animal.gender}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Price:</strong>
+              <br />
+
+              <span className="text-success fw-bold">
+                ₹ {animal.price}
+              </span>
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Location:</strong>
+              <br />
+              {animal.location}
+            </div>
+
+            <div className="col-12 mb-3">
+              <strong>Description:</strong>
+
+              <p className="mt-2">
+                {animal.description ||
+                  "No description available."}
+              </p>
+            </div>
+
+            <div className="col-12">
+              <strong>Availability:</strong>
+
+              <span
+                className={
+                  animal.available
+                    ? "badge bg-success ms-2"
+                    : "badge bg-danger ms-2"
+                }
+              >
+                {animal.available
+                  ? "Available"
+                  : "Not Available"}
+              </span>
+            </div>
+
+            {/* ==========================================
+                            BUY NOW
+                ========================================== */}
+
+            <div className="mt-4 text-center">
+
+              {animal.available ? (
 
                 <button
-                    className="btn btn-secondary"
-                    onClick={() => navigate(-1)}
+                  type="button"
+                  className="btn btn-success px-4"
+                  onClick={() => {
+
+                    const customerId =
+                      localStorage.getItem("customerId");
+
+                    console.log("BUY NOW CLICKED");
+                    console.log(
+                      "Animal ID:",
+                      animal.id
+                    );
+                    console.log(
+                      "Customer ID:",
+                      customerId
+                    );
+
+                    // ==========================================
+                    // CUSTOMER NOT LOGGED IN
+                    // ==========================================
+
+                    if (!customerId) {
+
+                      // Save current animal ID
+                      // for returning after login
+                      localStorage.setItem(
+                        "pendingAnimalId",
+                        String(animal.id)
+                      );
+
+                      console.log(
+                        "Customer not logged in"
+                      );
+
+                      console.log(
+                        "Redirecting to Buyer Register"
+                      );
+
+                      navigate("/buyer/register");
+
+                      return;
+                    }
+
+                    // ==========================================
+                    // CUSTOMER ALREADY LOGGED IN
+                    // ==========================================
+
+                    console.log(
+                      "Customer already logged in"
+                    );
+
+                    console.log(
+                      "Redirecting to Order Page"
+                    );
+
+                    navigate(
+                      `/buyer/order/${animal.id}`
+                    );
+                  }}
                 >
-                    ← Back
+                  Buy Now
                 </button>
 
-            </div>
-        );
-    }
+              ) : (
 
-    // ==========================================
-    // ANIMAL NOT FOUND
-    // ==========================================
+                <button
+                  type="button"
+                  className="btn btn-secondary px-4"
+                  disabled
+                >
+                  Not Available
+                </button>
 
-    if (!animal) {
-
-        return (
-            <div className="container mt-5">
-
-                <div className="alert alert-warning">
-                    Animal not found.
-                </div>
+              )}
 
             </div>
-        );
-    }
 
-    // ==========================================
-    // UI
-    // ==========================================
-
-    return (
-
-        <div className="container mt-4 mb-5">
-
-            {/* ==================================
-                BACK BUTTON
-            ================================== */}
-
-            <button
-                className="btn btn-secondary mb-3"
-                onClick={() => navigate(-1)}
-            >
-                ← Back
-            </button>
-
-            {/* ==================================
-                MAIN CARD
-            ================================== */}
-
-            <div className="card shadow border-0">
-
-                <div className="card-body p-4">
-
-                    <h2 className="text-success fw-bold mb-4">
-                        {animal.animalName}
-                    </h2>
-
-                    {/* ==================================
-                        ANIMAL PHOTOS
-                    ================================== */}
-
-                    <h5 className="fw-bold mb-3">
-                        Animal Photos
-                    </h5>
-
-                    <div className="row mb-4">
-
-                        {/* ==================================
-                            FRONT PHOTO
-                        ================================== */}
-
-                        <div className="col-md-4 mb-3">
-
-                            <div className="card h-100">
-
-                                {animal.frontImageUrl ? (
-
-                                    <img
-                                        src={animal.frontImageUrl}
-                                        className="card-img-top"
-                                        alt="Front Animal"
-                                        style={{
-                                            height: "250px",
-                                            objectFit: "cover"
-                                        }}
-                                        onError={(e) => {
-                                            console.error(
-                                                "Front image failed:",
-                                                animal.frontImageUrl
-                                            );
-
-                                            e.currentTarget.style.display =
-                                                "none";
-                                        }}
-                                    />
-
-                                ) : (
-
-                                    <div
-                                        className="d-flex align-items-center justify-content-center bg-light"
-                                        style={{
-                                            height: "250px"
-                                        }}
-                                    >
-                                        No Front Photo
-                                    </div>
-                                )}
-
-                                <div className="card-body text-center">
-
-                                    <strong>
-                                        Front Photo
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* ==================================
-                            SIDE PHOTO
-                        ================================== */}
-
-                        <div className="col-md-4 mb-3">
-
-                            <div className="card h-100">
-
-                                {animal.sideImageUrl ? (
-
-                                    <img
-                                        src={animal.sideImageUrl}
-                                        className="card-img-top"
-                                        alt="Side Animal"
-                                        style={{
-                                            height: "250px",
-                                            objectFit: "cover"
-                                        }}
-                                        onError={(e) => {
-                                            console.error(
-                                                "Side image failed:",
-                                                animal.sideImageUrl
-                                            );
-
-                                            e.currentTarget.style.display =
-                                                "none";
-                                        }}
-                                    />
-
-                                ) : (
-
-                                    <div
-                                        className="d-flex align-items-center justify-content-center bg-light"
-                                        style={{
-                                            height: "250px"
-                                        }}
-                                    >
-                                        No Side Photo
-                                    </div>
-                                )}
-
-                                <div className="card-body text-center">
-
-                                    <strong>
-                                        Side Photo
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {/* ==================================
-                            BACK PHOTO
-                        ================================== */}
-
-                        <div className="col-md-4 mb-3">
-
-                            <div className="card h-100">
-
-                                {animal.backImageUrl ? (
-
-                                    <img
-                                        src={animal.backImageUrl}
-                                        className="card-img-top"
-                                        alt="Back Animal"
-                                        style={{
-                                            height: "250px",
-                                            objectFit: "cover"
-                                        }}
-                                        onError={(e) => {
-                                            console.error(
-                                                "Back image failed:",
-                                                animal.backImageUrl
-                                            );
-
-                                            e.currentTarget.style.display =
-                                                "none";
-                                        }}
-                                    />
-
-                                ) : (
-
-                                    <div
-                                        className="d-flex align-items-center justify-content-center bg-light"
-                                        style={{
-                                            height: "250px"
-                                        }}
-                                    >
-                                        No Back Photo
-                                    </div>
-                                )}
-
-                                <div className="card-body text-center">
-
-                                    <strong>
-                                        Back Photo
-                                    </strong>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {/* ==================================
-                        ANIMAL DETAILS
-                    ================================== */}
-
-                    <h5 className="fw-bold text-success mb-3">
-                        Animal Details
-                    </h5>
-
-                    <div className="row">
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Animal ID:
-                            </strong>
-
-                            <br />
-
-                            {animal.id}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Animal Name:
-                            </strong>
-
-                            <br />
-
-                            {animal.animalName}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Category:
-                            </strong>
-
-                            <br />
-
-                            {animal.category}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Breed:
-                            </strong>
-
-                            <br />
-
-                            {animal.breed}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Age:
-                            </strong>
-
-                            <br />
-
-                            {animal.age}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Gender:
-                            </strong>
-
-                            <br />
-
-                            {animal.gender}
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Price:
-                            </strong>
-
-                            <br />
-
-                            <span className="text-success fw-bold">
-                                ₹ {animal.price}
-                            </span>
-
-                        </div>
-
-                        <div className="col-md-6 mb-3">
-
-                            <strong>
-                                Location:
-                            </strong>
-
-                            <br />
-
-                            {animal.location}
-
-                        </div>
-
-                        <div className="col-12 mb-3">
-
-                            <strong>
-                                Description:
-                            </strong>
-
-                            <p className="mt-2">
-
-                                {animal.description ||
-                                    "No description available."}
-
-                            </p>
-
-                        </div>
-
-                        <div className="col-12">
-
-                            <strong>
-                                Availability:
-                            </strong>
-
-                            <span
-                                className={
-                                    animal.available
-                                        ? "badge bg-success ms-2"
-                                        : "badge bg-danger ms-2"
-                                }
-                            >
-                                {animal.available
-                                    ? "Available"
-                                    : "Not Available"}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+          </div>
 
         </div>
-    );
+      </div>
+
+    </div>
+  );
 }
 
 export default AnimalDetails;

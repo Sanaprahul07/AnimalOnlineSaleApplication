@@ -1,70 +1,8 @@
 import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
-import { getAllAnimals } from "../services/AnimalService";
 
-// Fallback sample images
-import hfImg from "../assets/HF.png";
-import cowImg from "../assets/cowimg.png";
-import murrahImg from "../assets/MurrahBuffalo.png";
-import goatImg from "../assets/goat1.jpg";
-import dogImg from "../assets/Dog.png";
-
-// =====================================================
-// FEATURED ANIMALS
-// =====================================================
-
-const SAMPLE_ANIMALS = [
-  {
-    id: "s1",
-    animalName: "HF Cow",
-    breed: "HF",
-    price: 65000,
-    age: "2 Years",
-    gender: "Female",
-    location: "Punjab",
-    image: hfImg,
-  },
-  {
-    id: "s2",
-    animalName: "Sahiwal Cow",
-    breed: "Sahiwal",
-    price: 55000,
-    age: "3 Years",
-    gender: "Female",
-    location: "Haryana",
-    image: cowImg,
-  },
-  {
-    id: "s3",
-    animalName: "Murrah Buffalo",
-    breed: "Murrah",
-    price: 75000,
-    age: "4 Years",
-    gender: "Female",
-    location: "Uttar Pradesh",
-    image: murrahImg,
-  },
-  {
-    id: "s4",
-    animalName: "Beetal Goat",
-    breed: "Beetal",
-    price: 8500,
-    age: "1.5 Years",
-    gender: "Male",
-    location: "Rajasthan",
-    image: goatImg,
-  },
-  {
-    id: "s5",
-    animalName: "Golden Retriever",
-    breed: "Golden Retriever",
-    price: 18000,
-    age: "8 Months",
-    gender: "Male",
-    location: "Maharashtra",
-    image: dogImg,
-  },
-];
+import { getApprovedAndAvailableAnimals } from "../services/AnimalService";
 
 // =====================================================
 // 10 ANIMALS PER PAGE
@@ -76,12 +14,13 @@ function FeaturedAnimals() {
   const navigate = useNavigate();
 
   const [animals, setAnimals] = useState([]);
-  const [usingSamples, setUsingSamples] = useState(false);
+
   const [loading, setLoading] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(0);
 
   // =====================================================
-  // LOAD ANIMALS
+  // LOAD APPROVED + AVAILABLE ANIMALS
   // =====================================================
 
   useEffect(() => {
@@ -91,25 +30,30 @@ function FeaturedAnimals() {
       try {
         setLoading(true);
 
-        const response = await getAllAnimals();
+        const response = await getApprovedAndAvailableAnimals();
 
         if (!active) return;
 
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          // Real backend animals
+        // =================================================
+        // BACKEND ALREADY RETURNS APPROVED + AVAILABLE
+        // =================================================
+
+        if (Array.isArray(response.data)) {
           setAnimals(response.data);
-          setUsingSamples(false);
         } else {
-          // Fallback samples
-          setAnimals(SAMPLE_ANIMALS);
-          setUsingSamples(true);
+          setAnimals([]);
         }
+
+        setCurrentPage(0);
+
+        console.log("Approved + Available Animals:", response.data);
       } catch (err) {
-        console.error("LOAD ANIMALS ERROR:", err);
+        console.error("LOAD APPROVED + AVAILABLE ANIMALS ERROR:", err);
 
         if (active) {
-          setAnimals(SAMPLE_ANIMALS);
-          setUsingSamples(true);
+          setAnimals([]);
+
+          setCurrentPage(0);
         }
       } finally {
         if (active) {
@@ -155,7 +99,11 @@ function FeaturedAnimals() {
   // =====================================================
 
   const openAnimal = (animal) => {
-    if (usingSamples) return;
+    if (!animal?.id) {
+      console.error("Animal ID is missing:", animal);
+
+      return;
+    }
 
     navigate(`/animal/${animal.id}`);
   };
@@ -175,7 +123,7 @@ function FeaturedAnimals() {
   // =====================================================
 
   const imageOf = (animal) => {
-    return animal.frontImageUrl || animal.image || null;
+    return animal.frontImageUrl || animal.image || animal.imageUrl || null;
   };
 
   // =====================================================
@@ -260,15 +208,24 @@ function FeaturedAnimals() {
           <div className="text-center py-5">
             <div className="spinner-border as-text-green" role="status" />
           </div>
+        ) : animals.length === 0 ? (
+          /* =====================================================
+                        NO APPROVED ANIMALS
+                    ===================================================== */
+
+          <div className="text-center py-5">
+            <p className="text-muted mb-0">
+              No approved animals are currently available.
+            </p>
+          </div>
         ) : (
           <>
             {/* =====================================================
                             ANIMAL GRID
-
+                            
                             IMPORTANT:
                             5 animals in one row.
                             10 animals = 5 + 5.
-
                             CSS Grid is used instead of Bootstrap
                             col-md / col-lg so browser zoom does not
                             change 5 columns into 4 columns.
@@ -301,7 +258,7 @@ function FeaturedAnimals() {
                     className="as-animal-card h-100"
                     onClick={() => openAnimal(animal)}
                     style={{
-                      cursor: usingSamples ? "default" : "pointer",
+                      cursor: "pointer",
                       width: "100%",
                       height: "100%",
                       overflow: "hidden",
@@ -312,8 +269,6 @@ function FeaturedAnimals() {
                                         ===================================================== */}
 
                     <div className="as-animal-media">
-                      {/* <span className="as-featured-badge">Featured</span> */}
-
                       {imageOf(animal) ? (
                         <img
                           src={imageOf(animal)}
@@ -380,19 +335,17 @@ function FeaturedAnimals() {
 
                       {/* View Animal Button */}
 
-                      {!usingSamples && (
-                        <button
-                          type="button"
-                          className="btn btn-success w-100"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                      <button
+                        type="button"
+                        className="btn btn-success w-100"
+                        onClick={(e) => {
+                          e.stopPropagation();
 
-                            openAnimal(animal);
-                          }}
-                        >
-                          View Animal
-                        </button>
-                      )}
+                          openAnimal(animal);
+                        }}
+                      >
+                        View Animal
+                      </button>
                     </div>
                   </div>
                 </div>

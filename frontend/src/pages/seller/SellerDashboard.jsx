@@ -4,646 +4,454 @@ import axios from "axios";
 import { getAnimalsBySeller } from "../../services/AnimalService";
 
 function SellerDashboard() {
+  // =====================================
+  // DASHBOARD STATES
+  // =====================================
 
-    // =====================================
-    // DASHBOARD STATES
-    // =====================================
+  const [totalAnimals, setTotalAnimals] = useState(0);
+  const [availableAnimals, setAvailableAnimals] = useState(0);
+  const [orders, setOrders] = useState(0);
+  const [cancelledOrders, setCancelledOrders] = useState(0);
 
-    const [totalAnimals, setTotalAnimals] = useState(0);
-    const [availableAnimals, setAvailableAnimals] = useState(0);
-    const [orders, setOrders] = useState(0);
-    const [cancelledOrders, setCancelledOrders] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+  // =====================================
+  // LOAD DASHBOARD
+  // =====================================
 
+  const loadDashboard = async () => {
+    // -------------------------------------
+    // GET LOGGED-IN SELLER ID
+    // -------------------------------------
 
-    // =====================================
-    // LOAD DASHBOARD
-    // =====================================
+    const sellerId = localStorage.getItem("sellerId");
 
-    const loadDashboard = async () => {
+    console.log("=================================");
+    console.log("SELLER DASHBOARD");
+    console.log("Logged-in Seller ID:", sellerId);
+    console.log("=================================");
 
-        // -------------------------------------
-        // GET LOGGED-IN SELLER ID
-        // -------------------------------------
+    // -------------------------------------
+    // SELLER ID CHECK
+    // -------------------------------------
 
-        const sellerId = localStorage.getItem("sellerId");
+    if (!sellerId) {
+      setError("Seller session not found. Please login again.");
 
-        console.log("=================================");
-        console.log("SELLER DASHBOARD");
-        console.log("Logged-in Seller ID:", sellerId);
-        console.log("=================================");
+      setLoading(false);
 
+      return;
+    }
 
-        // -------------------------------------
-        // SELLER ID CHECK
-        // -------------------------------------
+    setLoading(true);
+    setError("");
 
-        if (!sellerId) {
+    // =====================================================
+    // 1. GET LOGGED-IN SELLER ANIMALS
+    // =====================================================
 
-            setError(
-                "Seller session not found. Please login again."
-            );
+    try {
+      console.log("Loading animals for Seller ID:", sellerId);
 
-            setLoading(false);
+      const animalResponse = await getAnimalsBySeller(sellerId);
 
-            return;
-        }
+      console.log("Seller Dashboard Animals:", animalResponse.data);
 
+      // -------------------------------------
+      // RESPONSE DATA
+      // -------------------------------------
 
-        setLoading(true);
-        setError("");
+      const animals = Array.isArray(animalResponse.data)
+        ? animalResponse.data
+        : [];
 
+      console.log("Total Animals For Seller:", animals.length);
 
-        try {
+      // -------------------------------------
+      // TOTAL ANIMALS
+      // -------------------------------------
 
-            // =====================================
-            // 1. GET SELLER ANIMALS
-            // =====================================
+      setTotalAnimals(animals.length);
 
-            const animalResponse =
-                await getAnimalsBySeller(sellerId);
+      // -------------------------------------
+      // AVAILABLE ANIMALS
+      // -------------------------------------
 
-            console.log(
-                "Seller Dashboard Animals:",
-                animalResponse.data
-            );
+      const availableCount = animals.filter(
+        (animal) =>
+          animal.available === true ||
+          animal.status === "AVAILABLE" ||
+          animal.status === "Available",
+      ).length;
 
+      console.log("Available Animals:", availableCount);
 
-            // -------------------------------------
-            // RESPONSE DATA
-            // -------------------------------------
+      setAvailableAnimals(availableCount);
+    } catch (animalError) {
+      console.error("Error loading seller animals:", animalError);
 
-            const animals =
-                Array.isArray(animalResponse.data)
-                    ? animalResponse.data
-                    : [];
+      // -------------------------------------
+      // ANIMAL BACKEND ERROR
+      // -------------------------------------
 
+      if (animalError.response) {
+        console.error("Animal Backend Status:", animalError.response.status);
 
-            console.log(
-                "Total Animals For Seller:",
-                animals.length
-            );
+        console.error("Animal Backend Response:", animalError.response.data);
+      }
 
+      // -------------------------------------
+      // ONLY ANIMAL COUNTS RESET
+      // -------------------------------------
 
-            // -------------------------------------
-            // TOTAL ANIMALS
-            // -------------------------------------
+      setTotalAnimals(0);
+      setAvailableAnimals(0);
+    }
 
-            setTotalAnimals(
-                animals.length
-            );
+    // =====================================================
+    // 2. GET SELLER ORDERS
+    // =====================================================
 
+    try {
+      console.log("Getting Orders For Seller:", sellerId);
 
-            // -------------------------------------
-            // AVAILABLE ANIMALS
-            // -------------------------------------
+      const orderResponse = await axios.get(
+        `http://localhost:8080/api/orders/seller/${sellerId}`,
+      );
 
-            const availableCount =
-                animals.filter(
-                    (animal) =>
-                        animal.available === true ||
-                        animal.status === "AVAILABLE" ||
-                        animal.status === "Available"
-                ).length;
+      console.log("Seller Orders:", orderResponse.data);
 
+      // -------------------------------------
+      // ORDER RESPONSE
+      // -------------------------------------
 
-            console.log(
-                "Available Animals:",
-                availableCount
-            );
+      const sellerOrders = Array.isArray(orderResponse.data)
+        ? orderResponse.data
+        : [];
 
+      console.log("Total Seller Orders:", sellerOrders.length);
 
-            setAvailableAnimals(
-                availableCount
-            );
+      // -------------------------------------
+      // TOTAL ORDERS
+      // -------------------------------------
 
+      setOrders(sellerOrders.length);
 
-            // =====================================
-            // 2. GET SELLER ORDERS
-            // =====================================
+      // -------------------------------------
+      // CANCELLED ORDERS
+      // -------------------------------------
 
-            console.log(
-                "Getting Orders For Seller:",
-                sellerId
-            );
+      const cancelledCount = sellerOrders.filter(
+        (order) => order.status && order.status.toUpperCase() === "CANCELLED",
+      ).length;
 
+      console.log("Cancelled Seller Orders:", cancelledCount);
 
-            const orderResponse =
-                await axios.get(
-                    `http://localhost:8080/api/orders/seller/${sellerId}`
-                );
+      setCancelledOrders(cancelledCount);
+    } catch (orderError) {
+      console.error("Error loading seller orders:", orderError);
 
+      // -------------------------------------
+      // ORDER BACKEND ERROR
+      // -------------------------------------
 
-            console.log(
-                "Seller Orders:",
-                orderResponse.data
-            );
+      if (orderError.response) {
+        console.error("Order Backend Status:", orderError.response.status);
 
+        console.error("Order Backend Response:", orderError.response.data);
+      }
 
-            // -------------------------------------
-            // ORDER RESPONSE
-            // -------------------------------------
+      // -------------------------------------
+      // ONLY ORDER COUNTS RESET
+      // -------------------------------------
 
-            const sellerOrders =
-                Array.isArray(orderResponse.data)
-                    ? orderResponse.data
-                    : [];
+      setOrders(0);
+      setCancelledOrders(0);
+    }
 
+    // -------------------------------------
+    // FINISH LOADING
+    // -------------------------------------
 
-            console.log(
-                "Total Seller Orders:",
-                sellerOrders.length
-            );
+    setLoading(false);
+  };
 
+  // =====================================
+  // PAGE LOAD
+  // =====================================
 
-            // -------------------------------------
-            // TOTAL ORDERS
-            // -------------------------------------
+  useEffect(() => {
+    loadDashboard();
+  }, []);
 
-            setOrders(
-                sellerOrders.length
-            );
+  // =====================================
+  // UI
+  // =====================================
 
-
-            // -------------------------------------
-            // CANCELLED ORDERS
-            // -------------------------------------
-
-            const cancelledCount =
-                sellerOrders.filter(
-                    (order) =>
-                        order.status &&
-                        order.status.toUpperCase() === "CANCELLED"
-                ).length;
-
-
-            console.log(
-                "Cancelled Seller Orders:",
-                cancelledCount
-            );
-
-
-            setCancelledOrders(
-                cancelledCount
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Error loading seller dashboard:",
-                error
-            );
-
-
-            // -------------------------------------
-            // BACKEND ERROR
-            // -------------------------------------
-
-            if (error.response) {
-
-                console.error(
-                    "Backend Response:",
-                    error.response.data
-                );
-
-            }
-
-
-            setError(
-                "Unable to load seller dashboard data."
-            );
-
-
-            setTotalAnimals(0);
-            setAvailableAnimals(0);
-            setOrders(0);
-            setCancelledOrders(0);
-
-        } finally {
-
-            setLoading(false);
-
-        }
-    };
-
-
-    // =====================================
-    // PAGE LOAD
-    // =====================================
-
-    useEffect(() => {
-
-        loadDashboard();
-
-    }, []);
-
-
-    // =====================================
-    // UI
-    // =====================================
-
-    return (
-
-        <div className="container-fluid p-4">
-
-            {/* =====================================
+  return (
+    <div className="container-fluid p-4">
+      {/* =====================================
                     PAGE TITLE
             ===================================== */}
 
-            <div className="mb-4">
+      <div className="mb-4">
+        <h2 className="fw-bold text-dark mb-2">Seller Dashboard</h2>
 
-                <h2 className="fw-bold text-dark mb-2">
-                    Seller Dashboard
-                </h2>
+        <p className="text-muted mb-0">
+          Welcome to Animal Online Sale Seller Panel.
+        </p>
+      </div>
 
-                <p className="text-muted mb-0">
-                    Welcome to Animal Online Sale Seller Panel.
-                </p>
-
-            </div>
-
-
-            {/* =====================================
+      {/* =====================================
                     ERROR MESSAGE
             ===================================== */}
 
-            {error && (
+      {error && <div className="alert alert-danger">{error}</div>}
 
-                <div className="alert alert-danger">
-                    {error}
-                </div>
-
-            )}
-
-
-            {/* =====================================
+      {/* =====================================
                     LOADING
             ===================================== */}
 
-            {loading && (
+      {loading && (
+        <div className="text-center mb-4">
+          <div className="spinner-border text-success" role="status"></div>
 
-                <div className="text-center mb-4">
+          <p className="mt-2">Loading seller dashboard...</p>
+        </div>
+      )}
 
-                    <div
-                        className="spinner-border text-success"
-                        role="status"
-                    >
-                    </div>
-
-                    <p className="mt-2">
-                        Loading seller dashboard...
-                    </p>
-
-                </div>
-
-            )}
-
-
-            {/* =====================================
+      {/* =====================================
                     DASHBOARD CARDS
             ===================================== */}
 
-            <div className="row g-4">
-
-
-                {/* =====================================
+      <div className="row g-4">
+        {/* =====================================
                         TOTAL ANIMALS
                 ===================================== */}
 
-                <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+          <div
+            className="card border-0 shadow-lg h-100"
+            style={{
+              borderRadius: "15px",
+              overflow: "hidden",
+            }}
+          >
+            {/* CARD HEADER */}
 
-                    <div
-                        className="card border-0 shadow-lg h-100"
-                        style={{
-                            borderRadius: "15px",
-                            overflow: "hidden"
-                        }}
-                    >
+            <div
+              className="card-header text-white border-0"
+              style={{
+                background: "linear-gradient(135deg, #198754, #20c997)",
+                padding: "20px",
+              }}
+            >
+              <div className="d-flex justify-content-between align-items-center">
+                <h5 className="mb-0 fw-bold">Total Animals</h5>
 
-                        {/* CARD HEADER */}
+                <span
+                  style={{
+                    fontSize: "35px",
+                  }}
+                >
+                  🐄
+                </span>
+              </div>
+            </div>
 
-                        <div
-                            className="card-header text-white border-0"
-                            style={{
-                                background:
-                                    "linear-gradient(135deg, #198754, #20c997)",
-                                padding: "20px"
-                            }}
-                        >
+            {/* CARD BODY */}
 
-                            <div className="d-flex justify-content-between align-items-center">
+            <div className="card-body p-4">
+              <h1 className="fw-bold text-success">
+                {loading ? "..." : totalAnimals}
+              </h1>
 
-                                <h5 className="mb-0 fw-bold">
-                                    Total Animals
-                                </h5>
+              <p className="text-muted mb-0">Total animals listed by you</p>
+            </div>
+          </div>
+        </div>
 
-                                <span
-                                    style={{
-                                        fontSize: "35px"
-                                    }}
-                                >
-                                    🐄
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* CARD BODY */}
-
-                        <div className="card-body p-4">
-
-                            <h1 className="fw-bold text-success">
-
-                                {loading
-                                    ? "..."
-                                    : totalAnimals
-                                }
-
-                            </h1>
-
-                            <p className="text-muted mb-0">
-                                Total animals listed by you
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                {/* =====================================
+        {/* =====================================
                         AVAILABLE ANIMALS
                 ===================================== */}
 
-                <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+          <div
+            className="card border-0 shadow-lg h-100"
+            style={{
+              borderRadius: "15px",
+              overflow: "hidden",
+            }}
+          >
+            {/* CARD HEADER */}
 
-                    <div
-                        className="card border-0 shadow-lg h-100"
-                        style={{
-                            borderRadius: "15px",
-                            overflow: "hidden"
-                        }}
-                    >
+            <div
+              className="card-header text-white border-0"
+              style={{
+                background: "linear-gradient(135deg, #0d6efd, #0dcaf0)",
+                padding: "20px",
+              }}
+            >
+              <div className="d-flex justify-content-between align-items-center">
+                <h5 className="mb-0 fw-bold">Available Animals</h5>
 
-                        {/* CARD HEADER */}
+                <span
+                  style={{
+                    fontSize: "35px",
+                  }}
+                >
+                  🐐
+                </span>
+              </div>
+            </div>
 
-                        <div
-                            className="card-header text-white border-0"
-                            style={{
-                                background:
-                                    "linear-gradient(135deg, #0d6efd, #0dcaf0)",
-                                padding: "20px"
-                            }}
-                        >
+            {/* CARD BODY */}
 
-                            <div className="d-flex justify-content-between align-items-center">
+            <div className="card-body p-4">
+              <h1 className="fw-bold text-primary">
+                {loading ? "..." : availableAnimals}
+              </h1>
 
-                                <h5 className="mb-0 fw-bold">
-                                    Available Animals
-                                </h5>
+              <p className="text-muted mb-0">Animals currently available</p>
+            </div>
+          </div>
+        </div>
 
-                                <span
-                                    style={{
-                                        fontSize: "35px"
-                                    }}
-                                >
-                                    🐐
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* CARD BODY */}
-
-                        <div className="card-body p-4">
-
-                            <h1 className="fw-bold text-primary">
-
-                                {loading
-                                    ? "..."
-                                    : availableAnimals
-                                }
-
-                            </h1>
-
-                            <p className="text-muted mb-0">
-                                Animals currently available
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                {/* =====================================
+        {/* =====================================
                         ORDERS
                 ===================================== */}
 
-                <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+          <div
+            className="card border-0 shadow-lg h-100"
+            style={{
+              borderRadius: "15px",
+              overflow: "hidden",
+            }}
+          >
+            {/* CARD HEADER */}
 
-                    <div
-                        className="card border-0 shadow-lg h-100"
-                        style={{
-                            borderRadius: "15px",
-                            overflow: "hidden"
-                        }}
-                    >
+            <div
+              className="card-header text-white border-0"
+              style={{
+                background: "linear-gradient(135deg, #fd7e14, #ffc107)",
+                padding: "20px",
+              }}
+            >
+              <div className="d-flex justify-content-between align-items-center">
+                <h5 className="mb-0 fw-bold">Orders</h5>
 
-                        {/* CARD HEADER */}
+                <span
+                  style={{
+                    fontSize: "35px",
+                  }}
+                >
+                  🛒
+                </span>
+              </div>
+            </div>
 
-                        <div
-                            className="card-header text-white border-0"
-                            style={{
-                                background:
-                                    "linear-gradient(135deg, #fd7e14, #ffc107)",
-                                padding: "20px"
-                            }}
-                        >
+            {/* CARD BODY */}
 
-                            <div className="d-flex justify-content-between align-items-center">
+            <div className="card-body p-4">
+              <h1 className="fw-bold text-warning">
+                {loading ? "..." : orders}
+              </h1>
 
-                                <h5 className="mb-0 fw-bold">
-                                    Orders
-                                </h5>
+              <p className="text-muted mb-0">Total customer orders</p>
+            </div>
+          </div>
+        </div>
 
-                                <span
-                                    style={{
-                                        fontSize: "35px"
-                                    }}
-                                >
-                                    🛒
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* CARD BODY */}
-
-                        <div className="card-body p-4">
-
-                            <h1 className="fw-bold text-warning">
-
-                                {loading
-                                    ? "..."
-                                    : orders
-                                }
-
-                            </h1>
-
-                            <p className="text-muted mb-0">
-                                Total customer orders
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                {/* =====================================
+        {/* =====================================
                         CANCELLED ORDERS
                 ===================================== */}
 
-                <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div className="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+          <div
+            className="card border-0 shadow-lg h-100"
+            style={{
+              borderRadius: "15px",
+              overflow: "hidden",
+            }}
+          >
+            {/* CARD HEADER */}
 
-                    <div
-                        className="card border-0 shadow-lg h-100"
-                        style={{
-                            borderRadius: "15px",
-                            overflow: "hidden"
-                        }}
-                    >
+            <div
+              className="card-header text-white border-0"
+              style={{
+                background: "linear-gradient(135deg, #dc3545, #ff6b6b)",
+                padding: "20px",
+              }}
+            >
+              <div className="d-flex justify-content-between align-items-center">
+                <h5 className="mb-0 fw-bold">Cancelled Orders</h5>
 
-                        {/* CARD HEADER */}
-
-                        <div
-                            className="card-header text-white border-0"
-                            style={{
-                                background:
-                                    "linear-gradient(135deg, #dc3545, #ff6b6b)",
-                                padding: "20px"
-                            }}
-                        >
-
-                            <div className="d-flex justify-content-between align-items-center">
-
-                                <h5 className="mb-0 fw-bold">
-                                    Cancelled Orders
-                                </h5>
-
-                                <span
-                                    style={{
-                                        fontSize: "35px"
-                                    }}
-                                >
-                                    ❌
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* CARD BODY */}
-
-                        <div className="card-body p-4">
-
-                            <h1 className="fw-bold text-danger">
-
-                                {loading
-                                    ? "..."
-                                    : cancelledOrders
-                                }
-
-                            </h1>
-
-                            <p className="text-muted mb-0">
-                                Total cancelled orders
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+                <span
+                  style={{
+                    fontSize: "35px",
+                  }}
+                >
+                  ❌
+                </span>
+              </div>
             </div>
 
+            {/* CARD BODY */}
 
-            {/* =====================================
+            <div className="card-body p-4">
+              <h1 className="fw-bold text-danger">
+                {loading ? "..." : cancelledOrders}
+              </h1>
+
+              <p className="text-muted mb-0">Total cancelled orders</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* =====================================
                     QUICK ACTIONS
             ===================================== */}
 
-            <div className="mt-5">
+      <div className="mt-5">
+        <h4 className="fw-bold mb-3">Quick Actions</h4>
 
-                <h4 className="fw-bold mb-3">
-                    Quick Actions
-                </h4>
+        <div className="row g-3">
+          {/* HOME */}
 
+          <div className="col-md-4">
+            <Link to="/" className="btn btn-success w-100 p-3 shadow-sm">
+              🏠 Home
+            </Link>
+          </div>
 
-                <div className="row g-3">
+          {/* MY ANIMALS */}
 
+          <div className="col-md-4">
+            <Link
+              to="/seller/animals"
+              className="btn btn-primary w-100 p-3 shadow-sm"
+            >
+              🐄 View My Animals
+            </Link>
+          </div>
 
-                    {/* HOME */}
+          {/* PROFILE */}
 
-                    <div className="col-md-4">
-
-                        <Link
-                            to="/"
-                            className="btn btn-success w-100 p-3 shadow-sm"
-                        >
-                            🏠 Home
-                        </Link>
-
-                    </div>
-
-
-                    {/* MY ANIMALS */}
-
-                    <div className="col-md-4">
-
-                        <Link
-                            to="/seller/animals"
-                            className="btn btn-primary w-100 p-3 shadow-sm"
-                        >
-                            🐄 View My Animals
-                        </Link>
-
-                    </div>
-
-
-                    {/* PROFILE */}
-
-                    <div className="col-md-4">
-
-                        <Link
-                            to="/seller/profile"
-                            className="btn btn-dark w-100 p-3 shadow-sm"
-                        >
-                            👤 Manage Profile
-                        </Link>
-
-                    </div>
-
-                </div>
-
-            </div>
-
+          <div className="col-md-4">
+            <Link
+              to="/seller/profile"
+              className="btn btn-dark w-100 p-3 shadow-sm"
+            >
+              👤 Manage Profile
+            </Link>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
 
 export default SellerDashboard;

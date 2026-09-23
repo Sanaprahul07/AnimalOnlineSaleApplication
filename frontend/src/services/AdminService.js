@@ -11,304 +11,245 @@ const BASE_URL = "http://localhost:8080/api";
 // =====================================================
 
 const AdminService = {
+  // =================================================
+  // ADMIN LOGIN
+  // =================================================
 
-    // =================================================
-    // ADMIN LOGIN
-    // =================================================
+  loginAdmin: async (email, password) => {
+    return axios.post(`${BASE_URL}/auth/login`, {
+      email: email,
+      password: password,
+    });
+  },
 
-    loginAdmin: async (email, password) => {
-        return axios.post(
-            `${BASE_URL}/auth/login`,
-            {
-                email: email,
-                password: password
-            }
-        );
-    },
+  // =================================================
+  // GET ALL SELLERS
+  // =================================================
 
-    // =================================================
-    // GET ALL SELLERS
-    // =================================================
+  getAllSellers: async () => {
+    return axios.get(`${BASE_URL}/seller/getAll`);
+  },
 
-    getAllSellers: async () => {
-        return axios.get(
-            `${BASE_URL}/seller/getAll`
-        );
-    },
+  // =================================================
+  // GET ADMIN DASHBOARD DATA
+  // =================================================
 
-    // =================================================
-    // GET ADMIN DASHBOARD DATA
-    // =================================================
+  getDashboard: async () => {
+    return axios.get(`${BASE_URL}/admin/dashboard`);
+  },
 
-    getDashboard: async () => {
-        return axios.get(
-            `${BASE_URL}/admin/dashboard`
-        );
-    },
+  // =================================================
+  // GET SELLER DETAILS WITH ANIMALS
+  // =================================================
 
-    // =================================================
-    // GET SELLER DETAILS WITH ANIMALS
-    // =================================================
+  getAdminSellerById: async (id) => {
+    return axios.get(`${BASE_URL}/admin/sellers/${id}`);
+  },
 
-    getAdminSellerById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/admin/sellers/${id}`
-        );
-    },
+  // =================================================
+  // SELLER APPROVAL / STATUS ACTIONS
+  // =================================================
 
-    // =================================================
-    // SELLER APPROVAL / STATUS ACTIONS
-    // =================================================
+  // APPROVE SELLER
+  approveSeller: async (sellerId) => {
+    return axios.put(`${BASE_URL}/admin/sellers/${sellerId}/approve`);
+  },
 
-    // APPROVE SELLER
-    approveSeller: async (sellerId) => {
-        return axios.put(
-            `${BASE_URL}/admin/sellers/${sellerId}/approve`
-        );
-    },
+  // BLOCK SELLER
+  blockSeller: async (sellerId) => {
+    return axios.put(`${BASE_URL}/admin/sellers/${sellerId}/block`);
+  },
 
-    // BLOCK SELLER
-    blockSeller: async (sellerId) => {
-        return axios.put(
-            `${BASE_URL}/admin/sellers/${sellerId}/block`
-        );
-    },
+  // ACTIVATE SELLER
+  activateSeller: async (sellerId) => {
+    return axios.put(`${BASE_URL}/admin/sellers/${sellerId}/activate`);
+  },
 
-    // ACTIVATE SELLER
-    activateSeller: async (sellerId) => {
-        return axios.put(
-            `${BASE_URL}/admin/sellers/${sellerId}/activate`
-        );
-    },
+  // REJECT SELLER
+  rejectSeller: async (sellerId) => {
+    return axios.put(`${BASE_URL}/admin/sellers/${sellerId}/reject`);
+  },
 
-    // REJECT SELLER
-    rejectSeller: async (sellerId) => {
-        return axios.put(
-            `${BASE_URL}/admin/sellers/${sellerId}/reject`
-        );
-    },
+  // =================================================
+  // GET SELLER BY ID
+  // =================================================
 
-    // =================================================
-    // GET SELLER BY ID
-    // =================================================
+  getSellerById: async (id) => {
+    return axios.get(`${BASE_URL}/seller/${id}`);
+  },
 
-    getSellerById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/seller/${id}`
-        );
-    },
+  // =================================================
+  // GET ALL CUSTOMERS
+  // =================================================
 
-    // =================================================
-    // GET ALL CUSTOMERS
-    // =================================================
+  getAllCustomers: async () => {
+    return axios.get(`${BASE_URL}/customer/getAll`);
+  },
 
-    getAllCustomers: async () => {
-        return axios.get(
-            `${BASE_URL}/customer/getAll`
-        );
-    },
+  // =================================================
+  // GET CUSTOMER BY ID
+  // =================================================
 
-    // =================================================
-    // GET CUSTOMER BY ID
-    // =================================================
+  getCustomerById: async (id) => {
+    return axios.get(`${BASE_URL}/customer/${id}`);
+  },
 
-    getCustomerById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/customer/${id}`
-        );
-    },
+  // =====================================================
+  // GET ALL ANIMALS
+  // =====================================================
 
-    // =================================================
-    // GET ALL ANIMALS
-    // =================================================
+  getAllAnimals: async () => {
+    return axios.get(`${BASE_URL}/admin/animals`);
+  },
 
-    getAllAnimals: async () => {
-        return axios.get(
-            `${BASE_URL}/animal/getAll`
-        );
-    },
+  // =====================================================
+  // GET ANIMAL BY ID
+  // =====================================================
 
-    // =================================================
-    // GET ANIMAL BY ID
-    // =================================================
+  getAnimalById: async (id) => {
+    return axios.get(`${BASE_URL}/admin/animals/${id}`);
+  },
 
-    getAnimalById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/animal/${id}`
-        );
-    },
+  // =====================================================
+  // DELETE ANIMAL
+  // =====================================================
 
-    // =================================================
-    // DELETE ANIMAL
-    // =================================================
+  deleteAnimal: async (id) => {
+    return axios.delete(`${BASE_URL}/admin/animals/${id}`);
+  },
 
-    deleteAnimal: async (id) => {
-        return axios.delete(
-            `${BASE_URL}/animal/delete/${id}`
-        );
-    },
+  // =====================================================
+  // ANIMAL APPROVAL MODULE
+  // =====================================================
 
-    // =================================================
-    // GET ALL CATEGORIES
-    // =================================================
+  // GET PENDING ANIMALS
 
-    getAllCategories: async () => {
-        return axios.get(
-            `${BASE_URL}/category/getAll`
-        );
-    },
+  getPendingAnimals: async () => {
+    return axios.get(`${BASE_URL}/admin/animals/pending`);
+  },
 
-    // =================================================
-    // GET CATEGORY BY ID
-    // =================================================
+  // APPROVE ANIMAL
 
-    getCategoryById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/category/${id}`
-        );
-    },
+  approveAnimal: async (id) => {
+    return axios.put(`${BASE_URL}/admin/animals/${id}/approve`);
+  },
 
-    // =================================================
-    // ADD CATEGORY
-    // =================================================
+  // REJECT ANIMAL
 
-    addCategory: async (categoryData) => {
-        return axios.post(
-            `${BASE_URL}/category/add`,
-            categoryData
-        );
-    },
+  rejectAnimal: async (id) => {
+    return axios.put(`${BASE_URL}/admin/animals/${id}/reject`);
+  },
 
-    // =================================================
-    // UPDATE CATEGORY
-    // =================================================
+  // =================================================
+  // GET ALL CATEGORIES
+  // =================================================
 
-    updateCategory: async (id, categoryData) => {
-        return axios.put(
-            `${BASE_URL}/category/update/${id}`,
-            categoryData
-        );
-    },
+  getAllCategories: async () => {
+    return axios.get(`${BASE_URL}/category/getAll`);
+  },
 
-    // =================================================
-    // DELETE CATEGORY
-    // =================================================
+  // =================================================
+  // GET CATEGORY BY ID
+  // =================================================
 
-    deleteCategory: async (id) => {
-        return axios.delete(
-            `${BASE_URL}/category/delete/${id}`
-        );
-    },
+  getCategoryById: async (id) => {
+    return axios.get(`${BASE_URL}/category/${id}`);
+  },
 
-    // =================================================
-    // SUBSCRIPTION PLAN MODULE
-    // =================================================
+  // =================================================
+  // ADD CATEGORY
+  // =================================================
 
-    // GET ALL SUBSCRIPTION PLANS
+  addCategory: async (categoryData) => {
+    return axios.post(`${BASE_URL}/category/add`, categoryData);
+  },
 
-    getAllSubscriptionPlans: async () => {
-        return axios.get(
-            `${BASE_URL}/admin/subscriptions/plans`
-        );
-    },
+  // =================================================
+  // UPDATE CATEGORY
+  // =================================================
 
-    // GET SUBSCRIPTION PLAN BY ID
+  updateCategory: async (id, categoryData) => {
+    return axios.put(`${BASE_URL}/category/update/${id}`, categoryData);
+  },
 
-    getSubscriptionPlanById: async (id) => {
-        return axios.get(
-            `${BASE_URL}/admin/subscriptions/plans/${id}`
-        );
-    },
+  // =================================================
+  // DELETE CATEGORY
+  // =================================================
 
-    // ADD SUBSCRIPTION PLAN
+  deleteCategory: async (id) => {
+    return axios.delete(`${BASE_URL}/category/delete/${id}`);
+  },
 
-    addSubscriptionPlan: async (planData) => {
-        return axios.post(
-            `${BASE_URL}/admin/subscriptions/plans`,
-            planData
-        );
-    },
+  // =================================================
+  // SUBSCRIPTION PLAN MODULE
+  // =================================================
 
-    // UPDATE SUBSCRIPTION PLAN
+  // GET ALL SUBSCRIPTION PLANS
+  getAllSubscriptionPlans: async () => {
+    return axios.get(`${BASE_URL}/admin/subscriptions/plans`);
+  },
 
-    updateSubscriptionPlan: async (id, planData) => {
-        return axios.put(
-            `${BASE_URL}/admin/subscriptions/plans/${id}`,
-            planData
-        );
-    },
+  // GET SUBSCRIPTION PLAN BY ID
+  getSubscriptionPlanById: async (id) => {
+    return axios.get(`${BASE_URL}/admin/subscriptions/plans/${id}`);
+  },
 
-    // ACTIVATE SUBSCRIPTION PLAN
+  // ADD SUBSCRIPTION PLAN
+  addSubscriptionPlan: async (planData) => {
+    return axios.post(`${BASE_URL}/admin/subscriptions/plans`, planData);
+  },
 
-    activateSubscriptionPlan: async (id) => {
-        return axios.put(
-            `${BASE_URL}/admin/subscriptions/plans/${id}/activate`
-        );
-    },
+  // UPDATE SUBSCRIPTION PLAN
+  updateSubscriptionPlan: async (id, planData) => {
+    return axios.put(`${BASE_URL}/admin/subscriptions/plans/${id}`, planData);
+  },
 
-    // DEACTIVATE SUBSCRIPTION PLAN
+  // ACTIVATE SUBSCRIPTION PLAN
+  activateSubscriptionPlan: async (id) => {
+    return axios.put(`${BASE_URL}/admin/subscriptions/plans/${id}/activate`);
+  },
 
-    deactivateSubscriptionPlan: async (id) => {
-        return axios.put(
-            `${BASE_URL}/admin/subscriptions/plans/${id}/deactivate`
-        );
-    },
+  // DEACTIVATE SUBSCRIPTION PLAN
+  deactivateSubscriptionPlan: async (id) => {
+    return axios.put(`${BASE_URL}/admin/subscriptions/plans/${id}/deactivate`);
+  },
 
-    // DELETE SUBSCRIPTION PLAN
+  // DELETE SUBSCRIPTION PLAN
+  deleteSubscriptionPlan: async (id) => {
+    return axios.delete(`${BASE_URL}/admin/subscriptions/plans/${id}`);
+  },
 
-    deleteSubscriptionPlan: async (id) => {
-        return axios.delete(
-            `${BASE_URL}/admin/subscriptions/plans/${id}`
-        );
-    },
+  // =================================================
+  // SELLER PAYMENT MODULE
+  // =================================================
 
-    // =================================================
-    // SELLER PAYMENT MODULE
-    // =================================================
+  // GET SELLER LATEST PAYMENT
+  // Payment screenshot +
+  // payment status +
+  // subscription details
+  getSellerLatestPayment: async (sellerId) => {
+    return axios.get(`${BASE_URL}/payments/seller/${sellerId}/latest`);
+  },
 
-    // GET SELLER LATEST PAYMENT
-    // Payment screenshot +
-    // payment status +
-    // subscription details
+  // GET ALL PAYMENTS OF SELLER
+  getSellerPayments: async (sellerId) => {
+    return axios.get(`${BASE_URL}/payments/seller/${sellerId}`);
+  },
 
-    getSellerLatestPayment: async (sellerId) => {
-        return axios.get(
-            `${BASE_URL}/payments/seller/${sellerId}/latest`
-        );
-    },
+  // GET ALL PENDING PAYMENTS FOR ADMIN
+  getPendingPayments: async () => {
+    return axios.get(`${BASE_URL}/payments/admin/pending`);
+  },
 
-    // GET ALL PAYMENTS OF SELLER
+  // APPROVE SELLER PAYMENT
+  approveSellerPayment: async (paymentId) => {
+    return axios.put(`${BASE_URL}/payments/admin/${paymentId}/approve`);
+  },
 
-    getSellerPayments: async (sellerId) => {
-        return axios.get(
-            `${BASE_URL}/payments/seller/${sellerId}`
-        );
-    },
-
-    // GET ALL PENDING PAYMENTS FOR ADMIN
-
-    getPendingPayments: async () => {
-        return axios.get(
-            `${BASE_URL}/payments/admin/pending`
-        );
-    },
-
-    // APPROVE SELLER PAYMENT
-
-    approveSellerPayment: async (paymentId) => {
-        return axios.put(
-            `${BASE_URL}/payments/admin/${paymentId}/approve`
-        );
-    },
-
-    // REJECT SELLER PAYMENT
-
-    rejectSellerPayment: async (paymentId) => {
-        return axios.put(
-            `${BASE_URL}/payments/admin/${paymentId}/reject`
-        );
-    }
-
+  // REJECT SELLER PAYMENT
+  rejectSellerPayment: async (paymentId) => {
+    return axios.put(`${BASE_URL}/payments/admin/${paymentId}/reject`);
+  },
 };
 
 // =====================================================

@@ -56,6 +56,13 @@ import AdminSellerDetails from "./pages/admin/AdminSellerDetails";
 
 import AdminBuyers from "./pages/admin/AdminBuyers";
 import AdminAnimals from "./pages/admin/AdminAnimals";
+
+// =====================================================
+// ADMIN ANIMAL DETAILS
+// =====================================================
+
+import AdminAnimalDetails from "./pages/admin/AdminAnimalDetails";
+
 import ManageCategories from "./pages/admin/ManageCategories";
 import AdminSubscriptionPlans from "./pages/admin/AdminSubscriptionPlans";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -71,7 +78,6 @@ import AdminSettings from "./pages/admin/AdminSettings";
 import BuyerLogin from "./pages/buyer/BuyerLogin";
 import BuyerRegister from "./pages/buyer/BuyerRegister";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
-
 import BuyerOrder from "./pages/buyer/BuyerOrder";
 
 function App() {
@@ -195,9 +201,17 @@ function App() {
 
       <Route path="/admin/buyers" element={<AdminBuyers />} />
 
-      {/* ANIMALS */}
+      {/* =================================================
+                          ANIMALS
+         ================================================= */}
 
       <Route path="/admin/animals" element={<AdminAnimals />} />
+
+      {/* =================================================
+                    PARTICULAR ANIMAL DETAILS
+         ================================================= */}
+
+      <Route path="/admin/animals/:id" element={<AdminAnimalDetails />} />
 
       {/* CATEGORIES */}
 

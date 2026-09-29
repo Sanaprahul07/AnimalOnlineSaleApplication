@@ -26,6 +26,8 @@ import SellerRegistrationSuccess from "./pages/seller/SellerRegistrationSuccess"
 import SellerDashboard from "./pages/seller/SellerDashboard";
 import SellerProfile from "./pages/seller/SellerProfile";
 import MyAnimals from "./pages/seller/MyAnimals";
+import SellerBids from "./pages/seller/SellerBids";
+import SellerChat from "./pages/seller/SellerChat";
 import AddAnimal from "./pages/seller/AddAnimal";
 import EditAnimal from "./pages/seller/EditAnimal";
 
@@ -143,6 +145,24 @@ function App() {
         element={
           <SellerLayout>
             <MyAnimals />
+          </SellerLayout>
+        }
+      />
+
+      <Route
+        path="/seller/chat"
+        element={
+          <SellerLayout>
+            <SellerChat />
+          </SellerLayout>
+        }
+      />
+
+      <Route
+        path="/seller/animal-bids/:animalId"
+        element={
+          <SellerLayout>
+            <SellerBids />
           </SellerLayout>
         }
       />

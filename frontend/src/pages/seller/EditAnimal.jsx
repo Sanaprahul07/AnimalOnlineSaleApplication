@@ -298,7 +298,7 @@ function EditAnimal() {
 
             {/* IMAGE URL */}
 
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label className="form-label fw-bold">Image URL</label>
 
               <input
@@ -307,7 +307,7 @@ function EditAnimal() {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
               />
-            </div>
+            </div> */}
 
             {/* BUTTONS */}
 

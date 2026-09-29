@@ -210,39 +210,22 @@ function MyAnimals() {
                   {animals.map((animal) => (
                     <tr key={animal.id}>
                       {/* ID */}
-
                       <td>{animal.id}</td>
-
                       {/* ANIMAL NAME */}
-
                       <td className="fw-bold">{animal.animalName}</td>
-
                       {/* CATEGORY */}
-
                       <td>{animal.category}</td>
-
                       {/* BREED */}
-
                       <td>{animal.breed}</td>
-
                       {/* AGE */}
-
                       <td>{animal.age} Years</td>
-
                       {/* GENDER */}
-
                       <td>{animal.gender}</td>
-
                       {/* PRICE */}
-
                       <td className="fw-bold">₹{animal.price}</td>
-
                       {/* LOCATION */}
-
                       <td>{animal.location}</td>
-
                       {/* STATUS */}
-
                       <td>
                         {animal.available ? (
                           <span className="badge bg-success">Available</span>
@@ -250,13 +233,9 @@ function MyAnimals() {
                           <span className="badge bg-danger">Not Available</span>
                         )}
                       </td>
-
                       {/* ACTION */}
-
                       <td>
-                        <div className="d-flex gap-2">
-                          {/* EDIT */}
-
+                        <div className="d-flex gap-2 flex-wrap">
                           <a
                             href={`/seller/edit-animal/${animal.id}`}
                             className="btn btn-sm btn-primary"
@@ -264,7 +243,12 @@ function MyAnimals() {
                             ✏️ Edit
                           </a>
 
-                          {/* DELETE */}
+                          <a
+                            href={`/seller/animal-bids/${animal.id}`}
+                            className="btn btn-sm btn-success"
+                          >
+                            👥 View Bids
+                          </a>
 
                           <button
                             type="button"
@@ -274,7 +258,7 @@ function MyAnimals() {
                             🗑️ Delete
                           </button>
                         </div>
-                      </td>
+                      </td>{" "}
                     </tr>
                   ))}
                 </tbody>

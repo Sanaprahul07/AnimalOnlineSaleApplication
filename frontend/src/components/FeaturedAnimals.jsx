@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { getApprovedAndAvailableAnimals } from "../services/AnimalService";
 
@@ -10,6 +10,23 @@ import { getApprovedAndAvailableAnimals } from "../services/AnimalService";
 
 const ANIMALS_PER_PAGE = 10;
 
+const EMPTY_FILTERS = {
+  category: "",
+  breed: "",
+  gender: "",
+  location: "",
+  minPrice: "",
+  maxPrice: "",
+};
+
+const same = (a, b) =>
+  String(a || "")
+    .trim()
+    .toLowerCase() ===
+  String(b || "")
+    .trim()
+    .toLowerCase();
+
 function FeaturedAnimals() {
   const navigate = useNavigate();
 
@@ -18,6 +35,22 @@ function FeaturedAnimals() {
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(0);
+
+  // =====================================================
+  // SEARCH + FILTERS (NO PAGE RELOAD)
+  // Header / Hero / Navbar / Category cards set ?q=cow.
+  // Only this section re-renders; the top bar stays.
+  // =====================================================
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchTerm = (searchParams.get("q") || "").trim();
+
+  const sectionRef = useRef(null);
+
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+
+  const [sort, setSort] = useState("default");
 
   // =====================================================
   // LOAD APPROVED + AVAILABLE ANIMALS
@@ -70,14 +103,128 @@ function FeaturedAnimals() {
   }, []);
 
   // =====================================================
+  // NEW SEARCH WORD: reset filters, scroll to this section
+  // =====================================================
+
+  useEffect(() => {
+    setFilters(EMPTY_FILTERS);
+    setSort("default");
+    setCurrentPage(0);
+
+    if (searchTerm && sectionRef.current) {
+      sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [searchTerm]);
+
+  // =====================================================
+  // 1) SEARCH WORD MATCH (name, category, breed, location)
+  //    "cows" also matches "cow"
+  // =====================================================
+
+  const searched = useMemo(() => {
+    if (!searchTerm) return animals;
+
+    const term = searchTerm.toLowerCase();
+    const singular = term.replace(/(es|s)$/, "");
+
+    return animals.filter((a) => {
+      const text = [
+        a.animalName,
+        a.category,
+        a.breed,
+        a.breedName,
+        a.location,
+        a.city,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        text.includes(term) || (singular.length > 2 && text.includes(singular))
+      );
+    });
+  }, [animals, searchTerm]);
+
+  const categoryOptions = useMemo(
+    () => [...new Set(searched.map((a) => a.category).filter(Boolean))].sort(),
+    [searched],
+  );
+
+  const breedOptions = useMemo(
+    () =>
+      [
+        ...new Set(
+          searched
+            .filter(
+              (a) => !filters.category || same(a.category, filters.category),
+            )
+            .map((a) => a.breed)
+            .filter(Boolean),
+        ),
+      ].sort(),
+    [searched, filters.category],
+  );
+
+  const genderOptions = useMemo(
+    () => [...new Set(searched.map((a) => a.gender).filter(Boolean))].sort(),
+    [searched],
+  );
+
+  // =====================================================
+  // 2) FILTERS + SORT
+  // =====================================================
+
+  const filtered = useMemo(() => {
+    let list = searched.filter((a) => {
+      if (filters.category && !same(a.category, filters.category)) return false;
+      if (filters.breed && !same(a.breed, filters.breed)) return false;
+      if (filters.gender && !same(a.gender, filters.gender)) return false;
+
+      if (
+        filters.location &&
+        !String(a.location || a.city || "")
+          .toLowerCase()
+          .includes(filters.location.trim().toLowerCase())
+      )
+        return false;
+
+      const price = Number(a.price) || 0;
+      if (filters.minPrice !== "" && price < Number(filters.minPrice))
+        return false;
+      if (filters.maxPrice !== "" && price > Number(filters.maxPrice))
+        return false;
+
+      return true;
+    });
+
+    if (sort === "low") list = [...list].sort((a, b) => a.price - b.price);
+    if (sort === "high") list = [...list].sort((a, b) => b.price - a.price);
+
+    return list;
+  }, [searched, filters, sort]);
+
+  const updateFilter = (name, value) => {
+    setFilters((prev) => {
+      const next = { ...prev, [name]: value };
+      if (name === "category") next.breed = "";
+      return next;
+    });
+    setCurrentPage(0);
+  };
+
+  const activeFilters = Object.values(filters).filter(Boolean).length;
+
+  const clearSearch = () => setSearchParams({});
+
+  // =====================================================
   // PAGINATION
   // =====================================================
 
-  const totalPages = Math.ceil(animals.length / ANIMALS_PER_PAGE);
+  const totalPages = Math.ceil(filtered.length / ANIMALS_PER_PAGE);
 
   const startIndex = currentPage * ANIMALS_PER_PAGE;
 
-  const currentAnimals = animals.slice(
+  const currentAnimals = filtered.slice(
     startIndex,
     startIndex + ANIMALS_PER_PAGE,
   );
@@ -182,23 +329,181 @@ function FeaturedAnimals() {
   // =====================================================
 
   return (
-    <section className="as-section as-section-alt">
+    <section ref={sectionRef} className="as-section as-section-alt">
       <div className="container">
         {/* =====================================================
                     HEADER
                 ===================================================== */}
 
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="as-section-title">Featured Animals</h2>
+          <h2 className="as-section-title">
+            {searchTerm ? `Results for "${searchTerm}"` : "Featured Animals"}
+          </h2>
 
-          <button
-            type="button"
-            className="as-link-green btn btn-link p-0"
-            onClick={() => navigate("/animals/all")}
-          >
-            View All Animals
-          </button>
+          {searchTerm ? (
+            <button
+              type="button"
+              className="as-link-green btn btn-link p-0"
+              onClick={clearSearch}
+            >
+              Clear search
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="as-link-green btn btn-link p-0"
+              onClick={() => navigate("/animals/all")}
+            >
+              View All Animals
+            </button>
+          )}
         </div>
+
+        {/* =====================================================
+                    CATEGORY CHIPS + FILTER BAR
+        ===================================================== */}
+
+        {!loading && animals.length > 0 && (
+          <div className="mb-4">
+            <div className="d-flex flex-wrap gap-2 mb-3">
+              <button
+                type="button"
+                className={`btn btn-sm rounded-pill ${
+                  !filters.category ? "btn-success" : "btn-outline-success"
+                }`}
+                onClick={() => updateFilter("category", "")}
+              >
+                All
+              </button>
+
+              {categoryOptions.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  className={`btn btn-sm rounded-pill ${
+                    same(filters.category, c)
+                      ? "btn-success"
+                      : "btn-outline-success"
+                  }`}
+                  onClick={() => updateFilter("category", c)}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+
+            <div className="row g-2 align-items-end">
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Breed
+                </label>
+                <select
+                  className="form-select form-select-sm"
+                  value={filters.breed}
+                  onChange={(e) => updateFilter("breed", e.target.value)}
+                >
+                  <option value="">All breeds</option>
+                  {breedOptions.map((b) => (
+                    <option key={b} value={b}>
+                      {b}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Min price (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control form-control-sm"
+                  value={filters.minPrice}
+                  onChange={(e) => updateFilter("minPrice", e.target.value)}
+                />
+              </div>
+
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Max price (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control form-control-sm"
+                  value={filters.maxPrice}
+                  onChange={(e) => updateFilter("maxPrice", e.target.value)}
+                />
+              </div>
+
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Gender
+                </label>
+                <select
+                  className="form-select form-select-sm"
+                  value={filters.gender}
+                  onChange={(e) => updateFilter("gender", e.target.value)}
+                >
+                  <option value="">Any</option>
+                  {genderOptions.map((g) => (
+                    <option key={g} value={g}>
+                      {g}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Location
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-sm"
+                  placeholder="e.g. Pune"
+                  value={filters.location}
+                  onChange={(e) => updateFilter("location", e.target.value)}
+                />
+              </div>
+
+              <div className="col-6 col-md-2">
+                <label className="form-label small fw-semibold mb-1">
+                  Sort
+                </label>
+                <select
+                  className="form-select form-select-sm"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="default">Default</option>
+                  <option value="low">Price: Low to High</option>
+                  <option value="high">Price: High to Low</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-between align-items-center mt-2">
+              <span className="small text-muted">
+                {filtered.length} animal{filtered.length === 1 ? "" : "s"} found
+              </span>
+
+              {activeFilters > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-link btn-sm as-link-green p-0"
+                  onClick={() => {
+                    setFilters(EMPTY_FILTERS);
+                    setCurrentPage(0);
+                  }}
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* =====================================================
                     LOADING
@@ -208,14 +513,16 @@ function FeaturedAnimals() {
           <div className="text-center py-5">
             <div className="spinner-border as-text-green" role="status" />
           </div>
-        ) : animals.length === 0 ? (
+        ) : filtered.length === 0 ? (
           /* =====================================================
                         NO APPROVED ANIMALS
                     ===================================================== */
 
           <div className="text-center py-5">
             <p className="text-muted mb-0">
-              No approved animals are currently available.
+              {animals.length === 0
+                ? "No approved animals are currently available."
+                : "No animals match your search. Try a different keyword or clear some filters."}
             </p>
           </div>
         ) : (

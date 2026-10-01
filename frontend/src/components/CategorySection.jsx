@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {
-    getAllAnimals
-} from "../services/AnimalService";
+import { getAllAnimals } from "../services/AnimalService";
 
 // =====================================================
 // EXISTING CATEGORY IMAGES
@@ -46,600 +44,447 @@ import rajaImg from "../assets/Raja.png";
 // =====================================================
 
 function CategorySection() {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  // =================================================
+  // 30 ANIMAL CATEGORIES
+  // =================================================
 
-    // =================================================
-    // 30 ANIMAL CATEGORIES
-    // =================================================
+  const categories = [
+    {
+      name: "Cow",
+      image: cowImg,
+    },
+    {
+      name: "Buffalo",
+      image: buffaloImg,
+    },
+    {
+      name: "Ox",
+      image: oxImg,
+    },
+    {
+      name: "Bull",
+      image: bullImg,
+    },
+    {
+      name: "Goat",
+      image: goatImg,
+    },
+    {
+      name: "Sheep",
+      image: sheepImg,
+    },
+    {
+      name: "Horse",
+      image: horseImg,
+    },
+    {
+      name: "Donkey",
+      image: donkeyImg,
+    },
+    {
+      name: "Camel",
+      image: camelImg,
+    },
+    {
+      name: "Dog",
+      image: dogImg,
+    },
+    {
+      name: "Cat",
+      image: catImg,
+    },
+    {
+      name: "Rabbit",
+      image: rabbitImg,
+    },
+    {
+      name: "Pig",
+      image: pigImg,
+    },
+    {
+      name: "Elephant",
+      image: elephantImg,
+    },
+    {
+      name: "Deer",
+      image: deerImg,
+    },
+    {
+      name: "Yak",
+      image: yakImg,
+    },
+    {
+      name: "Mule",
+      image: rajaImg,
+    },
+    {
+      name: "Chicken",
+      emoji: "🐔",
+    },
+    {
+      name: "Duck",
+      emoji: "🦆",
+    },
+    {
+      name: "Turkey",
+      emoji: "🦃",
+    },
+    {
+      name: "Goose",
+      image: gooseImg,
+    },
+    {
+      name: "Pigeon",
+      emoji: "🕊️",
+    },
+    {
+      name: "Parrot",
+      emoji: "🦜",
+    },
+    {
+      name: "Peacock",
+      emoji: "🦚",
+    },
+    {
+      name: "Quail",
+      image: quailImg,
+    },
+    {
+      name: "Fish",
+      emoji: "🐟",
+    },
+    {
+      name: "Turtle",
+      emoji: "🐢",
+    },
+    {
+      name: "Ostrich",
+      image: ostrichImg,
+    },
+    {
+      name: "Emu",
+      emoji: "🐦",
+    },
+    {
+      name: "Guinea Fowl",
+      emoji: "🐦",
+    },
+  ];
 
-    const categories = [
-        {
-            name: "Cow",
-            image: cowImg
-        },
-        {
-            name: "Buffalo",
-            image: buffaloImg
-        },
-        {
-            name: "Ox",
-            image: oxImg
-        },
-        {
-            name: "Bull",
-            image: bullImg
-        },
-        {
-            name: "Goat",
-            image: goatImg
-        },
-        {
-            name: "Sheep",
-            image: sheepImg
-        },
-        {
-            name: "Horse",
-            image: horseImg
-        },
-        {
-            name: "Donkey",
-            image: donkeyImg
-        },
-        {
-            name: "Camel",
-            image: camelImg
-        },
-        {
-            name: "Dog",
-            image: dogImg
-        },
-        {
-            name: "Cat",
-            image: catImg
-        },
-        {
-            name: "Rabbit",
-            image: rabbitImg
-        },
-        {
-            name: "Pig",
-            image: pigImg
-        },
-        {
-            name: "Elephant",
-            image: elephantImg
-        },
-        {
-            name: "Deer",
-            image: deerImg
-        },
-        {
-            name: "Yak",
-            image: yakImg
-        },
-        {
-            name: "Mule",
-            image: rajaImg
-        },
-        {
-            name: "Chicken",
-            emoji: "🐔"
-        },
-        {
-            name: "Duck",
-            emoji: "🦆"
-        },
-        {
-            name: "Turkey",
-            emoji: "🦃"
-        },
-        {
-            name: "Goose",
-            image: gooseImg
-        },
-        {
-            name: "Pigeon",
-            emoji: "🕊️"
-        },
-        {
-            name: "Parrot",
-            emoji: "🦜"
-        },
-        {
-            name: "Peacock",
-            emoji: "🦚"
-        },
-        {
-            name: "Quail",
-            image: quailImg
-        },
-        {
-            name: "Fish",
-            emoji: "🐟"
-        },
-        {
-            name: "Turtle",
-            emoji: "🐢"
-        },
-        {
-            name: "Ostrich",
-            image: ostrichImg
-        },
-        {
-            name: "Emu",
-            emoji: "🐦"
-        },
-        {
-            name: "Guinea Fowl",
-            emoji: "🐦"
-        }
-    ];
+  // =================================================
+  // CATEGORY COUNTS
+  // =================================================
 
-    // =================================================
-    // CATEGORY COUNTS
-    // =================================================
+  const [categoryCounts, setCategoryCounts] = useState({});
 
-    const [categoryCounts, setCategoryCounts] =
-        useState({});
+  // =================================================
+  // CURRENT PAGE
+  // =================================================
 
-    // =================================================
-    // CURRENT PAGE
-    // =================================================
+  const [currentPage, setCurrentPage] = useState(0);
 
-    const [currentPage, setCurrentPage] =
-        useState(0);
+  // =================================================
+  // SHOW 14 ANIMALS AT A TIME
+  // =================================================
 
-    // =================================================
-    // SHOW 14 ANIMALS AT A TIME
-    // =================================================
+  const categoriesPerPage = 14;
 
-    const categoriesPerPage = 14;
+  // =================================================
+  // LOAD ANIMALS FROM BACKEND
+  // =================================================
 
-    // =================================================
-    // LOAD ANIMALS FROM BACKEND
-    // =================================================
+  useEffect(() => {
+    const loadCategoryCounts = async () => {
+      try {
+        const response = await getAllAnimals();
 
-    useEffect(() => {
+        const animals = Array.isArray(response?.data) ? response.data : [];
 
-        const loadCategoryCounts = async () => {
+        // =====================================
+        // CREATE COUNTS
+        // =====================================
 
-            try {
+        const counts = {};
 
-                const response =
-                    await getAllAnimals();
+        categories.forEach((category) => {
+          counts[category.name] = 0;
+        });
 
-                const animals =
-                    Array.isArray(response?.data)
-                        ? response.data
-                        : [];
+        // =====================================
+        // AUTOMATIC COUNT
+        // =====================================
 
-                // =====================================
-                // CREATE COUNTS
-                // =====================================
+        animals.forEach((animal) => {
+          if (!animal?.category) {
+            return;
+          }
 
-                const counts = {};
+          const animalCategory = String(animal.category).trim();
 
-                categories.forEach((category) => {
+          if (Object.prototype.hasOwnProperty.call(counts, animalCategory)) {
+            counts[animalCategory] += 1;
+          }
+        });
 
-                    counts[category.name] = 0;
+        setCategoryCounts(counts);
+      } catch (error) {
+        console.error("Failed to load animal category counts:", error);
 
-                });
+        // =====================================
+        // BACKEND ERROR
+        // SHOW ZERO
+        // =====================================
 
-                // =====================================
-                // AUTOMATIC COUNT
-                // =====================================
+        const emptyCounts = {};
 
-                animals.forEach((animal) => {
+        categories.forEach((category) => {
+          emptyCounts[category.name] = 0;
+        });
 
-                    if (!animal?.category) {
-                        return;
-                    }
-
-                    const animalCategory =
-                        String(
-                            animal.category
-                        ).trim();
-
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            counts,
-                            animalCategory
-                        )
-                    ) {
-
-                        counts[animalCategory] += 1;
-
-                    }
-
-                });
-
-                setCategoryCounts(counts);
-
-            } catch (error) {
-
-                console.error(
-                    "Failed to load animal category counts:",
-                    error
-                );
-
-                // =====================================
-                // BACKEND ERROR
-                // SHOW ZERO
-                // =====================================
-
-                const emptyCounts = {};
-
-                categories.forEach((category) => {
-
-                    emptyCounts[category.name] = 0;
-
-                });
-
-                setCategoryCounts(
-                    emptyCounts
-                );
-
-            }
-
-        };
-
-        loadCategoryCounts();
-
-    }, []);
-
-    // =================================================
-    // PAGINATION
-    // =================================================
-
-    const startIndex =
-        currentPage *
-        categoriesPerPage;
-
-    const visibleCategories =
-        categories.slice(
-            startIndex,
-            startIndex + categoriesPerPage
-        );
-
-    // =================================================
-    // NEXT BUTTON AVAILABLE?
-    // =================================================
-
-    const hasNextPage =
-        startIndex +
-        categoriesPerPage <
-        categories.length;
-
-    // =================================================
-    // PREVIOUS BUTTON AVAILABLE?
-    // =================================================
-
-    const hasPreviousPage =
-        currentPage > 0;
-
-    // =================================================
-    // CATEGORY CLICK
-    // =================================================
-
-    const handleCategoryClick = (name) => {
-
-        navigate(
-            `/animals/${encodeURIComponent(name)}`
-        );
-
+        setCategoryCounts(emptyCounts);
+      }
     };
 
-    // =================================================
-    // NEXT
-    // =================================================
+    loadCategoryCounts();
+  }, []);
 
-    const handleNext = () => {
+  // =================================================
+  // PAGINATION
+  // =================================================
 
-        if (hasNextPage) {
+  const startIndex = currentPage * categoriesPerPage;
 
-            setCurrentPage(
-                currentPage + 1
-            );
+  const visibleCategories = categories.slice(
+    startIndex,
+    startIndex + categoriesPerPage,
+  );
 
-        }
+  // =================================================
+  // NEXT BUTTON AVAILABLE?
+  // =================================================
 
-    };
+  const hasNextPage = startIndex + categoriesPerPage < categories.length;
 
-    // =================================================
-    // PREVIOUS
-    // =================================================
+  // =================================================
+  // PREVIOUS BUTTON AVAILABLE?
+  // =================================================
 
-    const handlePrevious = () => {
+  const hasPreviousPage = currentPage > 0;
 
-        if (hasPreviousPage) {
+  // =================================================
+  // CATEGORY CLICK
+  // =================================================
 
-            setCurrentPage(
-                currentPage - 1
-            );
+  const handleCategoryClick = (name) => {
+    navigate(`/animals/${encodeURIComponent(name)}`);
+  };
 
-        }
+  // =================================================
+  // NEXT
+  // =================================================
 
-    };
+  const handleNext = () => {
+    if (hasNextPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-    // =================================================
-    // UI
-    // =================================================
+  // =================================================
+  // PREVIOUS
+  // =================================================
 
-    return (
+  const handlePrevious = () => {
+    if (hasPreviousPage) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
-        <section className="as-section">
+  // =================================================
+  // UI
+  // =================================================
 
-            <div className="container">
-
-                {/* =====================================
+  return (
+    <section className="as-section">
+      <div className="container">
+        {/* =====================================
                     HEADER
                 ====================================== */}
 
-                <div
-                    className="
+        <div
+          className="
                         d-flex
                         justify-content-between
                         align-items-center
                         mb-4
                     "
-                >
-
-                    {/* =================================
+        >
+          {/* =================================
                         TITLE
                     ================================== */}
 
-                    <h2 className="as-section-title mb-0">
+          <h2 className="as-section-title mb-0">Animal Categories</h2>
 
-                        Animal Categories
-
-                    </h2>
-
-                    {/* =================================
+          {/* =================================
                         RIGHT SIDE CONTROLS
                     ================================== */}
 
-                    <div
-                        className="
+          <div
+            className="
                             d-flex
                             align-items-center
                             gap-3
                         "
-                    >
-
-                        {/* =============================
+          >
+            {/* =============================
                             VIEW ALL
                         ============================== */}
 
-                        <button
-                            type="button"
-                            className="
+            <button
+              type="button"
+              className="
                                 as-link-green
                                 btn
                                 btn-link
                                 p-0
                             "
-                            onClick={() =>
-                                navigate(
-                                    "/animals/all"
-                                )
-                            }
-                        >
+              onClick={() => navigate("/animals/all")}
+            >
+              View All Categories
+            </button>
 
-                            View All Categories
-
-                        </button>
-
-                        {/* =============================
+            {/* =============================
                             PREVIOUS BUTTON
                         ============================== */}
 
-                        <button
-                            type="button"
-                            onClick={handlePrevious}
-                            disabled={
-                                !hasPreviousPage
-                            }
-                            aria-label="Previous 14 animals"
-                            title="Previous 14"
-                            style={{
-                                width: "38px",
-                                height: "38px",
-                                borderRadius: "50%",
-                                border:
-                                    "1px solid #198754",
-                                backgroundColor:
-                                    hasPreviousPage
-                                        ? "#198754"
-                                        : "#e9ecef",
-                                color:
-                                    hasPreviousPage
-                                        ? "#ffffff"
-                                        : "#adb5bd",
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor:
-                                    hasPreviousPage
-                                        ? "pointer"
-                                        : "not-allowed",
-                                padding: 0
-                            }}
-                        >
+            <button
+              type="button"
+              onClick={handlePrevious}
+              disabled={!hasPreviousPage}
+              aria-label="Previous 14 animals"
+              title="Previous 14"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                border: "1px solid #198754",
+                backgroundColor: hasPreviousPage ? "#198754" : "#e9ecef",
+                color: hasPreviousPage ? "#ffffff" : "#adb5bd",
+                fontSize: "20px",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: hasPreviousPage ? "pointer" : "not-allowed",
+                padding: 0,
+              }}
+            >
+              ◀
+            </button>
 
-                            ◀
-
-                        </button>
-
-                        {/* =============================
+            {/* =============================
                             NEXT BUTTON
                         ============================== */}
 
-                        <button
-                            type="button"
-                            onClick={handleNext}
-                            disabled={
-                                !hasNextPage
-                            }
-                            aria-label="Next 14 animals"
-                            title="Next 14"
-                            style={{
-                                width: "38px",
-                                height: "38px",
-                                borderRadius: "50%",
-                                border:
-                                    "1px solid #198754",
-                                backgroundColor:
-                                    hasNextPage
-                                        ? "#198754"
-                                        : "#e9ecef",
-                                color:
-                                    hasNextPage
-                                        ? "#ffffff"
-                                        : "#adb5bd",
-                                fontSize: "20px",
-                                fontWeight: "bold",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                cursor:
-                                    hasNextPage
-                                        ? "pointer"
-                                        : "not-allowed",
-                                padding: 0
-                            }}
-                        >
+            <button
+              type="button"
+              onClick={handleNext}
+              disabled={!hasNextPage}
+              aria-label="Next 14 animals"
+              title="Next 14"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "50%",
+                border: "1px solid #198754",
+                backgroundColor: hasNextPage ? "#198754" : "#e9ecef",
+                color: hasNextPage ? "#ffffff" : "#adb5bd",
+                fontSize: "20px",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: hasNextPage ? "pointer" : "not-allowed",
+                padding: 0,
+              }}
+            >
+              ▶
+            </button>
+          </div>
+        </div>
 
-                            ▶
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-                {/* =====================================
+        {/* =====================================
                     ANIMAL GRID
                 ====================================== */}
 
-                <div className="row g-4">
-
-                    {visibleCategories.map(
-                        (category) => (
-
-                            <div
-                                className="
+        <div className="row g-4">
+          {visibleCategories.map((category) => (
+            <div
+              className="
                                     col-lg
                                     col-md-3
                                     col-sm-4
                                     col-6
                                 "
-                                key={category.name}
-                            >
-
-                                {/* =========================
+              key={category.name}
+            >
+              {/* =========================
                                     CATEGORY CARD
                                 ========================== */}
 
-                                <div
-                                    className="as-cat-card"
-                                    onClick={() =>
-                                        handleCategoryClick(
-                                            category.name
-                                        )
-                                    }
-                                >
-
-                                    {/* =====================
+              <div
+                className="as-cat-card"
+                onClick={() => handleCategoryClick(category.name)}
+              >
+                {/* =====================
                                         IMAGE / EMOJI
                                     ====================== */}
 
-                                    <div
-                                        className="as-cat-thumb"
-                                    >
-
-                                        {category.image ? (
-
-                                            <img
-                                                src={
-                                                    category.image
-                                                }
-                                                alt={
-                                                    category.name
-                                                }
-                                            />
-
-                                        ) : (
-
-                                            <span
-                                                className="
+                <div className="as-cat-thumb">
+                  {category.image ? (
+                    <img src={category.image} alt={category.name} />
+                  ) : (
+                    <span
+                      className="
                                                     as-cat-emoji
                                                 "
-                                            >
+                    >
+                      {category.emoji}
+                    </span>
+                  )}
+                </div>
 
-                                                {
-                                                    category.emoji
-                                                }
-
-                                            </span>
-
-                                        )}
-
-                                    </div>
-
-                                    {/* =====================
+                {/* =====================
                                         ANIMAL NAME
                                     ====================== */}
 
-                                    <h6
-                                        className="
+                <h6
+                  className="
                                             as-cat-name
                                         "
-                                    >
+                >
+                  {category.name}
+                </h6>
 
-                                        {
-                                            category.name
-                                        }
-
-                                    </h6>
-
-                                    {/* =====================
+                {/* =====================
                                         AUTOMATIC COUNT
                                     ====================== */}
 
-                                    <div
-                                        className="
+                <div
+                  className="
                                             as-cat-count
                                         "
-                                    >
-
-                                        (
-                                        {
-                                            categoryCounts[
-                                                category.name
-                                            ] ?? 0
-                                        }
-                                        )
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        )
-                    )}
-
+                >
+                  ({categoryCounts[category.name] ?? 0})
                 </div>
-
+              </div>
             </div>
-
-        </section>
-
-    );
-
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export default CategorySection;

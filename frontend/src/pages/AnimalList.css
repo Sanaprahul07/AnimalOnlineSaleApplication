@@ -1,0 +1,359 @@
+/* =====================================================
+   ANIMAL LIST PAGE
+===================================================== */
+
+.animal-list-page {
+    width: 100%;
+    min-height: 100vh;
+    padding: 25px 30px;
+    background: #f8faf9;
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.animal-list-header {
+    width: 100%;
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+/* =====================================================
+   BACK BUTTON
+===================================================== */
+
+.animal-back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    border: 1px solid #198754;
+    background: #ffffff;
+    color: #198754;
+
+    padding: 8px 16px;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
+    white-space: nowrap;
+}
+
+.animal-back-button:hover {
+    background: #198754;
+    color: #ffffff;
+}
+
+.back-arrow {
+    font-size: 18px;
+    line-height: 1;
+}
+
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
+
+.animal-page-title {
+    flex: 1;
+}
+
+
+/* =====================================================
+   MAIN 32% / 68% LAYOUT
+===================================================== */
+
+.animal-list-layout {
+    display: grid;
+
+    grid-template-columns: 32% 68%;
+
+    width: 100%;
+
+    align-items: start;
+}
+
+
+/* =====================================================
+   LEFT FILTER SECTION
+   STATIC
+   NO INDEPENDENT SCROLL
+===================================================== */
+
+.animal-filter-section {
+    width: 100%;
+
+    padding-right: 18px;
+
+    position: sticky;
+
+    top: 20px;
+
+    align-self: start;
+
+    overflow: visible;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   FILTER CARD
+===================================================== */
+
+.animal-filter-card {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e8e4;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.05);
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   FILTER HEADER
+===================================================== */
+
+.filter-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 18px;
+}
+
+
+/* =====================================================
+   FILTER ITEM
+===================================================== */
+
+.filter-item {
+    margin-bottom: 18px;
+}
+
+.filter-item:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =====================================================
+   PRICE INPUTS
+===================================================== */
+
+.price-inputs {
+    display: flex;
+
+    gap: 10px;
+}
+
+.price-inputs input {
+    width: 50%;
+}
+
+
+/* =====================================================
+   RIGHT ANIMAL RESULTS
+===================================================== */
+
+.animal-results-section {
+    width: 100%;
+
+    min-width: 0;
+
+    padding-left: 18px;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   RIGHT RESULT HEADER
+===================================================== */
+
+.animal-results-top {
+    width: 100%;
+
+    background: #ffffff;
+
+    border: 1px solid #e1e8e4;
+
+    border-radius: 12px;
+
+    padding: 15px 18px;
+
+    margin-bottom: 15px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   SORT DROPDOWN
+===================================================== */
+
+.animal-sort-select {
+    width: 200px;
+}
+
+
+/* =====================================================
+   ONLY RIGHT SIDE SCROLLS
+===================================================== */
+
+.animal-results-scroll {
+    height: calc(100vh - 190px);
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding-right: 8px;
+
+    padding-bottom: 20px;
+
+    box-sizing: border-box;
+}
+
+
+/* =====================================================
+   RIGHT SIDE SCROLLBAR
+===================================================== */
+
+.animal-results-scroll::-webkit-scrollbar {
+    width: 7px;
+}
+
+.animal-results-scroll::-webkit-scrollbar-track {
+    background: #eef3f0;
+
+    border-radius: 10px;
+}
+
+.animal-results-scroll::-webkit-scrollbar-thumb {
+    background: #a6cbb7;
+
+    border-radius: 10px;
+}
+
+.animal-results-scroll::-webkit-scrollbar-thumb:hover {
+    background: #198754;
+}
+
+
+/* =====================================================
+   CARD ROW
+===================================================== */
+
+.animal-results-scroll .row {
+    margin-left: 0;
+
+    margin-right: 0;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 992px) {
+
+    .animal-list-layout {
+        grid-template-columns: 100%;
+    }
+
+    .animal-filter-section {
+        position: relative;
+
+        top: auto;
+
+        padding-right: 0;
+
+        margin-bottom: 20px;
+    }
+
+    .animal-results-section {
+        padding-left: 0;
+    }
+
+    .animal-results-scroll {
+        height: auto;
+
+        overflow: visible;
+
+        padding-right: 0;
+    }
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+    .animal-list-page {
+        padding: 15px;
+    }
+
+    .animal-list-header {
+        align-items: flex-start;
+
+        gap: 12px;
+    }
+
+    .animal-back-button {
+        padding: 7px 12px;
+
+        font-size: 13px;
+    }
+
+    .animal-results-top {
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+    }
+
+    .animal-sort-select {
+        width: 100%;
+    }
+
+    .price-inputs {
+        flex-direction: column;
+    }
+
+    .price-inputs input {
+        width: 100%;
+    }
+}

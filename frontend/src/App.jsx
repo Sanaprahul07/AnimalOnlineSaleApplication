@@ -64,7 +64,6 @@ import AdminAnimals from "./pages/admin/AdminAnimals";
 // =====================================================
 
 import AdminAnimalDetails from "./pages/admin/AdminAnimalDetails";
-
 import ManageCategories from "./pages/admin/ManageCategories";
 import AdminSubscriptionPlans from "./pages/admin/AdminSubscriptionPlans";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -74,6 +73,12 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminSettings from "./pages/admin/AdminSettings";
 
 // =====================================================
+// BUYER LAYOUT
+// =====================================================
+
+import BuyerLayout from "./components/buyer/BuyerLayout";
+
+// =====================================================
 // BUYER PAGES
 // =====================================================
 
@@ -81,6 +86,7 @@ import BuyerLogin from "./pages/buyer/BuyerLogin";
 import BuyerRegister from "./pages/buyer/BuyerRegister";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import BuyerOrder from "./pages/buyer/BuyerOrder";
+import BuyerChat from "./pages/buyer/BuyerChat";
 
 function App() {
   return (
@@ -97,28 +103,35 @@ function App() {
 
       <Route path="/animals/:category" element={<AnimalList />} />
 
-      <Route path="/animal/:id" element={<AnimalDetails />} />
+      {/* =================================================
+                    ANIMAL DETAILS ROUTE
+
+         BuyerLayout checks customerId.
+         Guest -> normal public AnimalDetails
+         Logged-in customer -> BuyerTopbar + AnimalDetails
+         ================================================= */}
+
+      <Route
+        path="/animal/:id"
+        element={
+          <BuyerLayout>
+            <AnimalDetails />
+          </BuyerLayout>
+        }
+      />
 
       {/* =================================================
-                          SELLER ROUTES
+                         SELLER ROUTES
          ================================================= */}
 
       <Route path="/seller/login" element={<SellerLogin />} />
 
       <Route path="/seller/register" element={<SellerRegister />} />
 
-      {/* =================================================
-                    SELLER REGISTRATION SUCCESS
-         ================================================= */}
-
       <Route
         path="/seller/registration-success"
         element={<SellerRegistrationSuccess />}
       />
-
-      {/* =================================================
-                    SELLER FORGOT PASSWORD
-         ================================================= */}
 
       <Route path="/seller/forgot-password" element={<ForgotPassword />} />
 
@@ -186,98 +199,109 @@ function App() {
       />
 
       {/* =================================================
-                          ADMIN ROUTES
+                         ADMIN ROUTES
          ================================================= */}
-
-      {/* ADMIN LOGIN */}
 
       <Route path="/admin/login" element={<AdminLogin />} />
 
-      {/* ADMIN REGISTER */}
-
       <Route path="/admin/register" element={<AdminRegister />} />
-
-      {/* ADMIN DASHBOARD */}
 
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
       {/* =================================================
-                       ADMIN SELLER MODULE
+                    ADMIN SELLER MODULE
          ================================================= */}
 
-      {/* ALL SELLERS LIST */}
-
       <Route path="/admin/sellers" element={<ManageSeller />} />
-
-      {/* PARTICULAR SELLER DETAILS */}
 
       <Route path="/admin/sellers/:id" element={<AdminSellerDetails />} />
 
       {/* =================================================
-                       ADMIN OTHER MODULES
+                    ADMIN OTHER MODULES
          ================================================= */}
-
-      {/* BUYERS */}
 
       <Route path="/admin/buyers" element={<AdminBuyers />} />
 
-      {/* =================================================
-                          ANIMALS
-         ================================================= */}
-
       <Route path="/admin/animals" element={<AdminAnimals />} />
-
-      {/* =================================================
-                    PARTICULAR ANIMAL DETAILS
-         ================================================= */}
 
       <Route path="/admin/animals/:id" element={<AdminAnimalDetails />} />
 
-      {/* CATEGORIES */}
-
       <Route path="/admin/categories" element={<ManageCategories />} />
-
-      {/* SUBSCRIPTION PLANS */}
 
       <Route path="/admin/subscriptions" element={<AdminSubscriptionPlans />} />
 
-      {/* ORDERS */}
-
       <Route path="/admin/orders" element={<AdminOrders />} />
-
-      {/* PAYMENTS */}
 
       <Route path="/admin/payments" element={<AdminPayments />} />
 
-      {/* REPORTS */}
-
       <Route path="/admin/reports" element={<AdminReports />} />
 
-      {/* NOTIFICATIONS */}
-
       <Route path="/admin/notifications" element={<AdminNotifications />} />
-
-      {/* SETTINGS */}
 
       <Route path="/admin/settings" element={<AdminSettings />} />
 
       {/* =================================================
-                          BUYER ROUTES
+                         BUYER ROUTES
          ================================================= */}
 
       <Route path="/buyer/login" element={<BuyerLogin />} />
 
       <Route path="/buyer/register" element={<BuyerRegister />} />
 
-      <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+      {/* BUYER DASHBOARD */}
 
-      <Route path="/buyer/login" element={<BuyerLogin />} />
+      <Route
+        path="/buyer/dashboard"
+        element={
+          <BuyerLayout>
+            <BuyerDashboard />
+          </BuyerLayout>
+        }
+      />
 
-      <Route path="/buyer/register" element={<BuyerRegister />} />
+      {/* BUYER CHAT / NEGOTIATION */}
 
-      <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
+      <Route
+        path="/buyer/chat"
+        element={
+          <BuyerLayout>
+            <BuyerChat />
+          </BuyerLayout>
+        }
+      />
 
-      <Route path="/buyer/order/:id" element={<BuyerOrder />} />
+      {/* EXISTING ORDER ROUTE - KEPT */}
+
+      <Route
+        path="/buyer/order/:id"
+        element={
+          <BuyerLayout>
+            <BuyerOrder />
+          </BuyerLayout>
+        }
+      />
+
+      {/* TEMPORARY BIDS NAVIGATION */}
+
+      <Route
+        path="/buyer/bids"
+        element={
+          <BuyerLayout>
+            <BuyerDashboard />
+          </BuyerLayout>
+        }
+      />
+
+      {/* TEMPORARY PROFILE NAVIGATION */}
+
+      <Route
+        path="/buyer/profile"
+        element={
+          <BuyerLayout>
+            <BuyerDashboard />
+          </BuyerLayout>
+        }
+      />
     </Routes>
   );
 }

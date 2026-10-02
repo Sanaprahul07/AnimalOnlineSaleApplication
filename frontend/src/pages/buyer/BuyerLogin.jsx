@@ -67,7 +67,7 @@ function BuyerLogin() {
         localStorage.removeItem("pendingAnimalId");
 
         // ONLY REQUIREMENT RELATED CHANGE
-        navigate(`/buyer/order/${pendingAnimalId}`);
+         navigate(`/animal/${pendingAnimalId}`);
 
         return;
       }

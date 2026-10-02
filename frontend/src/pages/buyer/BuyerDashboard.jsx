@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { getAllAnimals } from "../../services/AnimalService";
 
 function BuyerDashboard() {
@@ -9,10 +8,6 @@ function BuyerDashboard() {
   const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
-
-  // =====================================================
-  // LOAD ANIMALS
-  // =====================================================
 
   const loadAnimals = async () => {
     try {
@@ -45,17 +40,9 @@ function BuyerDashboard() {
     }
   };
 
-  // =====================================================
-  // LOAD DATA ON PAGE LOAD
-  // =====================================================
-
   useEffect(() => {
     loadAnimals();
   }, []);
-
-  // =====================================================
-  // ANIMAL IMAGE URL
-  // =====================================================
 
   const getImageUrl = (animal) => {
     const image =
@@ -83,10 +70,9 @@ function BuyerDashboard() {
         minHeight: "100vh",
       }}
     >
-      {/* =====================================================
-                          HEADER
-         ===================================================== */}
-
+      {/* =================================================
+          HEADER
+          ================================================= */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold mb-1">Buyer Dashboard</h2>
@@ -104,19 +90,12 @@ function BuyerDashboard() {
         </button>
       </div>
 
-      {/* =====================================================
-                          ERROR MESSAGE
-         ===================================================== */}
-
       {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
 
-      {/* =====================================================
-                          SUMMARY CARDS
-         ===================================================== */}
-
+      {/* =================================================
+          SUMMARY CARDS
+          ================================================= */}
       <div className="row g-4 mb-4">
-        {/* AVAILABLE ANIMALS */}
-
         <div className="col-md-4">
           <div className="card border-0 shadow-sm h-100">
             <div className="card-body">
@@ -126,8 +105,6 @@ function BuyerDashboard() {
             </div>
           </div>
         </div>
-
-        {/* CATEGORIES */}
 
         <div className="col-md-4">
           <div className="card border-0 shadow-sm h-100">
@@ -144,8 +121,6 @@ function BuyerDashboard() {
             </div>
           </div>
         </div>
-
-        {/* VERIFIED SELLERS */}
 
         <div className="col-md-4">
           <div className="card border-0 shadow-sm h-100">
@@ -164,14 +139,11 @@ function BuyerDashboard() {
         </div>
       </div>
 
-      {/* =====================================================
-                        AVAILABLE ANIMALS
-         ===================================================== */}
-
+      {/* =================================================
+          AVAILABLE ANIMALS
+          ================================================= */}
       <div className="card border-0 shadow-sm">
         <div className="card-body">
-          {/* SECTION HEADER */}
-
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div>
               <h4 className="fw-bold mb-1">Available Animals</h4>
@@ -182,10 +154,6 @@ function BuyerDashboard() {
             </div>
           </div>
 
-          {/* =================================================
-                              LOADING
-             ================================================= */}
-
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status" />
@@ -193,24 +161,14 @@ function BuyerDashboard() {
               <p className="mt-3 text-muted">Loading animals...</p>
             </div>
           ) : animals.length === 0 ? (
-            /* =================================================
-                              NO ANIMALS
-               ================================================= */
-
             <div className="alert alert-info mb-0">
               No animals are currently available.
             </div>
           ) : (
-            /* =================================================
-                              ANIMAL LIST
-               ================================================= */
-
             <div className="row g-4">
               {animals.map((animal) => (
                 <div className="col-md-6 col-lg-4 col-xl-3" key={animal.id}>
                   <div className="card h-100 border-0 shadow-sm">
-                    {/* ANIMAL IMAGE */}
-
                     <img
                       src={getImageUrl(animal)}
                       alt={animal.animalName || "Animal"}
@@ -220,11 +178,20 @@ function BuyerDashboard() {
                         objectFit: "cover",
                       }}
                       onError={(event) => {
+                        // =================================================
+                        // PREVENT INFINITE FALLBACK IMAGE LOOP
+                        // =================================================
+                        if (
+                          event.currentTarget.dataset.fallbackApplied === "true"
+                        ) {
+                          return;
+                        }
+
+                        event.currentTarget.dataset.fallbackApplied = "true";
+
                         event.currentTarget.src = "/images/default-animal.jpg";
                       }}
                     />
-
-                    {/* ANIMAL DETAILS */}
 
                     <div className="card-body">
                       <h5 className="fw-bold">{animal.animalName || "-"}</h5>
@@ -256,8 +223,6 @@ function BuyerDashboard() {
                       <p className="mb-3">
                         <strong>Seller:</strong> {animal.sellerName || "-"}
                       </p>
-
-                      {/* VIEW DETAILS */}
 
                       <button
                         className="btn btn-primary w-100"

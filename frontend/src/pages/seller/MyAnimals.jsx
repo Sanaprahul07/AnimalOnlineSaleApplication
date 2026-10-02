@@ -234,31 +234,31 @@ function MyAnimals() {
                         )}
                       </td>
                       {/* ACTION */}
-                      <td>
-                        <div className="d-flex gap-2 flex-wrap">
+                      <td style={{ minWidth: "240px", whiteSpace: "nowrap" }}>
+                        <div className="d-flex align-items-center gap-1">
                           <a
                             href={`/seller/edit-animal/${animal.id}`}
-                            className="btn btn-sm btn-primary"
+                            className="btn btn-sm btn-primary px-2 py-1"
                           >
                             ✏️ Edit
                           </a>
 
                           <a
                             href={`/seller/animal-bids/${animal.id}`}
-                            className="btn btn-sm btn-success"
+                            className="btn btn-sm btn-success px-2 py-1"
                           >
                             👥 View Bids
                           </a>
 
                           <button
                             type="button"
-                            className="btn btn-sm btn-danger"
+                            className="btn btn-sm btn-danger px-2 py-1"
                             onClick={() => handleDelete(animal.id)}
                           >
                             🗑️ Delete
                           </button>
                         </div>
-                      </td>{" "}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

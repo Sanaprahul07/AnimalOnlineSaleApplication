@@ -4,7 +4,6 @@ import { getAnimalById } from "../services/AnimalService";
 import { createBid, getBidsByAnimal } from "../services/BidService";
 
 function AnimalDetails() {
-
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -18,6 +17,7 @@ function AnimalDetails() {
 
   const [bidAmount, setBidAmount] = useState("");
   const [showBidForm, setShowBidForm] = useState(false);
+  const [showChatButton, setShowChatButton] = useState(false);
 
   // =====================================================
   // CURRENT BID STATES
@@ -28,15 +28,79 @@ function AnimalDetails() {
   const [bidLoading, setBidLoading] = useState(false);
 
   // =====================================================
+  // ALL PUBLIC BIDS
+  // =====================================================
+
+  const [animalBids, setAnimalBids] = useState([]);
+
+  // =====================================================
+  // LOAD BIDS
+  // =====================================================
+
+  const loadAnimalBids = async (animalId) => {
+    try {
+      const bidResponse = await getBidsByAnimal(animalId);
+
+      const bids = Array.isArray(bidResponse.data) ? bidResponse.data : [];
+
+      console.log("=================================");
+      console.log("ALL BIDS FOR ANIMAL:", bids);
+      console.log("=================================");
+
+      // =================================================
+      // ONLY VALID BID AMOUNTS
+      // =================================================
+
+      const validBids = bids.filter(
+        (bid) =>
+          bid &&
+          bid.bidAmount != null &&
+          Number(bid.bidAmount) > 0 &&
+          String(bid.status || "").toUpperCase() !== "REJECTED",
+      );
+
+      // =================================================
+      // SAVE PUBLIC BID LIST
+      // =================================================
+
+      setAnimalBids(validBids);
+
+      // =================================================
+      // CURRENT HIGHEST BID
+      // =================================================
+
+      if (validBids.length > 0) {
+        const bidAmounts = validBids.map((bid) => Number(bid.bidAmount));
+
+        const highestBid = Math.max(...bidAmounts);
+
+        if (Number.isFinite(highestBid) && highestBid > 0) {
+          setCurrentHighestBid(highestBid);
+          setHasExistingBids(true);
+        } else {
+          setCurrentHighestBid(0);
+          setHasExistingBids(false);
+        }
+      } else {
+        setCurrentHighestBid(0);
+        setHasExistingBids(false);
+      }
+    } catch (error) {
+      console.error("Error loading existing bids:", error);
+
+      setAnimalBids([]);
+      setHasExistingBids(false);
+      setCurrentHighestBid(0);
+    }
+  };
+
+  // =====================================================
   // GET ANIMAL DETAILS
   // =====================================================
 
   useEffect(() => {
-
     const fetchAnimal = async () => {
-
       try {
-
         setLoading(true);
         setErrorMessage("");
 
@@ -45,218 +109,48 @@ function AnimalDetails() {
         console.log("=================================");
         console.log("ANIMAL DETAILS RESPONSE");
         console.log(response.data);
-
-        console.log(
-          "Front Image URL:",
-          response.data?.frontImageUrl
-        );
-
-        console.log(
-          "Side Image URL:",
-          response.data?.sideImageUrl
-        );
-
-        console.log(
-          "Back Image URL:",
-          response.data?.backImageUrl
-        );
-
+        console.log("Front Image URL:", response.data?.frontImageUrl);
+        console.log("Side Image URL:", response.data?.sideImageUrl);
+        console.log("Back Image URL:", response.data?.backImageUrl);
         console.log("=================================");
 
         setAnimal(response.data);
 
         // =================================================
-        // LOAD EXISTING BIDS FOR THIS ANIMAL
+        // LOAD ALL EXISTING BIDS
         // =================================================
 
-        try {
-
-          const bidResponse = await getBidsByAnimal(
-            response.data.id
-          );
-
-          const bids = Array.isArray(bidResponse.data)
-            ? bidResponse.data
-            : [];
-
-          console.log("=================================");
-          console.log(
-            "EXISTING BIDS FOR ANIMAL:",
-            bids
-          );
-          console.log("=================================");
-
-          if (bids.length > 0) {
-
-            setHasExistingBids(true);
-
-            const validBids = bids
-              .filter(
-                (bid) =>
-                  bid &&
-                  bid.bidAmount != null &&
-                  Number(bid.bidAmount) > 0
-              )
-              .map(
-                (bid) =>
-                  Number(bid.bidAmount)
-              );
-
-            if (validBids.length > 0) {
-
-              const highestBid = Math.max(
-                ...validBids
-              );
-
-              if (
-                Number.isFinite(highestBid) &&
-                highestBid > 0
-              ) {
-
-                setCurrentHighestBid(
-                  highestBid
-                );
-
-              } else {
-
-                setCurrentHighestBid(0);
-
-              }
-
-            } else {
-
-              setCurrentHighestBid(0);
-
-            }
-
-          } else {
-
-            // =================================================
-            // NO BID YET
-            // Animal price is NOT the highest bid.
-            // =================================================
-
-            setHasExistingBids(false);
-            setCurrentHighestBid(0);
-
-          }
-
-        } catch (bidError) {
-
-          console.error(
-            "Error loading existing bids:",
-            bidError
-          );
-
-          // =================================================
-          // IF BIDS CANNOT BE LOADED
-          // START WITH NO BID
-          // =================================================
-
-          setHasExistingBids(false);
-          setCurrentHighestBid(0);
-
-        }
-
+        await loadAnimalBids(response.data.id);
       } catch (error) {
-
-        console.error(
-          "Error getting animal details:",
-          error
-        );
+        console.error("Error getting animal details:", error);
 
         if (error.response) {
-
-          console.error(
-            "Backend Response:",
-            error.response.data
-          );
+          console.error("Backend Response:", error.response.data);
 
           setErrorMessage(
-            error.response.data?.message ||
-            "Animal details not found."
+            error.response.data?.message || "Animal details not found.",
           );
-
         } else {
-
-          setErrorMessage(
-            "Backend server is not running."
-          );
-
+          setErrorMessage("Backend server is not running.");
         }
-
       } finally {
-
         setLoading(false);
-
       }
-
     };
 
     fetchAnimal();
-
   }, [id]);
 
   // =====================================================
-  // REFRESH CURRENT HIGHEST BID
+  // REFRESH ALL BIDS
   // =====================================================
 
   const refreshHighestBid = async () => {
-
-    try {
-
-      const response = await getBidsByAnimal(
-        animal.id
-      );
-
-      const bids = Array.isArray(response.data)
-        ? response.data
-        : [];
-
-      if (bids.length === 0) {
-
-        setHasExistingBids(false);
-        setCurrentHighestBid(0);
-
-        return;
-      }
-
-      const validBids = bids
-        .filter(
-          (bid) =>
-            bid &&
-            bid.bidAmount != null &&
-            Number(bid.bidAmount) > 0
-        )
-        .map(
-          (bid) =>
-            Number(bid.bidAmount)
-        );
-
-      if (validBids.length === 0) {
-
-        setHasExistingBids(false);
-        setCurrentHighestBid(0);
-
-        return;
-      }
-
-      const highestBid = Math.max(
-        ...validBids
-      );
-
-      setHasExistingBids(true);
-      setCurrentHighestBid(highestBid);
-
-    } catch (error) {
-
-      console.error(
-        "Error refreshing highest bid:",
-        error
-      );
-
+    if (!animal?.id) {
+      return;
     }
 
+    await loadAnimalBids(animal.id);
   };
 
   // =====================================================
@@ -264,9 +158,7 @@ function AnimalDetails() {
   // =====================================================
 
   const handleBuyNow = () => {
-
-    const customerId =
-      localStorage.getItem("customerId");
+    const customerId = localStorage.getItem("customerId");
 
     console.log("=================================");
     console.log("BUY NOW CLICKED");
@@ -279,22 +171,12 @@ function AnimalDetails() {
     // =====================================================
 
     if (!customerId) {
+      localStorage.setItem("pendingAnimalId", String(animal.id));
 
-      localStorage.setItem(
-        "pendingAnimalId",
-        String(animal.id)
-      );
-
-      console.log(
-        "Customer not logged in"
-      );
-
-      console.log(
-        "Redirecting to Buyer Register"
-      );
+      console.log("Customer not logged in");
+      console.log("Redirecting to Buyer Register");
 
       navigate("/buyer/register");
-
       return;
     }
 
@@ -302,16 +184,10 @@ function AnimalDetails() {
     // CUSTOMER ALREADY LOGGED IN
     // =====================================================
 
-    console.log(
-      "Customer already logged in"
-    );
-
-    console.log(
-      "Opening bidding section"
-    );
+    console.log("Customer already logged in");
+    console.log("Opening bidding section");
 
     setShowBidForm(true);
-
   };
 
   // =====================================================
@@ -319,23 +195,15 @@ function AnimalDetails() {
   // =====================================================
 
   const handlePlaceBid = async () => {
-
-    const customerId =
-      localStorage.getItem("customerId");
+    const customerId = localStorage.getItem("customerId");
 
     console.log("=================================");
     console.log("PLACE BID CLICKED");
     console.log("Animal ID:", animal.id);
     console.log("Customer ID:", customerId);
     console.log("Bid Amount:", bidAmount);
-    console.log(
-      "Current Highest Bid:",
-      currentHighestBid
-    );
-    console.log(
-      "Has Existing Bids:",
-      hasExistingBids
-    );
+    console.log("Current Highest Bid:", currentHighestBid);
+    console.log("Has Existing Bids:", hasExistingBids);
     console.log("=================================");
 
     // =====================================================
@@ -343,27 +211,14 @@ function AnimalDetails() {
     // =====================================================
 
     if (!customerId) {
+      localStorage.setItem("pendingAnimalId", String(animal.id));
 
-      localStorage.setItem(
-        "pendingAnimalId",
-        String(animal.id)
-      );
+      localStorage.setItem("pendingBidAmount", String(bidAmount));
 
-      localStorage.setItem(
-        "pendingBidAmount",
-        String(bidAmount)
-      );
-
-      console.log(
-        "Customer not logged in"
-      );
-
-      console.log(
-        "Redirecting to Buyer Register"
-      );
+      console.log("Customer not logged in");
+      console.log("Redirecting to Buyer Register");
 
       navigate("/buyer/register");
-
       return;
     }
 
@@ -371,15 +226,8 @@ function AnimalDetails() {
     // BID AMOUNT VALIDATION
     // =====================================================
 
-    if (
-      !bidAmount ||
-      Number(bidAmount) <= 0
-    ) {
-
-      alert(
-        "Please enter a valid bid amount."
-      );
-
+    if (!bidAmount || Number(bidAmount) <= 0) {
+      alert("Please enter a valid bid amount.");
       return;
     }
 
@@ -387,43 +235,17 @@ function AnimalDetails() {
     // CHECK ANIMAL PRICE
     // =====================================================
 
-    if (
-      animal.price == null ||
-      Number(animal.price) <= 0
-    ) {
-
-      alert(
-        "Animal price is not available."
-      );
-
+    if (animal.price == null || Number(animal.price) <= 0) {
+      alert("Animal price is not available.");
       return;
     }
 
     // =====================================================
     // BIDDING RULE
     // =====================================================
-    //
-    // Animal price is only the
-    // listed/reference price.
-    //
-    // Bid can be any amount greater than ₹0.
-    //
-    // Example:
-    //
-    // Animal Price = ₹10000
-    //
-    // Customer = ₹8000  -> ALLOWED
-    // Customer = ₹10000 -> ALLOWED
-    // Customer = ₹12000 -> ALLOWED
-    //
-    // =====================================================
 
     if (Number(bidAmount) <= 0) {
-
-      alert(
-        "Bid amount must be greater than ₹0."
-      );
-
+      alert("Bid amount must be greater than ₹0.");
       return;
     }
 
@@ -432,33 +254,22 @@ function AnimalDetails() {
     // =====================================================
 
     try {
-
       setBidLoading(true);
 
-      // =================================================
-      // IMPORTANT FIX
-      // bidAmount MUST be passed here
-      // =================================================
-
-     const response = await createBid(
-  customerId,
-  animal.id,
-  Number(bidAmount),
-);
-
-      console.log(
-        "Bid created successfully:",
-        response.data
+      const response = await createBid(
+        customerId,
+        animal.id,
+        Number(bidAmount),
       );
 
-      alert(
-        "Bid placed successfully!"
-      );
+      console.log("Bid created successfully:", response.data);
+
+      alert("Bid placed successfully!");
 
       setBidAmount("");
 
       // =================================================
-      // REFRESH HIGHEST BID
+      // REFRESH ALL BIDS + CURRENT HIGHEST BID
       // =================================================
 
       await refreshHighestBid();
@@ -469,40 +280,81 @@ function AnimalDetails() {
 
       setShowBidForm(true);
 
-    } catch (error) {
+      // =================================================
+      // SHOW CHAT / NEGOTIATE BUTTON
+      // =================================================
 
-      console.error(
-        "Error creating bid:",
-        error
-      );
+      setShowChatButton(true);
+    } catch (error) {
+      console.error("Error creating bid:", error);
 
       if (error.response) {
-
-        console.error(
-          "Backend Response:",
-          error.response.data
-        );
+        console.error("Backend Response:", error.response.data);
 
         alert(
           error.response.data?.message ||
-          error.response.data ||
-          "Failed to place bid."
+            error.response.data ||
+            "Failed to place bid.",
         );
-
       } else {
-
-        alert(
-          "Backend server is not running."
-        );
-
+        alert("Backend server is not running.");
       }
-
     } finally {
-
       setBidLoading(false);
+    }
+  };
 
+  // =====================================================
+  // OPEN BUYER CHAT
+  // =====================================================
+
+  const handleOpenChat = () => {
+    const customerId = localStorage.getItem("customerId");
+
+    if (!customerId) {
+      localStorage.setItem("pendingAnimalId", String(animal.id));
+
+      navigate("/buyer/login");
+      return;
     }
 
+    // =================================================
+    // GET SELLER ID
+    // Supports:
+    // animal.sellerId
+    // animal.seller.id
+    // =================================================
+
+    const sellerId = animal?.sellerId || animal?.seller?.id;
+
+    console.log("=================================");
+    console.log("OPEN BUYER CHAT");
+    console.log("Animal ID:", animal.id);
+    console.log("Seller ID:", sellerId);
+    console.log("Customer ID:", customerId);
+    console.log("=================================");
+
+    if (!sellerId) {
+      console.error("Seller ID not found in animal details:", animal);
+
+      alert("Seller information is not available for this animal.");
+
+      return;
+    }
+
+    // =================================================
+    // SAVE LAST CHAT CONTEXT
+    // =================================================
+
+    localStorage.setItem("lastChatAnimalId", String(animal.id));
+
+    localStorage.setItem("lastChatSellerId", String(sellerId));
+
+    // =================================================
+    // OPEN BUYER CHAT
+    // =================================================
+
+    navigate(`/buyer/chat?animalId=${animal.id}&sellerId=${sellerId}`);
   };
 
   // =====================================================
@@ -510,28 +362,15 @@ function AnimalDetails() {
   // =====================================================
 
   if (loading) {
-
     return (
-
       <div className="container mt-5">
-
         <div className="text-center">
+          <div className="spinner-border text-success" role="status"></div>
 
-          <div
-            className="spinner-border text-success"
-            role="status"
-          ></div>
-
-          <p className="mt-3">
-            Loading animal details...
-          </p>
-
+          <p className="mt-3">Loading animal details...</p>
         </div>
-
       </div>
-
     );
-
   }
 
   // =====================================================
@@ -539,29 +378,17 @@ function AnimalDetails() {
   // =====================================================
 
   if (errorMessage) {
-
     return (
-
       <div className="container mt-5">
-
         <div className="alert alert-danger">
-
-          <strong>Error:</strong>{" "}
-          {errorMessage}
-
+          <strong>Error:</strong> {errorMessage}
         </div>
 
-        <button
-          className="btn btn-secondary"
-          onClick={() => navigate(-1)}
-        >
+        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
           ← Back
         </button>
-
       </div>
-
     );
-
   }
 
   // =====================================================
@@ -569,21 +396,11 @@ function AnimalDetails() {
   // =====================================================
 
   if (!animal) {
-
     return (
-
       <div className="container mt-5">
-
-        <div className="alert alert-warning">
-
-          Animal not found.
-
-        </div>
-
+        <div className="alert alert-warning">Animal not found.</div>
       </div>
-
     );
-
   }
 
   // =====================================================
@@ -591,52 +408,27 @@ function AnimalDetails() {
   // =====================================================
 
   return (
-
     <div className="container mt-4 mb-5">
-
-      {/* ==================================
-          BACK BUTTON
-          ================================== */}
-
-      <button
-        className="btn btn-secondary mb-3"
-        onClick={() => navigate(-1)}
-      >
+      <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      {/* ==================================
-          MAIN CARD
-          ================================== */}
-
       <div className="card shadow border-0">
-
         <div className="card-body p-4">
+          <h2 className="text-success fw-bold mb-4">{animal.animalName}</h2>
 
-          <h2 className="text-success fw-bold mb-4">
-            {animal.animalName}
-          </h2>
-
-          {/* ==================================
+          {/* ==========================================
               ANIMAL PHOTOS
-              ================================== */}
+              ========================================== */}
 
-          <h5 className="fw-bold mb-3">
-            Animal Photos
-          </h5>
+          <h5 className="fw-bold mb-3">Animal Photos</h5>
 
           <div className="row mb-4">
-
-            {/* ==================================
-                FRONT PHOTO
-                ================================== */}
+            {/* FRONT PHOTO */}
 
             <div className="col-md-4 mb-3">
-
               <div className="card h-100">
-
                 {animal.frontImageUrl ? (
-
                   <img
                     src={animal.frontImageUrl}
                     className="card-img-top"
@@ -646,20 +438,15 @@ function AnimalDetails() {
                       objectFit: "cover",
                     }}
                     onError={(e) => {
-
                       console.error(
                         "Front image failed:",
-                        animal.frontImageUrl
+                        animal.frontImageUrl,
                       );
 
-                      e.currentTarget.style.display =
-                        "none";
-
+                      e.currentTarget.style.display = "none";
                     }}
                   />
-
                 ) : (
-
                   <div
                     className="d-flex align-items-center justify-content-center bg-light"
                     style={{
@@ -668,31 +455,19 @@ function AnimalDetails() {
                   >
                     No Front Photo
                   </div>
-
                 )}
 
                 <div className="card-body text-center">
-
-                  <strong>
-                    Front Photo
-                  </strong>
-
+                  <strong>Front Photo</strong>
                 </div>
-
               </div>
-
             </div>
 
-            {/* ==================================
-                SIDE PHOTO
-                ================================== */}
+            {/* SIDE PHOTO */}
 
             <div className="col-md-4 mb-3">
-
               <div className="card h-100">
-
                 {animal.sideImageUrl ? (
-
                   <img
                     src={animal.sideImageUrl}
                     className="card-img-top"
@@ -702,20 +477,12 @@ function AnimalDetails() {
                       objectFit: "cover",
                     }}
                     onError={(e) => {
+                      console.error("Side image failed:", animal.sideImageUrl);
 
-                      console.error(
-                        "Side image failed:",
-                        animal.sideImageUrl
-                      );
-
-                      e.currentTarget.style.display =
-                        "none";
-
+                      e.currentTarget.style.display = "none";
                     }}
                   />
-
                 ) : (
-
                   <div
                     className="d-flex align-items-center justify-content-center bg-light"
                     style={{
@@ -724,31 +491,19 @@ function AnimalDetails() {
                   >
                     No Side Photo
                   </div>
-
                 )}
 
                 <div className="card-body text-center">
-
-                  <strong>
-                    Side Photo
-                  </strong>
-
+                  <strong>Side Photo</strong>
                 </div>
-
               </div>
-
             </div>
 
-            {/* ==================================
-                BACK PHOTO
-                ================================== */}
+            {/* BACK PHOTO */}
 
             <div className="col-md-4 mb-3">
-
               <div className="card h-100">
-
                 {animal.backImageUrl ? (
-
                   <img
                     src={animal.backImageUrl}
                     className="card-img-top"
@@ -758,20 +513,12 @@ function AnimalDetails() {
                       objectFit: "cover",
                     }}
                     onError={(e) => {
+                      console.error("Back image failed:", animal.backImageUrl);
 
-                      console.error(
-                        "Back image failed:",
-                        animal.backImageUrl
-                      );
-
-                      e.currentTarget.style.display =
-                        "none";
-
+                      e.currentTarget.style.display = "none";
                     }}
                   />
-
                 ) : (
-
                   <div
                     className="d-flex align-items-center justify-content-center bg-light"
                     style={{
@@ -780,132 +527,80 @@ function AnimalDetails() {
                   >
                     No Back Photo
                   </div>
-
                 )}
 
                 <div className="card-body text-center">
-
-                  <strong>
-                    Back Photo
-                  </strong>
-
+                  <strong>Back Photo</strong>
                 </div>
-
               </div>
-
             </div>
-
           </div>
 
-          {/* ==================================
+          {/* ==========================================
               ANIMAL DETAILS
-              ================================== */}
+              ========================================== */}
 
-          <h5 className="fw-bold text-success mb-3">
-            Animal Details
-          </h5>
+          <h5 className="fw-bold text-success mb-3">Animal Details</h5>
 
           <div className="row">
-
             <div className="col-md-6 mb-3">
-
               <strong>Animal ID:</strong>
-
               <br />
-
               {animal.id}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Animal Name:</strong>
-
               <br />
-
               {animal.animalName}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Category:</strong>
-
               <br />
-
               {animal.category}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Breed:</strong>
-
               <br />
-
               {animal.breed}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Age:</strong>
-
               <br />
-
               {animal.age}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Gender:</strong>
-
               <br />
-
               {animal.gender}
-
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Price:</strong>
-
               <br />
 
-              <span className="text-success fw-bold">
-
-                ₹ {animal.price}
-
-              </span>
-
+              <span className="text-success fw-bold">₹ {animal.price}</span>
             </div>
 
             <div className="col-md-6 mb-3">
-
               <strong>Location:</strong>
-
               <br />
-
               {animal.location}
-
             </div>
 
             <div className="col-12 mb-3">
-
               <strong>Description:</strong>
 
               <p className="mt-2">
-
-                {animal.description ||
-                  "No description available."}
-
+                {animal.description || "No description available."}
               </p>
-
             </div>
 
             <div className="col-12">
-
               <strong>Availability:</strong>
 
               <span
@@ -915,13 +610,67 @@ function AnimalDetails() {
                     : "badge bg-danger ms-2"
                 }
               >
-
-                {animal.available
-                  ? "Available"
-                  : "Not Available"}
-
+                {animal.available ? "Available" : "Not Available"}
               </span>
+            </div>
 
+            {/* ==========================================
+                PUBLIC BIDDING INFORMATION
+                ========================================== */}
+
+            <div className="col-12 mt-4">
+              <div className="card border-success">
+                <div className="card-body">
+                  <h5 className="fw-bold text-success mb-3">
+                    Bidding Activity
+                  </h5>
+
+                  {/* CURRENT HIGHEST BID */}
+
+                  <div className="alert alert-success mb-3">
+                    <strong>Current Highest Bid:</strong>{" "}
+                    {hasExistingBids ? `₹ ${currentHighestBid}` : "No bids yet"}
+                  </div>
+
+                  {/* ALL PUBLIC BID AMOUNTS */}
+
+                  {animalBids.length > 0 ? (
+                    <div>
+                      <p className="fw-bold mb-2">Current Bids</p>
+
+                      <div
+                        className="list-group"
+                        style={{
+                          height: "250px",
+                          overflowY: "auto",
+                        }}
+                      >
+                        {animalBids.map((bid, index) => (
+                          <div
+                            key={bid.id || index}
+                            className="list-group-item d-flex justify-content-between align-items-center"
+                          >
+                            <span>Bid #{index + 1}</span>
+
+                            <strong className="text-success">
+                              ₹ {Number(bid.bidAmount).toLocaleString("en-IN")}
+                            </strong>
+                          </div>
+                        ))}
+                      </div>
+
+                      <small className="text-muted d-block mt-2">
+                        Customer identities are hidden. Only bid amounts are
+                        visible to other customers.
+                      </small>
+                    </div>
+                  ) : (
+                    <div className="alert alert-info mb-0">
+                      No bids have been placed for this animal yet.
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* ==========================================
@@ -929,9 +678,7 @@ function AnimalDetails() {
                 ========================================== */}
 
             <div className="mt-4 text-center">
-
               {animal.available ? (
-
                 <button
                   type="button"
                   className="btn btn-success px-4 me-2"
@@ -939,9 +686,7 @@ function AnimalDetails() {
                 >
                   Buy Now
                 </button>
-
               ) : (
-
                 <button
                   type="button"
                   className="btn btn-secondary px-4 me-2"
@@ -949,179 +694,114 @@ function AnimalDetails() {
                 >
                   Not Available
                 </button>
-
               )}
 
-              {/* ==========================================
+              {/* ========================================
                   PLACE BID
-                  ========================================== */}
+                  ======================================== */}
 
               {animal.available && (
-
                 <button
                   type="button"
                   className="btn btn-warning px-4"
                   onClick={() => {
-
-                    setShowBidForm(
-                      !showBidForm
-                    );
-
+                    setShowBidForm(!showBidForm);
                   }}
                 >
-
-                  {showBidForm
-                    ? "Cancel Bid"
-                    : "Place Bid"}
-
+                  {showBidForm ? "Cancel Bid" : "Place Bid"}
                 </button>
-
               )}
-
             </div>
 
             {/* ==========================================
                 BID FORM
                 ========================================== */}
 
-            {showBidForm &&
-              animal.available && (
+            {showBidForm && animal.available && (
+              <div className="mt-4">
+                <div className="card border-warning">
+                  <div className="card-body">
+                    <h5 className="fw-bold text-warning">Place Your Bid</h5>
 
-                <div className="mt-4">
+                    <p className="mb-2">
+                      Animal Price: <strong>₹ {animal.price}</strong>
+                    </p>
 
-                  <div className="card border-warning">
+                    <p className="mb-3">
+                      Current Highest Bid:{" "}
+                      <strong className="text-success">
+                        {hasExistingBids
+                          ? `₹ ${currentHighestBid}`
+                          : "No bids yet"}
+                      </strong>
+                    </p>
 
-                    <div className="card-body">
-
-                      <h5 className="fw-bold text-warning">
-                        Place Your Bid
-                      </h5>
-
-                      {/* =================================
-                          LISTED / ANIMAL PRICE
-                          ================================= */}
-
-                      <p className="mb-2">
-
-                        Animal Price:{" "}
-
-                        <strong>
-
-                          ₹ {animal.price}
-
-                        </strong>
-
-                      </p>
-
-                      {/* =================================
-                          CURRENT HIGHEST BID
-                          ================================= */}
-
-                      <p className="mb-3">
-
-                        Current Highest Bid:{" "}
-
-                        <strong className="text-success">
-
-                          {hasExistingBids
-                            ? `₹ ${currentHighestBid}`
-                            : "No bids yet"}
-
-                        </strong>
-
-                      </p>
-
-                      {/* =================================
-                          BIDDING RULE
-                          ================================= */}
-
-                      <div className="alert alert-info">
-
-                        <span>
-
-                          You can enter any bid
-                          amount greater than{" "}
-
-                          <strong>
-                            ₹ 0
-                          </strong>
-
-                          .
-
-                          <br />
-
-                          Animal Price ₹{" "}
-                          {animal.price} is only the
-                          listed/reference price.
-
-                        </span>
-
-                      </div>
-
-                      <div className="row">
-
-                        <div className="col-md-8">
-
-                          <label className="form-label fw-bold">
-
-                            Enter Bid Amount
-
-                          </label>
-
-                          <input
-                            type="number"
-                            className="form-control"
-                            placeholder="Enter bid amount"
-                            value={bidAmount}
-                            min={1}
-                            onChange={(e) =>
-                              setBidAmount(
-                                e.target.value
-                              )
-                            }
-                          />
-
-                        </div>
-
-                        <div className="col-md-4 d-flex align-items-end">
-
-                          <button
-                            type="button"
-                            className="btn btn-warning w-100"
-                            onClick={
-                              handlePlaceBid
-                            }
-                            disabled={
-                              bidLoading
-                            }
-                          >
-
-                            {bidLoading
-                              ? "Submitting..."
-                              : "Submit Bid"}
-
-                          </button>
-
-                        </div>
-
-                      </div>
-
+                    <div className="alert alert-info">
+                      <span>
+                        You can enter any bid amount greater than{" "}
+                        <strong>₹ 0</strong>.
+                        <br />
+                        Animal Price ₹ {animal.price} is only the
+                        listed/reference price.
+                      </span>
                     </div>
 
+                    <div className="row">
+                      <div className="col-md-8">
+                        <label className="form-label fw-bold">
+                          Enter Bid Amount
+                        </label>
+
+                        <input
+                          type="number"
+                          className="form-control"
+                          placeholder="Enter bid amount"
+                          value={bidAmount}
+                          min={1}
+                          onChange={(e) => setBidAmount(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="col-md-4 d-flex align-items-end">
+                        <button
+                          type="button"
+                          className="btn btn-warning w-100"
+                          onClick={handlePlaceBid}
+                          disabled={bidLoading}
+                        >
+                          {bidLoading ? "Submitting..." : "Submit Bid"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* ==================================
+                        CHAT / NEGOTIATE
+                        ================================== */}
+
+                    {showChatButton && (
+                      <div className="mt-4 text-center">
+                        <div className="alert alert-success">
+                          Your bid has been placed successfully. You can now
+                          discuss the price with the seller.
+                        </div>
+
+                        <button
+                          type="button"
+                          className="btn btn-primary px-4"
+                          onClick={handleOpenChat}
+                        >
+                          💬 Chat / Negotiate with Seller
+                        </button>
+                      </div>
+                    )}
                   </div>
-
                 </div>
-
-              )}
-
+              </div>
+            )}
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   );
 }
 

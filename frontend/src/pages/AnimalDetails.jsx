@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
+
 import { useParams, useNavigate } from "react-router-dom";
+
 import { getAnimalById } from "../services/AnimalService";
+
 import { createBid, getBidsByAnimal } from "../services/BidService";
+
+import "./AnimalDetails.css";
 
 function AnimalDetails() {
   const { id } = useParams();
+
   const navigate = useNavigate();
 
   const [animal, setAnimal] = useState(null);
+
   const [loading, setLoading] = useState(true);
+
   const [errorMessage, setErrorMessage] = useState("");
 
   // =====================================================
@@ -16,7 +24,9 @@ function AnimalDetails() {
   // =====================================================
 
   const [bidAmount, setBidAmount] = useState("");
+
   const [showBidForm, setShowBidForm] = useState(false);
+
   const [showChatButton, setShowChatButton] = useState(false);
 
   // =====================================================
@@ -24,7 +34,9 @@ function AnimalDetails() {
   // =====================================================
 
   const [currentHighestBid, setCurrentHighestBid] = useState(0);
+
   const [hasExistingBids, setHasExistingBids] = useState(false);
+
   const [bidLoading, setBidLoading] = useState(false);
 
   // =====================================================
@@ -44,7 +56,9 @@ function AnimalDetails() {
       const bids = Array.isArray(bidResponse.data) ? bidResponse.data : [];
 
       console.log("=================================");
+
       console.log("ALL BIDS FOR ANIMAL:", bids);
+
       console.log("=================================");
 
       // =================================================
@@ -76,20 +90,25 @@ function AnimalDetails() {
 
         if (Number.isFinite(highestBid) && highestBid > 0) {
           setCurrentHighestBid(highestBid);
+
           setHasExistingBids(true);
         } else {
           setCurrentHighestBid(0);
+
           setHasExistingBids(false);
         }
       } else {
         setCurrentHighestBid(0);
+
         setHasExistingBids(false);
       }
     } catch (error) {
       console.error("Error loading existing bids:", error);
 
       setAnimalBids([]);
+
       setHasExistingBids(false);
+
       setCurrentHighestBid(0);
     }
   };
@@ -102,16 +121,23 @@ function AnimalDetails() {
     const fetchAnimal = async () => {
       try {
         setLoading(true);
+
         setErrorMessage("");
 
         const response = await getAnimalById(id);
 
         console.log("=================================");
+
         console.log("ANIMAL DETAILS RESPONSE");
+
         console.log(response.data);
+
         console.log("Front Image URL:", response.data?.frontImageUrl);
+
         console.log("Side Image URL:", response.data?.sideImageUrl);
+
         console.log("Back Image URL:", response.data?.backImageUrl);
+
         console.log("=================================");
 
         setAnimal(response.data);
@@ -161,30 +187,37 @@ function AnimalDetails() {
     const customerId = localStorage.getItem("customerId");
 
     console.log("=================================");
+
     console.log("BUY NOW CLICKED");
+
     console.log("Animal ID:", animal.id);
+
     console.log("Customer ID:", customerId);
+
     console.log("=================================");
 
-    // =====================================================
+    // =================================================
     // CUSTOMER NOT LOGGED IN
-    // =====================================================
+    // =================================================
 
     if (!customerId) {
       localStorage.setItem("pendingAnimalId", String(animal.id));
 
       console.log("Customer not logged in");
+
       console.log("Redirecting to Buyer Register");
 
       navigate("/buyer/register");
+
       return;
     }
 
-    // =====================================================
+    // =================================================
     // CUSTOMER ALREADY LOGGED IN
-    // =====================================================
+    // =================================================
 
     console.log("Customer already logged in");
+
     console.log("Opening bidding section");
 
     setShowBidForm(true);
@@ -198,17 +231,24 @@ function AnimalDetails() {
     const customerId = localStorage.getItem("customerId");
 
     console.log("=================================");
+
     console.log("PLACE BID CLICKED");
+
     console.log("Animal ID:", animal.id);
+
     console.log("Customer ID:", customerId);
+
     console.log("Bid Amount:", bidAmount);
+
     console.log("Current Highest Bid:", currentHighestBid);
+
     console.log("Has Existing Bids:", hasExistingBids);
+
     console.log("=================================");
 
-    // =====================================================
+    // =================================================
     // CUSTOMER NOT LOGGED IN
-    // =====================================================
+    // =================================================
 
     if (!customerId) {
       localStorage.setItem("pendingAnimalId", String(animal.id));
@@ -216,42 +256,47 @@ function AnimalDetails() {
       localStorage.setItem("pendingBidAmount", String(bidAmount));
 
       console.log("Customer not logged in");
+
       console.log("Redirecting to Buyer Register");
 
       navigate("/buyer/register");
+
       return;
     }
 
-    // =====================================================
+    // =================================================
     // BID AMOUNT VALIDATION
-    // =====================================================
+    // =================================================
 
     if (!bidAmount || Number(bidAmount) <= 0) {
       alert("Please enter a valid bid amount.");
+
       return;
     }
 
-    // =====================================================
+    // =================================================
     // CHECK ANIMAL PRICE
-    // =====================================================
+    // =================================================
 
     if (animal.price == null || Number(animal.price) <= 0) {
       alert("Animal price is not available.");
+
       return;
     }
 
-    // =====================================================
+    // =================================================
     // BIDDING RULE
-    // =====================================================
+    // =================================================
 
     if (Number(bidAmount) <= 0) {
       alert("Bid amount must be greater than ₹0.");
+
       return;
     }
 
-    // =====================================================
+    // =================================================
     // CREATE BID API
-    // =====================================================
+    // =================================================
 
     try {
       setBidLoading(true);
@@ -315,6 +360,7 @@ function AnimalDetails() {
       localStorage.setItem("pendingAnimalId", String(animal.id));
 
       navigate("/buyer/login");
+
       return;
     }
 
@@ -328,10 +374,15 @@ function AnimalDetails() {
     const sellerId = animal?.sellerId || animal?.seller?.id;
 
     console.log("=================================");
+
     console.log("OPEN BUYER CHAT");
+
     console.log("Animal ID:", animal.id);
+
     console.log("Seller ID:", sellerId);
+
     console.log("Customer ID:", customerId);
+
     console.log("=================================");
 
     if (!sellerId) {
@@ -568,7 +619,7 @@ function AnimalDetails() {
             </div>
 
             <div className="col-md-6 mb-3">
-              <strong>Age:</strong>
+              <strong>Age (Years) :</strong>
               <br />
               {animal.age}
             </div>
@@ -638,30 +689,83 @@ function AnimalDetails() {
                     <div>
                       <p className="fw-bold mb-2">Current Bids</p>
 
+                      {/* =================================================
+                          SCROLLABLE BID TABLE
+                          ================================================= */}
+
                       <div
-                        className="list-group"
+                        className="border rounded"
                         style={{
                           height: "250px",
                           overflowY: "auto",
+                          overflowX: "hidden",
                         }}
                       >
-                        {animalBids.map((bid, index) => (
-                          <div
-                            key={bid.id || index}
-                            className="list-group-item d-flex justify-content-between align-items-center"
+                        <table className="table table-bordered table-hover mb-0">
+                          <thead
+                            className="table-light"
+                            style={{
+                              position: "sticky",
+                              top: 0,
+                              zIndex: 1,
+                            }}
                           >
-                            <span>Bid #{index + 1}</span>
+                            <tr>
+                              <th
+                                style={{
+                                  width: "20%",
+                                }}
+                              >
+                                Bid ID
+                              </th>
 
-                            <strong className="text-success">
-                              ₹ {Number(bid.bidAmount).toLocaleString("en-IN")}
-                            </strong>
-                          </div>
-                        ))}
+                              <th
+                                style={{
+                                  width: "50%",
+                                }}
+                              >
+                                Name
+                              </th>
+
+                              <th
+                                style={{
+                                  width: "30%",
+                                  textAlign: "right",
+                                }}
+                              >
+                                Price
+                              </th>
+                            </tr>
+                          </thead>
+
+                          <tbody>
+                            {animalBids.map((bid, index) => (
+                              <tr key={bid.id || index}>
+                                <td>{bid.id || "-"}</td>
+
+                                <td className="fw-semibold">
+                                  {bid.customerName || "Unknown Bidder"}
+                                </td>
+
+                                <td
+                                  className="text-success fw-bold"
+                                  style={{
+                                    textAlign: "right",
+                                  }}
+                                >
+                                  ₹{" "}
+                                  {Number(bid.bidAmount).toLocaleString(
+                                    "en-IN",
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
 
                       <small className="text-muted d-block mt-2">
-                        Customer identities are hidden. Only bid amounts are
-                        visible to other customers.
+                        Bidder name and bid amount are visible.
                       </small>
                     </div>
                   ) : (
@@ -775,8 +879,8 @@ function AnimalDetails() {
                     </div>
 
                     {/* ==================================
-                        CHAT / NEGOTIATE
-                        ================================== */}
+                          CHAT / NEGOTIATE
+                          ================================== */}
 
                     {showChatButton && (
                       <div className="mt-4 text-center">

@@ -13,6 +13,12 @@ function BuyerLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // =====================================================
+  // PASSWORD SHOW / HIDE
+  // =====================================================
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -40,7 +46,7 @@ function BuyerLogin() {
         {
           email: formData.email,
           password: formData.password,
-        }
+        },
       );
 
       console.log("Customer Login Response:", response.data);
@@ -50,24 +56,19 @@ function BuyerLogin() {
       // =====================================================
 
       if (response.data?.id) {
-        localStorage.setItem(
-          "customerId",
-          String(response.data.id)
-        );
+        localStorage.setItem("customerId", String(response.data.id));
       }
 
       // =====================================================
       // RETURN TO SELECTED ANIMAL
       // =====================================================
 
-      const pendingAnimalId =
-        localStorage.getItem("pendingAnimalId");
+      const pendingAnimalId = localStorage.getItem("pendingAnimalId");
 
       if (pendingAnimalId) {
         localStorage.removeItem("pendingAnimalId");
 
-        // ONLY REQUIREMENT RELATED CHANGE
-         navigate(`/animal/${pendingAnimalId}`);
+        navigate(`/animal/${pendingAnimalId}`);
 
         return;
       }
@@ -77,19 +78,15 @@ function BuyerLogin() {
       // =====================================================
 
       navigate("/buyer/dashboard");
-
     } catch (error) {
       console.error("Buyer Login Error:", error);
 
       const backendMessage =
         typeof error.response?.data === "string"
           ? error.response.data
-          : error.response?.data?.message ||
-            error.response?.data?.error;
+          : error.response?.data?.message || error.response?.data?.error;
 
-      setError(
-        backendMessage || "Unable to login buyer account."
-      );
+      setError(backendMessage || "Unable to login buyer account.");
     } finally {
       setLoading(false);
     }
@@ -97,33 +94,39 @@ function BuyerLogin() {
 
   return (
     <div className="container py-5">
+      {/* =====================================================
+          BACK BUTTON
+      ===================================================== */}
+
+      <div className="mb-3">
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={() => navigate(-1)}
+        >
+          ← Back
+        </button>
+      </div>
+
       <div className="row justify-content-center">
         <div className="col-md-6 col-lg-5">
-
           <div className="card shadow-sm border-0">
-
             <div className="card-body p-4">
-
-              <h2 className="text-center fw-bold mb-2">
-                Buyer Login
-              </h2>
+              <h2 className="text-center fw-bold mb-2">Buyer Login</h2>
 
               <p className="text-center text-muted mb-4">
                 Login to your buyer account
               </p>
 
-              {error && (
-                <div className="alert alert-danger">
-                  {error}
-                </div>
-              )}
+              {error && <div className="alert alert-danger">{error}</div>}
 
               <form onSubmit={handleSubmit}>
+                {/* =====================================================
+                    EMAIL
+                ===================================================== */}
 
                 <div className="mb-3">
-                  <label className="form-label">
-                    Email
-                  </label>
+                  <label className="form-label">Email</label>
 
                   <input
                     type="email"
@@ -135,20 +138,39 @@ function BuyerLogin() {
                   />
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label">
-                    Password
-                  </label>
+                {/* =====================================================
+                    PASSWORD
+                ===================================================== */}
 
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="Enter your password"
-                  />
+                <div className="mb-3">
+                  <label className="form-label">Password</label>
+
+                  <div className="input-group">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      className="form-control"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Enter your password"
+                    />
+
+                    <button
+                      type="button"
+                      className="btn btn-outline-secondary"
+                      onClick={() => setShowPassword((previous) => !previous)}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? "🙈" : "👁"}
+                    </button>
+                  </div>
                 </div>
+
+                {/* =====================================================
+                    LOGIN BUTTON
+                ===================================================== */}
 
                 <button
                   type="submit"
@@ -157,31 +179,25 @@ function BuyerLogin() {
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
-
               </form>
 
-              <div className="text-center mt-3">
+              {/* =====================================================
+                  REGISTER
+              ===================================================== */}
 
-                <span>
-                  Don't have an account?{" "}
-                </span>
+              <div className="text-center mt-3">
+                <span>Don't have an account? </span>
 
                 <button
                   type="button"
                   className="btn btn-link p-0"
-                  onClick={() =>
-                    navigate("/buyer/register")
-                  }
+                  onClick={() => navigate("/buyer/register")}
                 >
                   Register
                 </button>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
       </div>
     </div>

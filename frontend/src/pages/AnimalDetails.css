@@ -1,0 +1,353 @@
+/* =====================================================
+   ANIMAL DETAILS PAGE
+   Only color / visual styling
+   Existing functionality and layout are preserved
+   ===================================================== */
+
+.animal-details-page {
+    background: #f5f8f6;
+    min-height: 100vh;
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+/* =====================================================
+   BACK BUTTON
+   ===================================================== */
+
+.animal-details-page > .btn-secondary {
+    background: #6c757d;
+    border-color: #6c757d;
+    border-radius: 7px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.animal-details-page > .btn-secondary:hover {
+    background: #495057;
+    border-color: #495057;
+}
+
+/* =====================================================
+   MAIN CARD
+   ===================================================== */
+
+.animal-details-page > .card {
+    border: 1px solid #dce8e1 !important;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* =====================================================
+   PAGE TITLE
+   ===================================================== */
+
+.animal-details-page h2 {
+    color: #0f7f4f !important;
+    font-weight: 700;
+    border-bottom: 2px solid #d9eee2;
+    padding-bottom: 12px;
+}
+
+/* =====================================================
+   SECTION HEADINGS
+   ===================================================== */
+
+.animal-details-page h5 {
+    color: #145c3b;
+}
+
+.animal-details-page .text-success {
+    color: #198754 !important;
+}
+
+/* =====================================================
+   ANIMAL PHOTO SECTION
+   ===================================================== */
+
+.animal-details-page .row.mb-4 .card {
+    border: 1px solid #cfe1d6;
+    border-radius: 9px;
+    overflow: hidden;
+    background: #ffffff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.animal-details-page .row.mb-4 .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 14px rgba(0, 0, 0, 0.08);
+}
+
+.animal-details-page .row.mb-4 .card-img-top {
+    border-bottom: 1px solid #d8e6dd;
+}
+
+.animal-details-page .row.mb-4 .card-body {
+    background: #f8fbf9;
+    color: #29483a;
+    padding: 10px;
+}
+
+/* =====================================================
+   ANIMAL DETAILS
+   ===================================================== */
+
+.animal-details-page .card-body > .row {
+    color: #33483d;
+}
+
+.animal-details-page .card-body > .row strong {
+    color: #174b35;
+}
+
+.animal-details-page .card-body p {
+    color: #53645b;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   PRICE
+   ===================================================== */
+
+.animal-details-page .text-success.fw-bold {
+    color: #198754 !important;
+}
+
+/* =====================================================
+   AVAILABILITY BADGE
+   ===================================================== */
+
+.animal-details-page .badge.bg-success {
+    background-color: #198754 !important;
+    border-radius: 5px;
+    padding: 5px 8px;
+}
+
+.animal-details-page .badge.bg-danger {
+    border-radius: 5px;
+    padding: 5px 8px;
+}
+
+/* =====================================================
+   BIDDING ACTIVITY
+   ===================================================== */
+
+.animal-details-page .border-success {
+    border-color: #198754 !important;
+}
+
+.animal-details-page .border-success > .card-body {
+    background: #fbfefd;
+}
+
+/* Bidding heading */
+
+.animal-details-page .border-success h5 {
+    color: #0f7f4f !important;
+}
+
+/* Highest bid box */
+
+.animal-details-page .alert-success {
+    background: #e5f4eb;
+    border-color: #b8ddc5;
+    color: #185b3d;
+    border-radius: 8px;
+}
+
+/* =====================================================
+   BID TABLE
+   ===================================================== */
+
+.animal-details-page .table {
+    margin-bottom: 0;
+    background: #ffffff;
+}
+
+.animal-details-page .table thead th {
+    background: #e8f3ec;
+    color: #214b37;
+    border-color: #c7d9ce;
+    font-weight: 700;
+    vertical-align: middle;
+}
+
+.animal-details-page .table tbody td {
+    border-color: #d8e3dc;
+    color: #35463d;
+    vertical-align: middle;
+}
+
+.animal-details-page .table tbody tr:hover {
+    background: #f3faf6;
+}
+
+.animal-details-page .table .text-success {
+    color: #198754 !important;
+}
+
+/* Scrollbar for bid table */
+
+.animal-details-page
+    .border.rounded[style*="overflow-y: auto"]::-webkit-scrollbar {
+    width: 7px;
+}
+
+.animal-details-page
+    .border.rounded[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+    background: #eef4f0;
+    border-radius: 10px;
+}
+
+.animal-details-page
+    .border.rounded[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+    background: #a8cbb6;
+    border-radius: 10px;
+}
+
+.animal-details-page
+    .border.rounded[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
+    background: #198754;
+}
+
+/* =====================================================
+   NO BIDS MESSAGE
+   ===================================================== */
+
+.animal-details-page .alert-info {
+    background: #eef7fb;
+    border-color: #c9e3ee;
+    color: #28566a;
+    border-radius: 8px;
+}
+
+/* =====================================================
+   BUY NOW AREA
+   ===================================================== */
+
+.animal-details-page .btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    font-weight: 600;
+    border-radius: 7px;
+}
+
+.animal-details-page .btn-success:hover {
+    background-color: #146c43;
+    border-color: #146c43;
+}
+
+/* =====================================================
+   PLACE BID BUTTON
+   ===================================================== */
+
+.animal-details-page .btn-warning {
+    background-color: #f0ad00;
+    border-color: #f0ad00;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 7px;
+}
+
+.animal-details-page .btn-warning:hover {
+    background-color: #d99a00;
+    border-color: #d99a00;
+    color: #ffffff;
+}
+
+/* =====================================================
+   BID FORM
+   ===================================================== */
+
+.animal-details-page .border-warning {
+    border-color: #f0ad00 !important;
+    border-radius: 10px;
+}
+
+.animal-details-page .border-warning .card-body {
+    background: #fffdf7;
+}
+
+.animal-details-page .border-warning h5 {
+    color: #c48700 !important;
+}
+
+/* =====================================================
+   BID INPUT
+   ===================================================== */
+
+.animal-details-page input.form-control {
+    border: 1px solid #cbdcd2;
+    border-radius: 7px;
+}
+
+.animal-details-page input.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.15);
+}
+
+/* =====================================================
+   CHAT / NEGOTIATE AREA
+   ===================================================== */
+
+.animal-details-page .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    border-radius: 7px;
+    font-weight: 600;
+}
+
+.animal-details-page .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* =====================================================
+   CHAT SUCCESS MESSAGE
+   ===================================================== */
+
+.animal-details-page .mt-4 .alert-success {
+    background: #e5f4eb;
+    color: #185b3d;
+    border-color: #b8ddc5;
+}
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 768px) {
+
+    .animal-details-page {
+        padding-top: 12px;
+        padding-bottom: 25px;
+    }
+
+    .animal-details-page > .card .card-body {
+        padding: 18px !important;
+    }
+
+    .animal-details-page h2 {
+        font-size: 24px;
+    }
+
+    .animal-details-page h5 {
+        font-size: 18px;
+    }
+
+    .animal-details-page .table {
+        font-size: 13px;
+    }
+
+    .animal-details-page .table th,
+    .animal-details-page .table td {
+        padding: 8px;
+    }
+
+    .animal-details-page .btn-success,
+    .animal-details-page .btn-warning,
+    .animal-details-page .btn-primary {
+        margin-bottom: 8px;
+    }
+}

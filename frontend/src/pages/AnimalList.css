@@ -1,6 +1,6 @@
 /* =====================================================
    ANIMAL LIST PAGE
-===================================================== */
+   ===================================================== */
 
 .animal-list-page {
     width: 100%;
@@ -13,12 +13,11 @@
 
 /* =====================================================
    PAGE HEADER
-===================================================== */
+   ===================================================== */
 
 .animal-list-header {
     width: 100%;
     margin-bottom: 20px;
-
     display: flex;
     align-items: center;
     gap: 20px;
@@ -27,28 +26,21 @@
 
 /* =====================================================
    BACK BUTTON
-===================================================== */
+   ===================================================== */
 
 .animal-back-button {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-
     border: 1px solid #198754;
     background: #ffffff;
     color: #198754;
-
     padding: 8px 16px;
-
     border-radius: 8px;
-
     font-size: 14px;
     font-weight: 600;
-
     cursor: pointer;
-
     transition: all 0.2s ease;
-
     white-space: nowrap;
 }
 
@@ -65,7 +57,7 @@
 
 /* =====================================================
    PAGE TITLE
-===================================================== */
+   ===================================================== */
 
 .animal-page-title {
     flex: 1;
@@ -74,15 +66,12 @@
 
 /* =====================================================
    MAIN 32% / 68% LAYOUT
-===================================================== */
+   ===================================================== */
 
 .animal-list-layout {
     display: grid;
-
     grid-template-columns: 32% 68%;
-
     width: 100%;
-
     align-items: start;
 }
 
@@ -90,83 +79,136 @@
 /* =====================================================
    LEFT FILTER SECTION
    STATIC
-   NO INDEPENDENT SCROLL
-===================================================== */
+   ===================================================== */
 
 .animal-filter-section {
     width: 100%;
-
     padding-right: 18px;
-
     position: sticky;
-
     top: 20px;
-
     align-self: start;
-
     overflow: visible;
-
     box-sizing: border-box;
 }
 
 
 /* =====================================================
    FILTER CARD
-===================================================== */
+   ===================================================== */
 
 .animal-filter-card {
     width: 100%;
-
     background: #ffffff;
-
-    border: 1px solid #e1e8e4;
-
-    border-radius: 12px;
-
-    padding: 20px;
-
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.05);
-
+    border: 1px solid #d7e6de;
+    border-radius: 14px;
+    padding: 0;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 
 /* =====================================================
    FILTER HEADER
-===================================================== */
+   ===================================================== */
 
 .filter-header {
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
+    margin-bottom: 0;
+    padding: 18px 20px;
+    background: linear-gradient(
+        135deg,
+        #0f7f4f,
+        #198754
+    );
+    color: #ffffff;
+}
 
-    margin-bottom: 18px;
+.filter-header h5 {
+    color: #ffffff;
+}
+
+.filter-header small {
+    color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.filter-header .btn-link {
+    color: #ffffff !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.filter-header .btn-link:hover {
+    color: #e8fff2 !important;
+    text-decoration: underline;
 }
 
 
 /* =====================================================
    FILTER ITEM
-===================================================== */
+   ===================================================== */
 
 .filter-item {
-    margin-bottom: 18px;
+    margin-bottom: 0;
+    padding: 0 20px;
+    margin-top: 18px;
 }
 
 .filter-item:last-child {
-    margin-bottom: 0;
+    margin-bottom: 20px;
 }
 
 
 /* =====================================================
-   PRICE INPUTS
-===================================================== */
+   FILTER LABEL
+   ===================================================== */
+
+.filter-item .form-label {
+    display: block;
+    color: #29483a;
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+
+/* =====================================================
+   FILTER INPUTS / SELECTS
+   ===================================================== */
+
+.animal-filter-card .form-control,
+.animal-filter-card .form-select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #cbded3;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #263c32;
+    font-size: 14px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.animal-filter-card .form-control::placeholder {
+    color: #8a9b92;
+}
+
+.animal-filter-card .form-control:focus,
+.animal-filter-card .form-select:focus {
+    border-color: #198754;
+    box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.12);
+    outline: none;
+}
+
+
+/* =====================================================
+   PRICE / AGE INPUTS
+   ===================================================== */
 
 .price-inputs {
     display: flex;
-
     gap: 10px;
 }
 
@@ -176,50 +218,53 @@
 
 
 /* =====================================================
+   ACTIVE FILTER COUNT
+   ===================================================== */
+
+.filter-active-info {
+    margin: 20px;
+    padding: 10px 12px;
+    background: #eaf7f0;
+    border: 1px solid #b9e2ca;
+    border-radius: 8px;
+    color: #176b45;
+    font-size: 13px;
+}
+
+
+/* =====================================================
    RIGHT ANIMAL RESULTS
-===================================================== */
+   ===================================================== */
 
 .animal-results-section {
     width: 100%;
-
     min-width: 0;
-
     padding-left: 18px;
-
     box-sizing: border-box;
 }
 
 
 /* =====================================================
    RIGHT RESULT HEADER
-===================================================== */
+   ===================================================== */
 
 .animal-results-top {
     width: 100%;
-
     background: #ffffff;
-
     border: 1px solid #e1e8e4;
-
     border-radius: 12px;
-
     padding: 15px 18px;
-
     margin-bottom: 15px;
-
     display: flex;
-
     justify-content: space-between;
-
     align-items: center;
-
     box-sizing: border-box;
 }
 
 
 /* =====================================================
    SORT DROPDOWN
-===================================================== */
+   ===================================================== */
 
 .animal-sort-select {
     width: 200px;
@@ -228,26 +273,21 @@
 
 /* =====================================================
    ONLY RIGHT SIDE SCROLLS
-===================================================== */
+   ===================================================== */
 
 .animal-results-scroll {
     height: calc(100vh - 190px);
-
     overflow-y: auto;
-
     overflow-x: hidden;
-
     padding-right: 8px;
-
     padding-bottom: 20px;
-
     box-sizing: border-box;
 }
 
 
 /* =====================================================
    RIGHT SIDE SCROLLBAR
-===================================================== */
+   ===================================================== */
 
 .animal-results-scroll::-webkit-scrollbar {
     width: 7px;
@@ -255,13 +295,11 @@
 
 .animal-results-scroll::-webkit-scrollbar-track {
     background: #eef3f0;
-
     border-radius: 10px;
 }
 
 .animal-results-scroll::-webkit-scrollbar-thumb {
     background: #a6cbb7;
-
     border-radius: 10px;
 }
 
@@ -272,18 +310,17 @@
 
 /* =====================================================
    CARD ROW
-===================================================== */
+   ===================================================== */
 
 .animal-results-scroll .row {
     margin-left: 0;
-
     margin-right: 0;
 }
 
 
 /* =====================================================
    TABLET
-===================================================== */
+   ===================================================== */
 
 @media (max-width: 992px) {
 
@@ -293,11 +330,8 @@
 
     .animal-filter-section {
         position: relative;
-
         top: auto;
-
         padding-right: 0;
-
         margin-bottom: 20px;
     }
 
@@ -307,9 +341,7 @@
 
     .animal-results-scroll {
         height: auto;
-
         overflow: visible;
-
         padding-right: 0;
     }
 }
@@ -317,7 +349,7 @@
 
 /* =====================================================
    MOBILE
-===================================================== */
+   ===================================================== */
 
 @media (max-width: 576px) {
 
@@ -327,21 +359,17 @@
 
     .animal-list-header {
         align-items: flex-start;
-
         gap: 12px;
     }
 
     .animal-back-button {
         padding: 7px 12px;
-
         font-size: 13px;
     }
 
     .animal-results-top {
         flex-direction: column;
-
         align-items: stretch;
-
         gap: 12px;
     }
 
@@ -355,5 +383,18 @@
 
     .price-inputs input {
         width: 100%;
+    }
+
+    .filter-header {
+        padding: 16px;
+    }
+
+    .filter-item {
+        padding: 0 16px;
+        margin-top: 15px;
+    }
+
+    .filter-active-info {
+        margin: 16px;
     }
 }

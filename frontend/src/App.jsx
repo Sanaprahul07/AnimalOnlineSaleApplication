@@ -30,6 +30,8 @@ import SellerBids from "./pages/seller/SellerBids";
 import SellerChat from "./pages/seller/SellerChat";
 import AddAnimal from "./pages/seller/AddAnimal";
 import EditAnimal from "./pages/seller/EditAnimal";
+import SellerOrders from "./pages/seller/SellerOrders";
+import SellerReports from "./pages/seller/SellerReports";
 
 // =====================================================
 // FORGOT PASSWORD
@@ -197,7 +199,25 @@ function App() {
           </SellerLayout>
         }
       />
+      <Route
+        path="/seller/orders"
+        element={
+          <SellerLayout>
+            <SellerOrders />
+          </SellerLayout>
+        }
+      />
 
+      {/* SELLER REPORTS ROUTE */}
+
+      <Route
+        path="/seller/reports"
+        element={
+          <SellerLayout>
+            <SellerReports />
+          </SellerLayout>
+        }
+      />
       {/* =================================================
                          ADMIN ROUTES
          ================================================= */}

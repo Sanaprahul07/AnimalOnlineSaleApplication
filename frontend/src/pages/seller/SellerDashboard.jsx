@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { getAnimalsBySeller } from "../../services/AnimalService";
+import { apiUrl } from "../../config/api";
 
 function SellerDashboard() {
   // =====================================
@@ -117,9 +118,8 @@ function SellerDashboard() {
       console.log("Getting Orders For Seller:", sellerId);
 
       const orderResponse = await axios.get(
-        `http://localhost:8080/api/orders/seller/${sellerId}`,
+        apiUrl(`/api/orders/seller/${sellerId}`),
       );
-
       console.log("Seller Orders:", orderResponse.data);
 
       // -------------------------------------

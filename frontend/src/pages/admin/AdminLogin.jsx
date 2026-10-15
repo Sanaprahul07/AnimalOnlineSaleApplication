@@ -1,7 +1,7 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 function AdminLogin() {
   const navigate = useNavigate();
@@ -61,13 +61,10 @@ function AdminLogin() {
       // Do NOT use /api/auth/login here.
       // =================================================
 
-      const response = await axios.post(
-        "http://localhost:8080/api/admin/login",
-        {
-          email: formData.email.trim(),
-          password: formData.password,
-        }
-      );
+      const response = await axios.post(apiUrl("/api/admin/login"), {
+        email: formData.email.trim(),
+        password: formData.password,
+      });
 
       console.log("Admin Login Response:", response.data);
 
@@ -80,9 +77,7 @@ function AdminLogin() {
       const role = admin?.role?.toLowerCase() || "";
 
       if (role !== "admin") {
-        setErrorMessage(
-          "Access denied. This account is not an admin account."
-        );
+        setErrorMessage("Access denied. This account is not an admin account.");
         return;
       }
 
@@ -90,37 +85,21 @@ function AdminLogin() {
       // SAVE ADMIN LOGIN DATA
       // =================================================
 
-      localStorage.setItem(
-        "adminId",
-        String(admin.id)
-      );
+      localStorage.setItem("adminId", String(admin.id));
 
-      localStorage.setItem(
-        "adminLogin",
-        "true"
-      );
+      localStorage.setItem("adminLogin", "true");
 
-      localStorage.setItem(
-        "adminEmail",
-        admin.email || ""
-      );
+      localStorage.setItem("adminEmail", admin.email || "");
 
-      localStorage.setItem(
-        "adminName",
-        admin.adminName || "Admin"
-      );
+      localStorage.setItem("adminName", admin.adminName || "Admin");
 
-      localStorage.setItem(
-        "adminRole",
-        admin.role || "ADMIN"
-      );
+      localStorage.setItem("adminRole", admin.role || "ADMIN");
 
       // =================================================
       // ADMIN DASHBOARD
       // =================================================
 
       navigate("/admin/dashboard");
-
     } catch (error) {
       console.error("Admin Login Error:", error);
 
@@ -129,35 +108,20 @@ function AdminLogin() {
       // =================================================
 
       if (error.response) {
-        console.error(
-          "Backend Status:",
-          error.response.status
-        );
+        console.error("Backend Status:", error.response.status);
 
-        console.error(
-          "Backend Response:",
-          error.response.data
-        );
+        console.error("Backend Response:", error.response.data);
 
         setErrorMessage(
           error.response.data?.message ||
             error.response.data ||
-            "Invalid admin email or password."
+            "Invalid admin email or password.",
         );
-
       } else if (error.request) {
-
-        setErrorMessage(
-          "Unable to connect to backend server."
-        );
-
+        setErrorMessage("Unable to connect to backend server.");
       } else {
-
-        setErrorMessage(
-          error.message || "Admin login failed."
-        );
+        setErrorMessage(error.message || "Admin login failed.");
       }
-
     } finally {
       setLoading(false);
     }
@@ -169,7 +133,6 @@ function AdminLogin() {
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light p-3">
-
       <div
         className="card border-0 shadow"
         style={{
@@ -178,13 +141,10 @@ function AdminLogin() {
           borderRadius: "16px",
         }}
       >
-
         <div className="card-body p-4 p-md-5">
-
           {/* BRAND */}
 
           <div className="text-center mb-4">
-
             <div
               className="fw-bold text-success"
               style={{
@@ -194,23 +154,17 @@ function AdminLogin() {
               🐾 AnimalSale
             </div>
 
-            <h3 className="fw-bold mt-3 mb-1">
-              Admin Login
-            </h3>
+            <h3 className="fw-bold mt-3 mb-1">Admin Login</h3>
 
             <p className="text-muted mb-0">
               Login to manage the AnimalSale platform
             </p>
-
           </div>
 
           {/* ERROR */}
 
           {errorMessage && (
-            <div
-              className="alert alert-danger"
-              role="alert"
-            >
+            <div className="alert alert-danger" role="alert">
               {errorMessage}
             </div>
           )}
@@ -218,14 +172,10 @@ function AdminLogin() {
           {/* FORM */}
 
           <form onSubmit={handleSubmit}>
-
             {/* EMAIL */}
 
             <div className="mb-3">
-
-              <label className="form-label fw-semibold">
-                Admin Email
-              </label>
+              <label className="form-label fw-semibold">Admin Email</label>
 
               <input
                 type="email"
@@ -237,16 +187,12 @@ function AdminLogin() {
                 autoComplete="username"
                 disabled={loading}
               />
-
             </div>
 
             {/* PASSWORD */}
 
             <div className="mb-4">
-
-              <label className="form-label fw-semibold">
-                Password
-              </label>
+              <label className="form-label fw-semibold">Password</label>
 
               <input
                 type="password"
@@ -258,7 +204,6 @@ function AdminLogin() {
                 autoComplete="current-password"
                 disabled={loading}
               />
-
             </div>
 
             {/* LOGIN */}
@@ -268,21 +213,14 @@ function AdminLogin() {
               className="btn btn-success w-100 py-2 fw-semibold"
               disabled={loading}
             >
-              {loading
-                ? "Logging in..."
-                : "Login as Admin"}
+              {loading ? "Logging in..." : "Login as Admin"}
             </button>
-
           </form>
 
           {/* ADMIN REGISTER */}
 
           <div className="text-center mt-3">
-
-            <span className="text-muted">
-              Don't have an admin account?
-            </span>{" "}
-
+            <span className="text-muted">Don't have an admin account?</span>{" "}
             <button
               type="button"
               className="btn btn-link p-0 text-success fw-semibold text-decoration-none"
@@ -291,13 +229,11 @@ function AdminLogin() {
             >
               Register
             </button>
-
           </div>
 
           {/* BACK */}
 
           <div className="text-center mt-4">
-
             <button
               type="button"
               className="btn btn-link text-decoration-none"
@@ -306,9 +242,7 @@ function AdminLogin() {
             >
               ← Back to Home
             </button>
-
           </div>
-
         </div>
       </div>
     </div>
@@ -316,4 +250,3 @@ function AdminLogin() {
 }
 
 export default AdminLogin;
-

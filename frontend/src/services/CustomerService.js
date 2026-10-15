@@ -1,13 +1,14 @@
- import axios from "axios";
+import axios from "axios";
+import { apiUrl } from "../config/api";
 
-const BASE_URL = "http://localhost:8080/api/customer";
+const BASE_URL = apiUrl("/api/customer");
 
-// Customer Registration
+// CUSTOMER REGISTRATION
 export const registerCustomer = (customerData) => {
-    return axios.post(`${BASE_URL}/register`, customerData);
+  return axios.post(`${BASE_URL}/register`, customerData);
 };
 
-// Customer Login
+// CUSTOMER LOGIN
 export const loginCustomer = (loginData) => {
-    return axios.post(`${BASE_URL}/login`, loginData);
+  return axios.post(`${BASE_URL}/login`, loginData);
 };

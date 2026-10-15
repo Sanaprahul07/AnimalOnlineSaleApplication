@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminService from "../../services/AdminService";
+import { apiUrl } from "../../config/api";
 
 function AdminAnimals() {
   const navigate = useNavigate();
@@ -73,9 +74,10 @@ function AdminAnimals() {
       return image;
     }
 
-    return `http://localhost:8080${image.startsWith("/") ? "" : "/"}${image}`;
-  };
+    const cleanPath = image.startsWith("/") ? image : `/${image}`;
 
+    return apiUrl(cleanPath);
+  };
   // =====================================================
   // PRICE FORMAT
   // =====================================================
@@ -554,10 +556,7 @@ function AdminAnimals() {
                             {/* SINGLE PHOTO */}
 
                             <td style={cellStyle}>
-                              <AnimalThumbnail
-                                src={frontImage}
-                                label="Front"
-                              />
+                              <AnimalThumbnail src={frontImage} label="Front" />
                             </td>
 
                             {/* STATUS */}
@@ -586,9 +585,7 @@ function AdminAnimals() {
                                     animal.animalId,
                                   );
 
-                                  navigate(
-                                    `/admin/animals/${animal.animalId}`,
-                                  );
+                                  navigate(`/admin/animals/${animal.animalId}`);
                                 }}
                               >
                                 View Animal

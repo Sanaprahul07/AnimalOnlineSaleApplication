@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminService from "../../services/AdminService";
+import { apiUrl } from "../../config/api";
 
 function ManageSeller() {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ function ManageSeller() {
       ? paymentScreenshot
       : `/${paymentScreenshot}`;
 
-    return `http://localhost:8080${cleanPath}`;
+    return apiUrl(cleanPath);
   };
 
   // =====================================================

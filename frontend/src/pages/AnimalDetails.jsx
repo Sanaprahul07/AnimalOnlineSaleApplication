@@ -20,6 +20,30 @@ function AnimalDetails() {
   const [errorMessage, setErrorMessage] = useState("");
 
   // =====================================================
+  // AWS IMAGE URL FIX ONLY
+  // Localhost behavior remains unchanged.
+  // =====================================================
+
+  const getAnimalImageUrl = (url) => {
+    if (!url || typeof url !== "string") {
+      return url;
+    }
+
+    const isLocalhost =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+
+    if (isLocalhost) {
+      return url;
+    }
+
+    return url.replace(
+      /^https?:\/\/(localhost|127\.0\.0\.1):8080(?=\/api\/animal\/images\/)/i,
+      window.location.origin,
+    );
+  };
+
+  // =====================================================
   // BID STATES
   // =====================================================
 
@@ -61,10 +85,6 @@ function AnimalDetails() {
 
       console.log("=================================");
 
-      // =================================================
-      // ONLY VALID BID AMOUNTS
-      // =================================================
-
       const validBids = bids.filter(
         (bid) =>
           bid &&
@@ -73,15 +93,7 @@ function AnimalDetails() {
           String(bid.status || "").toUpperCase() !== "REJECTED",
       );
 
-      // =================================================
-      // SAVE PUBLIC BID LIST
-      // =================================================
-
       setAnimalBids(validBids);
-
-      // =================================================
-      // CURRENT HIGHEST BID
-      // =================================================
 
       if (validBids.length > 0) {
         const bidAmounts = validBids.map((bid) => Number(bid.bidAmount));
@@ -142,10 +154,6 @@ function AnimalDetails() {
 
         setAnimal(response.data);
 
-        // =================================================
-        // LOAD ALL EXISTING BIDS
-        // =================================================
-
         await loadAnimalBids(response.data.id);
       } catch (error) {
         console.error("Error getting animal details:", error);
@@ -180,47 +188,35 @@ function AnimalDetails() {
   };
 
   // =====================================================
-  // BUY NOW / START BIDDING
+  // BUY NOW / DIRECT CHECKOUT
   // =====================================================
 
   const handleBuyNow = () => {
-    const customerId = localStorage.getItem("customerId");
-
-    console.log("=================================");
-
-    console.log("BUY NOW CLICKED");
-
-    console.log("Animal ID:", animal.id);
-
-    console.log("Customer ID:", customerId);
-
-    console.log("=================================");
-
-    // =================================================
-    // CUSTOMER NOT LOGGED IN
-    // =================================================
-
-    if (!customerId) {
-      localStorage.setItem("pendingAnimalId", String(animal.id));
-
-      console.log("Customer not logged in");
-
-      console.log("Redirecting to Buyer Register");
-
-      navigate("/buyer/register");
-
+    if (!animal?.id) {
+      alert("Animal details are not available.");
       return;
     }
 
-    // =================================================
-    // CUSTOMER ALREADY LOGGED IN
-    // =================================================
+    const customerId = localStorage.getItem("customerId");
 
-    console.log("Customer already logged in");
+    console.log("=================================");
+    console.log("BUY NOW CLICKED");
+    console.log("Animal ID:", animal.id);
+    console.log("Customer ID:", customerId);
+    console.log("=================================");
 
-    console.log("Opening bidding section");
+    if (!customerId) {
+      localStorage.setItem("pendingAnimalId", String(animal.id));
+      navigate("/buyer/login");
+      return;
+    }
 
-    setShowBidForm(true);
+    if (!animal.available) {
+      alert("This animal is already sold or not available.");
+      return;
+    }
+
+    navigate(`/buyer/order/${animal.id}`);
   };
 
   // =====================================================
@@ -246,10 +242,6 @@ function AnimalDetails() {
 
     console.log("=================================");
 
-    // =================================================
-    // CUSTOMER NOT LOGGED IN
-    // =================================================
-
     if (!customerId) {
       localStorage.setItem("pendingAnimalId", String(animal.id));
 
@@ -264,19 +256,11 @@ function AnimalDetails() {
       return;
     }
 
-    // =================================================
-    // BID AMOUNT VALIDATION
-    // =================================================
-
     if (!bidAmount || Number(bidAmount) <= 0) {
       alert("Please enter a valid bid amount.");
 
       return;
     }
-
-    // =================================================
-    // CHECK ANIMAL PRICE
-    // =================================================
 
     if (animal.price == null || Number(animal.price) <= 0) {
       alert("Animal price is not available.");
@@ -284,19 +268,11 @@ function AnimalDetails() {
       return;
     }
 
-    // =================================================
-    // BIDDING RULE
-    // =================================================
-
     if (Number(bidAmount) <= 0) {
       alert("Bid amount must be greater than ₹0.");
 
       return;
     }
-
-    // =================================================
-    // CREATE BID API
-    // =================================================
 
     try {
       setBidLoading(true);
@@ -313,21 +289,9 @@ function AnimalDetails() {
 
       setBidAmount("");
 
-      // =================================================
-      // REFRESH ALL BIDS + CURRENT HIGHEST BID
-      // =================================================
-
       await refreshHighestBid();
 
-      // =================================================
-      // KEEP BID FORM OPEN
-      // =================================================
-
       setShowBidForm(true);
-
-      // =================================================
-      // SHOW CHAT / NEGOTIATE BUTTON
-      // =================================================
 
       setShowChatButton(true);
     } catch (error) {
@@ -364,13 +328,6 @@ function AnimalDetails() {
       return;
     }
 
-    // =================================================
-    // GET SELLER ID
-    // Supports:
-    // animal.sellerId
-    // animal.seller.id
-    // =================================================
-
     const sellerId = animal?.sellerId || animal?.seller?.id;
 
     console.log("=================================");
@@ -393,17 +350,9 @@ function AnimalDetails() {
       return;
     }
 
-    // =================================================
-    // SAVE LAST CHAT CONTEXT
-    // =================================================
-
     localStorage.setItem("lastChatAnimalId", String(animal.id));
 
     localStorage.setItem("lastChatSellerId", String(sellerId));
-
-    // =================================================
-    // OPEN BUYER CHAT
-    // =================================================
 
     navigate(`/buyer/chat?animalId=${animal.id}&sellerId=${sellerId}`);
   };
@@ -468,9 +417,7 @@ function AnimalDetails() {
         <div className="card-body p-4">
           <h2 className="text-success fw-bold mb-4">{animal.animalName}</h2>
 
-          {/* ==========================================
-              ANIMAL PHOTOS
-              ========================================== */}
+          {/* ANIMAL PHOTOS */}
 
           <h5 className="fw-bold mb-3">Animal Photos</h5>
 
@@ -481,7 +428,7 @@ function AnimalDetails() {
               <div className="card h-100">
                 {animal.frontImageUrl ? (
                   <img
-                    src={animal.frontImageUrl}
+                    src={getAnimalImageUrl(animal.frontImageUrl)}
                     className="card-img-top"
                     alt="Front Animal"
                     style={{
@@ -491,7 +438,7 @@ function AnimalDetails() {
                     onError={(e) => {
                       console.error(
                         "Front image failed:",
-                        animal.frontImageUrl,
+                        getAnimalImageUrl(animal.frontImageUrl),
                       );
 
                       e.currentTarget.style.display = "none";
@@ -520,7 +467,7 @@ function AnimalDetails() {
               <div className="card h-100">
                 {animal.sideImageUrl ? (
                   <img
-                    src={animal.sideImageUrl}
+                    src={getAnimalImageUrl(animal.sideImageUrl)}
                     className="card-img-top"
                     alt="Side Animal"
                     style={{
@@ -528,7 +475,10 @@ function AnimalDetails() {
                       objectFit: "cover",
                     }}
                     onError={(e) => {
-                      console.error("Side image failed:", animal.sideImageUrl);
+                      console.error(
+                        "Side image failed:",
+                        getAnimalImageUrl(animal.sideImageUrl),
+                      );
 
                       e.currentTarget.style.display = "none";
                     }}
@@ -556,7 +506,7 @@ function AnimalDetails() {
               <div className="card h-100">
                 {animal.backImageUrl ? (
                   <img
-                    src={animal.backImageUrl}
+                    src={getAnimalImageUrl(animal.backImageUrl)}
                     className="card-img-top"
                     alt="Back Animal"
                     style={{
@@ -564,7 +514,10 @@ function AnimalDetails() {
                       objectFit: "cover",
                     }}
                     onError={(e) => {
-                      console.error("Back image failed:", animal.backImageUrl);
+                      console.error(
+                        "Back image failed:",
+                        getAnimalImageUrl(animal.backImageUrl),
+                      );
 
                       e.currentTarget.style.display = "none";
                     }}
@@ -587,9 +540,7 @@ function AnimalDetails() {
             </div>
           </div>
 
-          {/* ==========================================
-              ANIMAL DETAILS
-              ========================================== */}
+          {/* ANIMAL DETAILS */}
 
           <h5 className="fw-bold text-success mb-3">Animal Details</h5>
 
@@ -625,6 +576,30 @@ function AnimalDetails() {
             </div>
 
             <div className="col-md-6 mb-3">
+              <strong>Weight:</strong>
+              <br />
+              {animal.weight || "Not provided"}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Color:</strong>
+              <br />
+              {animal.color || "Not provided"}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Health Status:</strong>
+              <br />
+              {animal.healthStatus || "Not provided"}
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>Vaccination Records:</strong>
+              <br />
+              {animal.vaccinationRecords || "Not provided"}
+            </div>
+
+            <div className="col-md-6 mb-3">
               <strong>Gender:</strong>
               <br />
               {animal.gender}
@@ -633,7 +608,6 @@ function AnimalDetails() {
             <div className="col-md-6 mb-3">
               <strong>Price:</strong>
               <br />
-
               <span className="text-success fw-bold">₹ {animal.price}</span>
             </div>
 
@@ -665,9 +639,7 @@ function AnimalDetails() {
               </span>
             </div>
 
-            {/* ==========================================
-                PUBLIC BIDDING INFORMATION
-                ========================================== */}
+            {/* PUBLIC BIDDING INFORMATION */}
 
             <div className="col-12 mt-4">
               <div className="card border-success">
@@ -676,22 +648,14 @@ function AnimalDetails() {
                     Bidding Activity
                   </h5>
 
-                  {/* CURRENT HIGHEST BID */}
-
                   <div className="alert alert-success mb-3">
                     <strong>Current Highest Bid:</strong>{" "}
                     {hasExistingBids ? `₹ ${currentHighestBid}` : "No bids yet"}
                   </div>
 
-                  {/* ALL PUBLIC BID AMOUNTS */}
-
                   {animalBids.length > 0 ? (
                     <div>
                       <p className="fw-bold mb-2">Current Bids</p>
-
-                      {/* =================================================
-                          SCROLLABLE BID TABLE
-                          ================================================= */}
 
                       <div
                         className="border rounded"
@@ -711,21 +675,9 @@ function AnimalDetails() {
                             }}
                           >
                             <tr>
-                              <th
-                                style={{
-                                  width: "20%",
-                                }}
-                              >
-                                Bid ID
-                              </th>
+                              <th style={{ width: "20%" }}>Bid ID</th>
 
-                              <th
-                                style={{
-                                  width: "50%",
-                                }}
-                              >
-                                Name
-                              </th>
+                              <th style={{ width: "50%" }}>Name</th>
 
                               <th
                                 style={{
@@ -749,9 +701,7 @@ function AnimalDetails() {
 
                                 <td
                                   className="text-success fw-bold"
-                                  style={{
-                                    textAlign: "right",
-                                  }}
+                                  style={{ textAlign: "right" }}
                                 >
                                   ₹{" "}
                                   {Number(bid.bidAmount).toLocaleString(
@@ -777,9 +727,7 @@ function AnimalDetails() {
               </div>
             </div>
 
-            {/* ==========================================
-                BUY NOW
-                ========================================== */}
+            {/* BUY NOW */}
 
             <div className="mt-4 text-center">
               {animal.available ? (
@@ -800,9 +748,7 @@ function AnimalDetails() {
                 </button>
               )}
 
-              {/* ========================================
-                  PLACE BID
-                  ======================================== */}
+              {/* PLACE BID */}
 
               {animal.available && (
                 <button
@@ -817,9 +763,7 @@ function AnimalDetails() {
               )}
             </div>
 
-            {/* ==========================================
-                BID FORM
-                ========================================== */}
+            {/* BID FORM */}
 
             {showBidForm && animal.available && (
               <div className="mt-4">
@@ -878,9 +822,7 @@ function AnimalDetails() {
                       </div>
                     </div>
 
-                    {/* ==================================
-                          CHAT / NEGOTIATE
-                          ================================== */}
+                    {/* CHAT / NEGOTIATE */}
 
                     {showChatButton && (
                       <div className="mt-4 text-center">

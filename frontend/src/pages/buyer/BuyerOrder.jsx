@@ -1,28 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import { getAnimalById } from "../../services/AnimalService";
+import { createOrder } from "../../services/OrderService";
 
 function BuyerOrder() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const [animal, setAnimal] = useState(null);
-
   const [loading, setLoading] = useState(true);
-
   const [errorMessage, setErrorMessage] = useState("");
-
   const [placingOrder, setPlacingOrder] = useState(false);
-
   const [order, setOrder] = useState(null);
 
-  // ==========================================
-  // GET SELECTED ANIMAL
-  // ==========================================
-
+  // Load selected animal
   useEffect(() => {
+    let isMounted = true;
+
     const fetchAnimal = async () => {
       try {
         setLoading(true);
@@ -30,196 +24,144 @@ function BuyerOrder() {
 
         const response = await getAnimalById(id);
 
-        console.log("Buyer Order - Animal Response:", response.data);
-
-        setAnimal(response.data);
+        if (isMounted) {
+          setAnimal(response.data);
+        }
       } catch (error) {
         console.error("Error getting animal for order:", error);
 
-        if (error.response) {
-          const backendMessage =
-            typeof error.response.data === "string"
-              ? error.response.data
-              : error.response.data?.message || error.response.data?.error;
+        const data = error.response?.data;
+        const message =
+          typeof data === "string" ? data : data?.message || data?.error;
 
-          setErrorMessage(backendMessage || "Animal details not found.");
-        } else {
-          setErrorMessage("Backend server is not running.");
+        if (isMounted) {
+          setErrorMessage(message || "Unable to load animal details.");
         }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchAnimal();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id]);
 
-  // ==========================================
-  // PLACE ORDER
-  // ==========================================
+  const animalPrice = Number(animal?.price || 0);
 
+  // Display estimate using the existing backend 5% commission rule.
+  const commission = animalPrice * 0.05;
+  const estimatedTotal = animalPrice + commission;
+
+  // Create order at the listed asking price.
   const handlePlaceOrder = async () => {
-    setErrorMessage("");
+    if (placingOrder) {
+      return;
+    }
 
-    // ==========================================
-    // CHECK CUSTOMER LOGIN
-    // ==========================================
+    setErrorMessage("");
 
     const customerId = localStorage.getItem("customerId");
 
     if (!customerId) {
       localStorage.setItem("pendingAnimalId", String(id));
-
       navigate("/buyer/login");
-
       return;
     }
 
-    // ==========================================
-    // CHECK ANIMAL
-    // ==========================================
-
     if (!animal) {
       setErrorMessage("Animal details are not available.");
-
       return;
     }
 
     if (!animal.available) {
       setErrorMessage("This animal is already sold or not available.");
+      return;
+    }
 
+    if (!Number.isFinite(animalPrice) || animalPrice <= 0) {
+      setErrorMessage("The animal asking price is invalid.");
       return;
     }
 
     try {
       setPlacingOrder(true);
 
-      console.log(
-        "Creating Order...",
-        "Customer ID:",
-        customerId,
-        "Animal ID:",
-        id,
-      );
+      const response = await createOrder(customerId, id);
 
-      // ==========================================
-      // CREATE ORDER API
-      // POST /api/orders/create
-      // ==========================================
+      if (!response.data) {
+        throw new Error("The server did not return order details.");
+      }
 
-      const response = await axios.post(
-        "http://localhost:8080/api/orders/create",
-        null,
-        {
-          params: {
-            buyerId: Number(customerId),
-            animalId: Number(id),
-          },
-        },
-      );
-
-      console.log("Order Created Successfully:", response.data);
-
+      console.log("Order created successfully:", response.data);
       setOrder(response.data);
     } catch (error) {
-      console.error("Place Order Error:", error);
+      console.error("Place order error:", error);
 
-      if (error.response) {
-        const backendMessage =
-          typeof error.response.data === "string"
-            ? error.response.data
-            : error.response.data?.message || error.response.data?.error;
+      const data = error.response?.data;
+      const backendMessage =
+        typeof data === "string" ? data : data?.message || data?.error;
 
-        setErrorMessage(backendMessage || "Unable to create order.");
-      } else {
-        setErrorMessage("Backend server is not running.");
-      }
+      setErrorMessage(
+        backendMessage ||
+          error.message ||
+          "Unable to create the order. Please try again.",
+      );
     } finally {
       setPlacingOrder(false);
     }
   };
 
-  // ==========================================
-  // LOADING
-  // ==========================================
+  const formatPrice = (value) =>
+    Number(value || 0).toLocaleString("en-IN", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
   if (loading) {
     return (
-      <div className="container mt-5">
-        <div className="text-center">
-          <div className="spinner-border text-success" role="status"></div>
-
-          <p className="mt-3">Loading order details...</p>
-        </div>
+      <div className="container mt-5 text-center">
+        <div className="spinner-border text-success" role="status" />
+        <p className="mt-3">Loading order details...</p>
       </div>
     );
   }
-
-  // ==========================================
-  // ERROR
-  // ==========================================
-
-  if (errorMessage && !animal) {
-    return (
-      <div className="container mt-5">
-        <div className="alert alert-danger">{errorMessage}</div>
-
-        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
-      </div>
-    );
-  }
-
-  // ==========================================
-  // ANIMAL NOT FOUND
-  // ==========================================
 
   if (!animal) {
     return (
       <div className="container mt-5">
-        <div className="alert alert-warning">Animal not found.</div>
-      </div>
-    );
-  }
-
-  // ==========================================
-  // CHECK AVAILABILITY
-  // ==========================================
-
-  if (!animal.available && !order) {
-    return (
-      <div className="container mt-5">
         <div className="alert alert-danger">
-          This animal is already sold or not available.
+          {errorMessage || "Animal details not found."}
         </div>
-
         <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-          ← Back
+          Back
         </button>
       </div>
     );
   }
 
-  // ==========================================
-  // ORDER CREATED SUCCESSFULLY
-  // ==========================================
-
+  // Order confirmation
   if (order) {
+    const confirmedTotal =
+      order.totalAmount != null ? Number(order.totalAmount) : estimatedTotal;
+
     return (
       <div className="container mt-5 mb-5">
         <div className="card shadow border-0">
           <div className="card-body p-5 text-center">
-            <div className="mb-3">
-              <span className="text-success" style={{ fontSize: "60px" }}>
-                ✓
-              </span>
+            <div className="text-success mb-3" style={{ fontSize: "60px" }}>
+              ✓
             </div>
 
             <h2 className="text-success fw-bold">Order Created Successfully</h2>
 
             <p className="text-muted mt-3">
-              Your animal order has been created successfully.
+              Your order has been created. The seller can process the order
+              according to the order status.
             </p>
 
             <hr />
@@ -227,42 +169,38 @@ function BuyerOrder() {
             <div className="row text-start mt-4">
               <div className="col-md-6 mb-3">
                 <strong>Order ID:</strong>
-                <br />
-                {order.id}
+                <div>{order.id ?? "-"}</div>
               </div>
 
               <div className="col-md-6 mb-3">
                 <strong>Order Number:</strong>
-                <br />
-                {order.orderNumber || "-"}
+                <div>{order.orderNumber || "-"}</div>
               </div>
 
               <div className="col-md-6 mb-3">
                 <strong>Animal:</strong>
-                <br />
-                {order.animalName || animal.animalName}
+                <div>{order.animalName || animal.animalName}</div>
               </div>
 
               <div className="col-md-6 mb-3">
-                <strong>Amount:</strong>
-                <br />₹ {order.totalAmount ?? animal.price}
+                <strong>Total Amount:</strong>
+                <div className="text-success fw-bold">
+                  ₹ {formatPrice(confirmedTotal)}
+                </div>
               </div>
 
               <div className="col-md-6 mb-3">
                 <strong>Order Status:</strong>
-                <br />
-                {order.status || "-"}
+                <div>{order.status || "PENDING"}</div>
               </div>
 
               <div className="col-md-6 mb-3">
                 <strong>Payment Status:</strong>
-                <br />
-                {order.paymentStatus || "-"}
+                <div>{order.paymentStatus || "PENDING"}</div>
               </div>
             </div>
 
             <button
-              type="button"
               className="btn btn-success mt-3"
               onClick={() => navigate("/buyer/dashboard")}
             >
@@ -274,38 +212,37 @@ function BuyerOrder() {
     );
   }
 
-  // ==========================================
-  // ORDER PAGE
-  // ==========================================
+  if (!animal.available) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger">
+          This animal is already sold or not available.
+        </div>
+
+        <button className="btn btn-secondary" onClick={() => navigate(-1)}>
+          Back
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-4 mb-5">
-      {/* ==================================
-                  BACK BUTTON
-          ================================== */}
-
       <button className="btn btn-secondary mb-3" onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      {/* ==================================
-                  PAGE TITLE
-          ================================== */}
-
-      <h2 className="text-success fw-bold mb-4">Order Animal</h2>
+      <h2 className="text-success fw-bold mb-4">Buy Animal</h2>
 
       <div className="row">
-        {/* ==================================
-                    ANIMAL IMAGE
-            ================================== */}
-
+        {/* Animal image */}
         <div className="col-md-6 mb-4">
-          <div className="card shadow">
+          <div className="card shadow h-100">
             {animal.frontImageUrl ? (
               <img
                 src={animal.frontImageUrl}
                 className="card-img-top"
-                alt={animal.animalName}
+                alt={animal.animalName || "Animal"}
                 style={{
                   height: "400px",
                   objectFit: "cover",
@@ -314,89 +251,88 @@ function BuyerOrder() {
             ) : (
               <div
                 className="d-flex align-items-center justify-content-center bg-light"
-                style={{
-                  height: "400px",
-                }}
+                style={{ height: "400px" }}
               >
                 No Animal Photo
               </div>
             )}
-          </div>
-        </div>
 
-        {/* ==================================
-                    ORDER DETAILS
-            ================================== */}
-
-        <div className="col-md-6 mb-4">
-          <div className="card shadow">
-            <div className="card-body p-4">
-              <h3 className="text-success fw-bold mb-4">{animal.animalName}</h3>
+            <div className="card-body">
+              <h4 className="text-success fw-bold">{animal.animalName}</h4>
 
               <p>
                 <strong>Animal ID:</strong> {animal.id}
               </p>
 
               <p>
-                <strong>Category:</strong> {animal.category}
+                <strong>Category:</strong> {animal.category || "-"}
               </p>
 
               <p>
-                <strong>Breed:</strong> {animal.breed}
+                <strong>Breed:</strong> {animal.breed || "-"}
               </p>
 
               <p>
-                <strong>Age:</strong> {animal.age}
+                <strong>Age:</strong> {animal.age ?? "-"}
               </p>
 
               <p>
-                <strong>Gender:</strong> {animal.gender}
+                <strong>Gender:</strong> {animal.gender || "-"}
               </p>
 
               <p>
-                <strong>Location:</strong> {animal.location}
+                <strong>Location:</strong> {animal.location || "-"}
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Checkout summary */}
+        <div className="col-md-6 mb-4">
+          <div className="card shadow">
+            <div className="card-body p-4">
+              <h4 className="fw-bold mb-3">Order Summary</h4>
+
+              <div className="alert alert-info">
+                You are buying this animal at the seller's listed asking price.
+                No bid or offer is created by Buy Now.
+              </div>
+
+              <div className="d-flex justify-content-between mb-3">
+                <span>Animal Asking Price</span>
+                <strong>₹ {formatPrice(animalPrice)}</strong>
+              </div>
+
+              <div className="d-flex justify-content-between mb-3">
+                <span>Service Commission (5%)</span>
+                <span>₹ {formatPrice(commission)}</span>
+              </div>
 
               <hr />
 
-              <h5>Price</h5>
-
-              <h3 className="text-success fw-bold">₹ {animal.price}</h3>
-
-              <hr />
-
-              <h5>Order Summary</h5>
-
-              <div className="d-flex justify-content-between mt-3">
-                <span>Animal Price</span>
-
-                <span>₹ {animal.price}</span>
+              <div className="d-flex justify-content-between">
+                <strong>Estimated Total</strong>
+                <strong className="text-success fs-5">
+                  ₹ {formatPrice(estimatedTotal)}
+                </strong>
               </div>
 
-              <div className="d-flex justify-content-between mt-2">
-                <strong>Total Amount</strong>
-
-                <strong className="text-success">₹ {animal.price}</strong>
-              </div>
-
-              {/* ==================================
-                        ERROR MESSAGE
-                  ================================== */}
+              <small className="text-muted d-block mt-2">
+                The final total is determined by the backend when the order is
+                created.
+              </small>
 
               {errorMessage && (
                 <div className="alert alert-danger mt-3">{errorMessage}</div>
               )}
 
-              {/* ==================================
-                        PLACE ORDER
-                  ================================== */}
-
               <button
+                type="button"
                 className="btn btn-success w-100 mt-4"
                 onClick={handlePlaceOrder}
                 disabled={placingOrder}
               >
-                {placingOrder ? "Placing Order..." : "Place Order"}
+                {placingOrder ? "Creating Order..." : "Confirm Buy Now"}
               </button>
             </div>
           </div>

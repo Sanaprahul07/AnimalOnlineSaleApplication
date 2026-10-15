@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
-const BASE_URL = "http://localhost:8080/api/chat";
+const BASE_URL = apiUrl("/api/chat");
 
 function SellerChat() {
   const [searchParams] = useSearchParams();

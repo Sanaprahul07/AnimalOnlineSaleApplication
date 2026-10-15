@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminService from "../../services/AdminService";
+import { apiUrl } from "../../config/api";
 
 function AdminAnimalDetails() {
   const { id } = useParams();
@@ -75,7 +76,7 @@ function AdminAnimalDetails() {
 
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-    return `http://localhost:8080${cleanPath}`;
+    return apiUrl(cleanPath);
   };
 
   // =========================================================

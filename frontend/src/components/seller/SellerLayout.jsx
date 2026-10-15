@@ -2,28 +2,21 @@ import SellerSidebar from "./SellerSidebar";
 import SellerTopbar from "./SellerTopbar";
 
 function SellerLayout({ children }) {
+  return (
+    <div className="d-flex min-vh-100">
+      {/* Seller Sidebar */}
+      <SellerSidebar />
 
-    return (
-        <div className="d-flex min-vh-100">
+      {/* Right Side */}
+      <div className="flex-grow-1">
+        {/* Seller Topbar */}
+        <SellerTopbar />
 
-            {/* Seller Sidebar */}
-            <SellerSidebar />
-
-            {/* Right Side */}
-            <div className="flex-grow-1">
-
-                {/* Seller Topbar */}
-                <SellerTopbar />
-
-                {/* Page Content */}
-                <main className="p-4">
-                    {children}
-                </main>
-
-            </div>
-
-        </div>
-    );
+        {/* Page Content */}
+        <main className="p-4">{children}</main>
+      </div>
+    </div>
+  );
 }
 
 export default SellerLayout;

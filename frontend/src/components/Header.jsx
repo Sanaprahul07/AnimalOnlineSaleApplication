@@ -1,13 +1,12 @@
 import { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
 
 import {
-    PawIcon,
-    LocationIcon,
-    ChevronDown,
-    HeartIcon,
-    UserIcon
+  PawIcon,
+  LocationIcon,
+  ChevronDown,
+  HeartIcon,
+  UserIcon,
 } from "./Icons";
 
 // =====================================================
@@ -16,178 +15,253 @@ import {
 // =====================================================
 
 function Header() {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+  const [showLoginMenu, setShowLoginMenu] = useState(false);
 
-    const [query, setQuery] = useState("");
+  // =====================================================
+  // SEARCH
+  // =====================================================
 
-    // =====================================================
-    // SEARCH
-    // =====================================================
+  const handleSearch = (e) => {
+    e.preventDefault();
 
-    const handleSearch = (e) => {
+    const term = query.trim();
 
-        e.preventDefault();
+    if (term) {
+      navigate(`/animals/${encodeURIComponent(term)}`);
+    }
+  };
 
-        const term = query.trim();
+  // =====================================================
+  // BUYER LOGIN
+  // UPDATED ROUTE
+  // =====================================================
 
-        if (term) {
+  const handleBuyerLogin = () => {
+    setShowLoginMenu(false);
+    navigate("/buyer/login");
+  };
 
-            navigate(
-                `/animals/${encodeURIComponent(term)}`
-            );
+  // =====================================================
+  // BUYER REGISTER
+  // NEW REQUIREMENT
+  // =====================================================
 
-        }
+  const handleBuyerRegister = () => {
+    setShowLoginMenu(false);
+    navigate("/buyer/register");
+  };
 
-    };
+  // =====================================================
+  // SELLER LOGIN
+  // EXISTING ROUTE
+  // =====================================================
 
-    return (
+  const handleSellerLogin = () => {
+    setShowLoginMenu(false);
+    navigate("/seller/login");
+  };
 
-        <header className="as-header">
+  return (
+    <header className="as-header">
+      <div className="container py-2">
+        <div className="d-flex align-items-center gap-3">
+          {/* BRAND */}
 
-            <div className="container py-2">
+          <div className="as-brand" role="button" onClick={() => navigate("/")}>
+            <PawIcon size={26} />
 
-                <div className="d-flex align-items-center gap-3">
+            <span>
+              Animal
+              <span className="as-text-green">Sale</span>
+            </span>
+          </div>
 
-                    {/* ==========================================
-                        BRAND
-                    ========================================== */}
+          {/* LOCATION */}
 
-                    <div
-                        className="as-brand"
-                        role="button"
-                        onClick={() => navigate("/")}
-                    >
+          <div className="as-location d-none d-lg-flex">
+            <LocationIcon size={16} />
+            All India
+            <ChevronDown size={14} />
+          </div>
 
-                        <PawIcon size={26} />
+          {/* SEARCH */}
 
-                        <span>
+          <form className="as-search" onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Search animals, breeds, categories..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
 
-                            Animal
+            <button type="submit" className="as-search-btn">
+              Search
+            </button>
+          </form>
 
-                            <span className="as-text-green">
-                                Sale
-                            </span>
+          {/* WISHLIST */}
 
-                        </span>
+          <button
+            type="button"
+            className="as-header-action d-none d-md-flex"
+            onClick={() => navigate("/buyer/login")}
+          >
+            <HeartIcon size={20} />
+            Wishlist
+          </button>
 
-                    </div>
+          {/* LOGIN DROPDOWN */}
 
-                    {/* ==========================================
-                        LOCATION
-                    ========================================== */}
+          <div className="position-relative d-none d-md-block">
+            <button
+              type="button"
+              className="as-header-action"
+              onClick={() => setShowLoginMenu(!showLoginMenu)}
+              style={{
+                border: "none",
+                background: "transparent",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                cursor: "pointer",
+              }}
+            >
+              <UserIcon size={20} />
+              Login
+              <ChevronDown size={14} />
+            </button>
 
-                    <div className="as-location d-none d-lg-flex">
+            {showLoginMenu && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "calc(100% + 8px)",
+                  right: "0",
+                  width: "200px",
+                  background: "#ffffff",
+                  border: "1px solid #e5e5e5",
+                  borderRadius: "8px",
+                  boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+                  padding: "6px",
+                  zIndex: 2000,
+                }}
+              >
+                {/* BUYER LOGIN */}
 
-                        <LocationIcon size={16} />
+                <button
+                  type="button"
+                  onClick={handleBuyerLogin}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    background: "transparent",
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f7f5";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  👤 Buyer Login
+                </button>
 
-                        All India
+                {/* BUYER REGISTER */}
 
-                        <ChevronDown size={14} />
+                <button
+                  type="button"
+                  onClick={handleBuyerRegister}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    background: "transparent",
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f7f5";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  📝 Buyer Register
+                </button>
 
-                    </div>
+                {/* SELLER LOGIN */}
 
-                    {/* ==========================================
-                        SEARCH
-                    ========================================== */}
+                <button
+                  type="button"
+                  onClick={handleSellerLogin}
+                  style={{
+                    width: "100%",
+                    textAlign: "left",
+                    border: "none",
+                    background: "transparent",
+                    padding: "10px 12px",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "500",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f3f7f5";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  🏪 Seller Login
+                </button>
+              </div>
+            )}
+          </div>
 
-                    <form
-                        className="as-search"
-                        onSubmit={handleSearch}
-                    >
+          {/* ADMIN BUTTON */}
 
-                        <input
-                            type="text"
-                            placeholder="Search animals, breeds, categories..."
-                            value={query}
-                            onChange={(e) =>
-                                setQuery(e.target.value)
-                            }
-                        />
+          <button
+            type="button"
+            className="btn btn-outline-dark px-3 py-2 text-nowrap fw-semibold"
+            onClick={() => navigate("/admin/login")}
+          >
+            Admin
+          </button>
 
-                        <button
-                            type="submit"
-                            className="as-search-btn"
-                        >
-                            Search
-                        </button>
+          {/* SELL ANIMAL BUTTON */}
 
-                    </form>
-
-                    {/* ==========================================
-                        ACTIONS
-                    ========================================== */}
-
-                    <button
-                        type="button"
-                        className="as-header-action d-none d-md-flex"
-                        onClick={() => navigate("/login")}
-                    >
-
-                        <HeartIcon size={20} />
-
-                        Wishlist
-
-                    </button>
-
-                    <button
-                        type="button"
-                        className="as-header-action d-none d-md-flex"
-                        onClick={() => navigate("/login")}
-                    >
-
-                        <UserIcon size={20} />
-
-                        Login
-
-                    </button>
-
-                    {/* ==========================================
-                        ADMIN BUTTON
-                        ONLY NEW REQUIREMENT
-                    ========================================== */}
-
-                    <button
-                        type="button"
-                        className="btn btn-outline-dark px-3 py-2 text-nowrap fw-semibold"
-                        onClick={() => navigate("/admin/login")}
-                    >
-                        Admin
-                    </button>
-
-                    {/* ==========================================
-                        SELL ANIMAL BUTTON
-                        EXISTING CODE - UNCHANGED
-                    ========================================== */}
-
-                    <button
-                        type="button"
-                        className="btn px-4 py-2 text-nowrap fw-bold"
-                        style={{
-                            backgroundColor: "#198754",
-                            color: "#ffffff",
-                            border: "1px solid #198754",
-                            borderRadius: "8px",
-                            minHeight: "42px",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            whiteSpace: "nowrap",
-                            boxShadow: "none"
-                        }}
-                        onClick={() =>
-                            navigate("/seller/register")
-                        }
-                    >
-                        + Sell Animal
-                    </button>
-
-                </div>
-
-            </div>
-
-        </header>
-    );
+          <button
+            type="button"
+            className="btn px-4 py-2 text-nowrap fw-bold"
+            style={{
+              backgroundColor: "#198754",
+              color: "#ffffff",
+              border: "1px solid #198754",
+              borderRadius: "8px",
+              minHeight: "42px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              whiteSpace: "nowrap",
+              boxShadow: "none",
+            }}
+            onClick={() => navigate("/seller/register")}
+          >
+            + Sell Animal
+          </button>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export default Header;

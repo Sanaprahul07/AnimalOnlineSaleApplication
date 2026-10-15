@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminService from "../../services/AdminService";
+import { apiUrl } from "../../config/api";
 
 function AdminSellerDetails() {
   const { id } = useParams();
@@ -244,7 +245,7 @@ function AdminSellerDetails() {
 
     const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
 
-    return `http://localhost:8080${cleanPath}`;
+    return apiUrl(cleanPath);
   };
 
   // =========================================================

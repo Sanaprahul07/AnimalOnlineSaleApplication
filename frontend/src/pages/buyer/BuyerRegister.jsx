@@ -1,6 +1,82 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
+
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+
+import "leaflet/dist/leaflet.css";
+
+// =====================================================
+// LOCATION EVENT HANDLER
+// =====================================================
+function LocationEvents({ onLocationFound, onLocationError }) {
+  useMapEvents({
+    locationfound: (e) => {
+      const latitude = e.latlng.lat;
+      const longitude = e.latlng.lng;
+
+      onLocationFound(latitude, longitude, e.accuracy);
+    },
+
+    locationerror: (e) => {
+      onLocationError(e.message || "Unable to get your current location.");
+    },
+  });
+
+  return null;
+}
+
+// =====================================================
+// CURRENT LOCATION BUTTON
+// =====================================================
+function LocateButton({ onStart }) {
+  const map = useMap();
+
+  const handleCurrentLocation = () => {
+    onStart();
+
+    map.locate({
+      setView: true,
+      maxZoom: 16,
+      enableHighAccuracy: true,
+    });
+  };
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        zIndex: 1000,
+      }}
+    >
+      <button
+        type="button"
+        onClick={handleCurrentLocation}
+        style={{
+          background: "#008577",
+          color: "#ffffff",
+          border: "none",
+          borderRadius: "6px",
+          padding: "9px 14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.20)",
+        }}
+      >
+        📍 Use Current Location
+      </button>
+    </div>
+  );
+}
 
 function BuyerRegister() {
   const navigate = useNavigate();
@@ -14,17 +90,25 @@ function BuyerRegister() {
     state: "",
     pincode: "",
     password: "",
+
+    // =================================================
+    // LOCATION FIELDS
+    // =================================================
+    location: "",
+    latitude: "",
+    longitude: "",
   });
 
   const [profileImage, setProfileImage] = useState(null);
-
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [locationLoading, setLocationLoading] = useState(false);
+  const [locationAccuracy, setLocationAccuracy] = useState(null);
 
   // =====================================================
   // TEXT FIELD CHANGE
   // =====================================================
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -35,7 +119,6 @@ function BuyerRegister() {
   // =====================================================
   // PROFILE IMAGE CHANGE
   // =====================================================
-
   const handleProfileImageChange = (e) => {
     const file = e.target.files?.[0];
 
@@ -47,7 +130,6 @@ function BuyerRegister() {
     // =================================================
     // ALLOWED IMAGE TYPES
     // =================================================
-
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
     if (!allowedTypes.includes(file.type)) {
@@ -55,14 +137,12 @@ function BuyerRegister() {
 
       e.target.value = "";
       setProfileImage(null);
-
       return;
     }
 
     // =================================================
     // MAXIMUM IMAGE SIZE - 10 MB
     // =================================================
-
     const maxSize = 10 * 1024 * 1024;
 
     if (file.size > maxSize) {
@@ -70,7 +150,6 @@ function BuyerRegister() {
 
       e.target.value = "";
       setProfileImage(null);
-
       return;
     }
 
@@ -79,18 +158,57 @@ function BuyerRegister() {
   };
 
   // =====================================================
+  // LOCATION START
+  // =====================================================
+  const handleLocationStart = () => {
+    setLocationLoading(true);
+    setError("");
+  };
+
+  // =====================================================
+  // LOCATION FOUND
+  // =====================================================
+  const handleLocationFound = (latitude, longitude, accuracy) => {
+    setFormData((previousData) => ({
+      ...previousData,
+
+      latitude: latitude.toFixed(6),
+      longitude: longitude.toFixed(6),
+
+      // Leaflet gives coordinates.
+      // Backend's location field will store this readable value.
+      location: `Latitude: ${latitude.toFixed(
+        6,
+      )}, Longitude: ${longitude.toFixed(6)}`,
+    }));
+
+    setLocationAccuracy(accuracy);
+    setLocationLoading(false);
+    setError("");
+  };
+
+  // =====================================================
+  // LOCATION ERROR
+  // =====================================================
+  const handleLocationError = (message) => {
+    setLocationLoading(false);
+
+    setError(
+      message ||
+        "Unable to get your current location. Please allow location permission.",
+    );
+  };
+
+  // =====================================================
   // REGISTER
   // =====================================================
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError("");
 
     // =================================================
     // EXISTING VALIDATION
     // =================================================
-
     if (!formData.name.trim()) {
       setError("Please enter buyer name.");
       return;
@@ -111,13 +229,22 @@ function BuyerRegister() {
       return;
     }
 
+    // =================================================
+    // LOCATION VALIDATION
+    // =================================================
+    // if (!formData.latitude || !formData.longitude) {
+    //   setError(
+    //     "Please use the 'Use Current Location' button to select your location.",
+    //   );
+    //   return;
+    // }
+
     try {
       setLoading(true);
 
       // =================================================
       // FORM DATA
       // =================================================
-
       const registrationData = new FormData();
 
       registrationData.append("customerName", formData.name);
@@ -137,9 +264,17 @@ function BuyerRegister() {
       registrationData.append("password", formData.password);
 
       // =================================================
+      // LOCATION DATA
+      // =================================================
+      registrationData.append("location", formData.location);
+
+      registrationData.append("latitude", formData.latitude);
+
+      registrationData.append("longitude", formData.longitude);
+
+      // =================================================
       // OPTIONAL PROFILE IMAGE
       // =================================================
-
       if (profileImage) {
         registrationData.append("profileImage", profileImage);
       }
@@ -147,9 +282,8 @@ function BuyerRegister() {
       // =================================================
       // CUSTOMER REGISTER API
       // =================================================
-
       const response = await axios.post(
-        "http://localhost:8080/api/customer/register",
+        apiUrl("/api/customer/register"),
         registrationData,
       );
 
@@ -158,7 +292,6 @@ function BuyerRegister() {
       // =================================================
       // SUCCESS
       // =================================================
-
       alert("Registration successful. Please login.");
 
       navigate("/buyer/login");
@@ -197,8 +330,7 @@ function BuyerRegister() {
         <div className="row g-0">
           {/* =================================================
               LEFT BUYER INFORMATION PANEL
-          ================================================= */}
-
+              ================================================= */}
           <div
             className="col-lg-4"
             style={{
@@ -213,8 +345,7 @@ function BuyerRegister() {
           >
             {/* =================================================
                 BRAND
-            ================================================= */}
-
+                ================================================= */}
             <div className="mb-5">
               <h3
                 className="fw-bold mb-1"
@@ -230,8 +361,7 @@ function BuyerRegister() {
 
             {/* =================================================
                 TITLE
-            ================================================= */}
-
+                ================================================= */}
             <div className="mb-4">
               <h2
                 className="fw-bold mb-2"
@@ -255,8 +385,7 @@ function BuyerRegister() {
 
             {/* =================================================
                 BENEFITS
-            ================================================= */}
-
+                ================================================= */}
             <div className="mb-4">
               <div className="d-flex align-items-start mb-3">
                 <span
@@ -360,8 +489,7 @@ function BuyerRegister() {
 
             {/* =================================================
                 WHY BUY FROM ANIMALSALE
-            ================================================= */}
-
+                ================================================= */}
             <div
               style={{
                 border: "1px solid rgba(255,255,255,0.35)",
@@ -386,8 +514,7 @@ function BuyerRegister() {
 
             {/* =================================================
                 LOGIN
-            ================================================= */}
-
+                ================================================= */}
             <div
               style={{
                 marginTop: "auto",
@@ -415,8 +542,7 @@ function BuyerRegister() {
 
           {/* =================================================
               RIGHT REGISTRATION PANEL
-          ================================================= */}
-
+              ================================================= */}
           <div
             className="col-lg-8"
             style={{
@@ -425,8 +551,7 @@ function BuyerRegister() {
           >
             {/* =================================================
                 HEADER
-            ================================================= */}
-
+                ================================================= */}
             <div
               style={{
                 margin: "0 -28px 25px",
@@ -446,8 +571,7 @@ function BuyerRegister() {
             <form onSubmit={handleSubmit}>
               {/* =================================================
                   BASIC INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <div className="mb-4">
                 <h6
                   className="fw-bold"
@@ -462,7 +586,6 @@ function BuyerRegister() {
 
                 <div className="row">
                   {/* BUYER NAME */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Buyer Name *</label>
 
@@ -477,7 +600,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* EMAIL */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Email *</label>
 
@@ -492,7 +614,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* MOBILE */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Mobile Number *</label>
 
@@ -507,7 +628,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* PASSWORD */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Password *</label>
 
@@ -525,8 +645,7 @@ function BuyerRegister() {
 
               {/* =================================================
                   ADDRESS INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <div className="mb-4">
                 <h6
                   className="fw-bold"
@@ -541,7 +660,6 @@ function BuyerRegister() {
 
                 <div className="row">
                   {/* ADDRESS */}
-
                   <div className="col-12 mb-3">
                     <label className="form-label">Address</label>
 
@@ -556,7 +674,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* CITY */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">City</label>
 
@@ -571,7 +688,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* STATE */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">State</label>
 
@@ -586,7 +702,6 @@ function BuyerRegister() {
                   </div>
 
                   {/* PINCODE */}
-
                   <div className="col-md-6 mb-3">
                     <label className="form-label">Pincode</label>
 
@@ -603,9 +718,155 @@ function BuyerRegister() {
               </div>
 
               {/* =================================================
-                  PROFILE INFORMATION
-              ================================================= */}
+                  GEO LOCATION
+                  ================================================= */}
+              <div className="mb-4">
+                <h6
+                  className="fw-bold"
+                  style={{
+                    color: "#008577",
+                    borderBottom: "1px solid #dddddd",
+                    paddingBottom: "8px",
+                  }}
+                >
+                  Buyer Location
+                </h6>
 
+                <div
+                  style={{
+                    position: "relative",
+                    height: "350px",
+                    width: "100%",
+                    border: "1px solid #dddddd",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <MapContainer
+                    center={[20.5937, 78.9629]}
+                    zoom={5}
+                    scrollWheelZoom={true}
+                    style={{
+                      height: "100%",
+                      width: "100%",
+                    }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <LocationEvents
+                      onLocationFound={handleLocationFound}
+                      onLocationError={handleLocationError}
+                    />
+
+                    <LocateButton onStart={handleLocationStart} />
+
+                    {formData.latitude && formData.longitude && (
+                      <CircleMarker
+                        center={[
+                          Number(formData.latitude),
+                          Number(formData.longitude),
+                        ]}
+                        radius={10}
+                        pathOptions={{
+                          color: "#008577",
+                          fillColor: "#009688",
+                          fillOpacity: 0.8,
+                        }}
+                      />
+                    )}
+                  </MapContainer>
+                </div>
+
+                <div className="mt-3">
+                  {locationLoading && (
+                    <div className="alert alert-info py-2">
+                      Detecting your current location...
+                    </div>
+                  )}
+
+                  {!locationLoading &&
+                    formData.latitude &&
+                    formData.longitude && (
+                      <div className="alert alert-success py-2">
+                        <strong>Location selected successfully.</strong>
+
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            marginTop: "4px",
+                          }}
+                        >
+                          Latitude: {formData.latitude}
+                          <br />
+                          Longitude: {formData.longitude}
+                        </div>
+
+                        {locationAccuracy && (
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              marginTop: "4px",
+                            }}
+                          >
+                            Accuracy: approximately{" "}
+                            {Math.round(locationAccuracy)} meters
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                  <div className="row">
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">Location</label>
+
+                      <input
+                        type="text"
+                        name="location"
+                        className="form-control"
+                        value={formData.location}
+                        readOnly
+                        placeholder="Use current location"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">Latitude</label>
+
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.latitude}
+                        readOnly
+                        placeholder="Latitude"
+                      />
+                    </div>
+
+                    <div className="col-md-4 mb-3">
+                      <label className="form-label">Longitude</label>
+
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={formData.longitude}
+                        readOnly
+                        placeholder="Longitude"
+                      />
+                    </div>
+                  </div>
+
+                  <small className="text-muted">
+                    Click <strong>"Use Current Location"</strong> and allow
+                    browser location permission.
+                  </small>
+                </div>
+              </div>
+
+              {/* =================================================
+                  PROFILE INFORMATION
+                  ================================================= */}
               <div className="mb-4">
                 <h6
                   className="fw-bold"
@@ -641,8 +902,7 @@ function BuyerRegister() {
 
               {/* =================================================
                   REGISTER + BACK BUTTON
-              ================================================= */}
-
+                  ================================================= */}
               <div className="d-flex gap-2">
                 <button
                   type="submit"
@@ -677,8 +937,7 @@ function BuyerRegister() {
 
             {/* =================================================
                 LOGIN
-            ================================================= */}
-
+                ================================================= */}
             <div className="text-center mt-3">
               <span>Already have an account? </span>
 

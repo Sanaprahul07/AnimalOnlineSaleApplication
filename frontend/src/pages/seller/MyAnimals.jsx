@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-
 import { getAnimalsBySeller, deleteAnimal } from "../../services/AnimalService";
 
 function MyAnimals() {
@@ -23,31 +22,19 @@ function MyAnimals() {
     setLoading(true);
     setError("");
 
-    // =====================================
     // SELLER ID VALIDATION
-    // =====================================
-
     if (!sellerId) {
       setError("Seller information not found. Please login again.");
-
       setLoading(false);
-
       return;
     }
 
     console.log("Loading animals for Seller ID:", sellerId);
 
-    // =====================================
     // CALL BACKEND
-    // =====================================
-
     getAnimalsBySeller(sellerId)
       .then((response) => {
         console.log("Seller Animals Response:", response.data);
-
-        // =====================================
-        // CHECK RESPONSE
-        // =====================================
 
         if (Array.isArray(response.data)) {
           setAnimals(response.data);
@@ -60,7 +47,6 @@ function MyAnimals() {
 
         if (error.response) {
           console.error("Backend Status:", error.response.status);
-
           console.error("Backend Response:", error.response.data);
         }
 
@@ -90,15 +76,10 @@ function MyAnimals() {
 
         alert("Animal deleted successfully.");
 
-        // =====================================
-        // RELOAD SELLER ANIMALS
-        // =====================================
-
         loadSellerAnimals();
       })
       .catch((error) => {
         console.error("Error deleting animal:", error);
-
         alert("Unable to delete animal.");
       });
   };
@@ -117,14 +98,11 @@ function MyAnimals() {
 
   return (
     <div className="container-fluid p-4">
-      {/* =====================================
-                HEADER
-            ===================================== */}
+      {/* HEADER */}
 
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 className="fw-bold text-success">My Animals 🐄</h2>
-
           <p className="text-muted mb-0">Animals added by seller</p>
         </div>
 
@@ -133,27 +111,20 @@ function MyAnimals() {
         </a>
       </div>
 
-      {/* =====================================
-                ERROR
-            ===================================== */}
+      {/* ERROR */}
 
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* =====================================
-                LOADING
-            ===================================== */}
+      {/* LOADING */}
 
       {loading && (
         <div className="text-center p-5">
           <div className="spinner-border text-success" role="status"></div>
-
           <p className="mt-2">Loading animals...</p>
         </div>
       )}
 
-      {/* =====================================
-                NO ANIMALS
-            ===================================== */}
+      {/* NO ANIMALS */}
 
       {!loading && !error && animals.length === 0 && (
         <div className="alert alert-info">
@@ -161,9 +132,7 @@ function MyAnimals() {
         </div>
       )}
 
-      {/* =====================================
-                ANIMAL TABLE
-            ===================================== */}
+      {/* ANIMAL TABLE */}
 
       {!loading && animals.length > 0 && (
         <div className="card shadow border-0">
@@ -183,23 +152,14 @@ function MyAnimals() {
                 <thead className="table-light">
                   <tr>
                     <th>ID</th>
-
                     <th>Animal</th>
-
                     <th>Category</th>
-
                     <th>Breed</th>
-
                     <th>Age</th>
-
                     <th>Gender</th>
-
                     <th>Price</th>
-
                     <th>Location</th>
-
                     <th>Status</th>
-
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -207,60 +167,121 @@ function MyAnimals() {
                 {/* TABLE BODY */}
 
                 <tbody>
-                  {animals.map((animal) => (
-                    <tr key={animal.id}>
-                      {/* ID */}
-                      <td>{animal.id}</td>
-                      {/* ANIMAL NAME */}
-                      <td className="fw-bold">{animal.animalName}</td>
-                      {/* CATEGORY */}
-                      <td>{animal.category}</td>
-                      {/* BREED */}
-                      <td>{animal.breed}</td>
-                      {/* AGE */}
-                      <td>{animal.age} Years</td>
-                      {/* GENDER */}
-                      <td>{animal.gender}</td>
-                      {/* PRICE */}
-                      <td className="fw-bold">₹{animal.price}</td>
-                      {/* LOCATION */}
-                      <td>{animal.location}</td>
-                      {/* STATUS */}
-                      <td>
-                        {animal.available ? (
-                          <span className="badge bg-success">Available</span>
-                        ) : (
-                          <span className="badge bg-danger">Not Available</span>
-                        )}
-                      </td>
-                      {/* ACTION */}
-                      <td style={{ minWidth: "240px", whiteSpace: "nowrap" }}>
-                        <div className="d-flex align-items-center gap-1">
-                          <a
-                            href={`/seller/edit-animal/${animal.id}`}
-                            className="btn btn-sm btn-primary px-2 py-1"
-                          >
-                            ✏️ Edit
-                          </a>
+                  {animals.map((animal) => {
+                    // =====================================
+                    // NEW: APPROVAL + AVAILABILITY STATUS
+                    // =====================================
 
-                          <a
-                            href={`/seller/animal-bids/${animal.id}`}
-                            className="btn btn-sm btn-success px-2 py-1"
-                          >
-                            👥 View Bids
-                          </a>
+                    const approvalStatus = String(
+                      animal.approvalStatus || "PENDING",
+                    )
+                      .trim()
+                      .toUpperCase();
 
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-danger px-2 py-1"
-                            onClick={() => handleDelete(animal.id)}
-                          >
-                            🗑️ Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                    let statusText;
+                    let statusClass;
+
+                    if (approvalStatus === "REJECTED") {
+                      statusText = "Rejected";
+                      statusClass = "badge bg-danger";
+                    } else if (
+                      approvalStatus === "PENDING" ||
+                      approvalStatus === ""
+                    ) {
+                      statusText = "Pending Approval";
+                      statusClass = "badge bg-warning text-dark";
+                    } else if (approvalStatus === "APPROVED") {
+                      if (animal.available === true) {
+                        statusText = "Available";
+                        statusClass = "badge bg-success";
+                      } else {
+                        statusText = "Not Available";
+                        statusClass = "badge bg-secondary";
+                      }
+                    } else {
+                      statusText = approvalStatus;
+                      statusClass = "badge bg-secondary";
+                    }
+
+                    return (
+                      <tr key={animal.id}>
+                        {/* ID */}
+
+                        <td>{animal.id}</td>
+
+                        {/* ANIMAL NAME */}
+
+                        <td className="fw-bold">{animal.animalName}</td>
+
+                        {/* CATEGORY */}
+
+                        <td>
+                          {typeof animal.category === "object"
+                            ? animal.category?.categoryName || "N/A"
+                            : animal.category || "N/A"}
+                        </td>
+
+                        {/* BREED */}
+
+                        <td>{animal.breed}</td>
+
+                        {/* AGE */}
+
+                        <td>{animal.age} Years</td>
+
+                        {/* GENDER */}
+
+                        <td>{animal.gender}</td>
+
+                        {/* PRICE */}
+
+                        <td className="fw-bold">₹{animal.price}</td>
+
+                        {/* LOCATION */}
+
+                        <td>{animal.location}</td>
+
+                        {/* UPDATED STATUS */}
+
+                        <td>
+                          <span className={statusClass}>{statusText}</span>
+                        </td>
+
+                        {/* ACTION */}
+
+                        <td
+                          style={{
+                            minWidth: "240px",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          <div className="d-flex align-items-center gap-1">
+                            <a
+                              href={`/seller/edit-animal/${animal.id}`}
+                              className="btn btn-sm btn-primary px-2 py-1"
+                            >
+                              ✏️ Edit
+                            </a>
+
+                            <a
+                              href={`/seller/animal-bids/${animal.id}`}
+                              className="btn btn-sm btn-success px-2 py-1"
+                            >
+                              👥 View Bids
+                            </a>
+
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-danger px-2 py-1"
+                              onClick={() => handleDelete(animal.id)}
+                            >
+                              🗑️ Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

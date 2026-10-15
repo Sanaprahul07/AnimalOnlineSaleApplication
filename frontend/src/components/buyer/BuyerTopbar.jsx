@@ -2,15 +2,37 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 function BuyerTopbar() {
   const navigate = useNavigate();
+
   const location = useLocation();
 
   const handleLogout = () => {
+    // =====================================================
+    // SAVE CURRENT ANIMAL BEFORE LOGOUT
+    // ONLY WHEN LOGOUT IS FROM ANIMAL DETAILS PAGE
+    // =====================================================
+
+    const animalPathMatch = location.pathname.match(/^\/animal\/(\d+)$/);
+
+    if (animalPathMatch) {
+      localStorage.setItem("pendingAnimalId", animalPathMatch[1]);
+    } else {
+      localStorage.removeItem("pendingAnimalId");
+    }
+
+    // =====================================================
+    // EXISTING CUSTOMER LOGOUT
+    // =====================================================
+
     localStorage.removeItem("customerId");
+
     localStorage.removeItem("customerName");
+
     localStorage.removeItem("customerEmail");
-    localStorage.removeItem("pendingAnimalId");
+
     localStorage.removeItem("pendingBidAmount");
+
     localStorage.removeItem("lastChatAnimalId");
+
     localStorage.removeItem("lastChatSellerId");
 
     navigate("/buyer/login");
@@ -26,24 +48,29 @@ function BuyerTopbar() {
     // =====================================================
     // CUSTOMER LOGIN CHECK
     // =====================================================
+
     if (!customerId) {
       navigate("/buyer/login");
+
       return;
     }
 
     // =====================================================
     // CHAT CONTEXT CHECK
     // =====================================================
+
     if (!animalId || !sellerId) {
       alert("Please open Chat / Negotiate from an animal details page first.");
 
       navigate("/buyer/dashboard");
+
       return;
     }
 
     // =====================================================
     // OPEN LAST ACTIVE CHAT
     // =====================================================
+
     navigate(`/buyer/chat?animalId=${animalId}&sellerId=${sellerId}`);
   };
 
@@ -69,7 +96,8 @@ function BuyerTopbar() {
         >
           {/* =================================================
               LOGO
-              ================================================= */}
+          ================================================= */}
+
           <button
             type="button"
             className="btn btn-link text-decoration-none p-0"
@@ -83,7 +111,8 @@ function BuyerTopbar() {
 
           {/* =================================================
               NAVIGATION
-              ================================================= */}
+          ================================================= */}
+
           <div className="d-flex align-items-center gap-2">
             <button
               type="button"
@@ -97,7 +126,8 @@ function BuyerTopbar() {
 
             {/* =================================================
                 CHAT
-                ================================================= */}
+            ================================================= */}
+
             <button
               type="button"
               className={`btn ${
@@ -110,7 +140,8 @@ function BuyerTopbar() {
 
             {/* =================================================
                 PROFILE
-                ================================================= */}
+            ================================================= */}
+
             <button
               type="button"
               className={`btn ${
@@ -125,7 +156,8 @@ function BuyerTopbar() {
 
             {/* =================================================
                 LOGOUT
-                ================================================= */}
+            ================================================= */}
+
             <button
               type="button"
               className="btn btn-outline-danger"

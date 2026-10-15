@@ -1,32 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getAllAnimals, getAnimalById } from "../../services/AnimalService";
-
 import { getOrdersByBuyer } from "../../services/OrderService";
+import { apiUrl } from "../../config/api";
+
+import "./BuyerDashboard.css";
 
 function BuyerDashboard() {
   const navigate = useNavigate();
 
-  // =====================================================
-  // EXISTING AVAILABLE ANIMALS STATE
-  // =====================================================
-
   const [animals, setAnimals] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  // =====================================================
-  // NEW - PURCHASED ANIMALS STATE
-  // =====================================================
-
   const [purchasedAnimals, setPurchasedAnimals] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [purchasedLoading, setPurchasedLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
   const [purchasedError, setPurchasedError] = useState("");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("All");
+  const [activeSection, setActiveSection] = useState("overview");
 
-  // =====================================================
-  // EXISTING - LOAD AVAILABLE ANIMALS
-  // =====================================================
+  const customerId = localStorage.getItem("customerId");
+  const customerName = localStorage.getItem("customerName") || "Buyer";
 
   const loadAnimals = async () => {
     try {
@@ -34,76 +29,47 @@ function BuyerDashboard() {
       setErrorMessage("");
 
       const response = await getAllAnimals();
-
       const data = Array.isArray(response.data) ? response.data : [];
 
-      const availableAnimals = data.filter(
-        (animal) =>
-          animal.available === true &&
-          animal.approvalStatus === "APPROVED" &&
-          animal.sellerId,
+      setAnimals(
+        data.filter(
+          (animal) =>
+            animal.available === true &&
+            animal.approvalStatus === "APPROVED" &&
+            animal.sellerId,
+        ),
       );
-
-      setAnimals(availableAnimals);
     } catch (error) {
       console.error("Buyer Animals Loading Error:", error);
-
-      const backendMessage =
-        typeof error.response?.data === "string"
-          ? error.response.data
-          : error.response?.data?.message || error.response?.data?.error;
-
-      setErrorMessage(backendMessage || "Unable to load animals.");
+      setErrorMessage(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Unable to load animals. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
-
-  // =====================================================
-  // NEW - LOAD LOGGED-IN CUSTOMER PURCHASED ANIMALS
-  // =====================================================
 
   const loadPurchasedAnimals = async () => {
     try {
       setPurchasedLoading(true);
       setPurchasedError("");
 
-      const customerId = localStorage.getItem("customerId");
-
-      // =================================================
-      // CUSTOMER LOGIN CHECK
-      // =================================================
-
       if (!customerId) {
         setPurchasedAnimals([]);
-        setPurchasedError(
-          "Please login as a customer to view your purchased animals.",
-        );
+        setPurchasedError("Please login to view your orders.");
         return;
       }
 
-      // =================================================
-      // GET CUSTOMER ORDERS
-      // =================================================
+      const response = await getOrdersByBuyer(Number(customerId));
+      const orders = Array.isArray(response.data) ? response.data : [];
 
-      const orderResponse = await getOrdersByBuyer(Number(customerId));
-
-      const orders = Array.isArray(orderResponse.data)
-        ? orderResponse.data
-        : [];
-
-      // =================================================
-      // GET ANIMAL DETAILS FOR EACH ORDER
-      // =================================================
-
-      const purchasedData = await Promise.all(
+      const results = await Promise.all(
         orders.map(async (order) => {
           try {
             if (!order.animalId) {
-              return {
-                order,
-                animal: null,
-              };
+              return { order, animal: null };
             }
 
             const animalResponse = await getAnimalById(order.animalId);
@@ -112,54 +78,33 @@ function BuyerDashboard() {
               order,
               animal: animalResponse.data || null,
             };
-          } catch (animalError) {
-            console.error(
-              `Unable to load Animal ID ${order.animalId}:`,
-              animalError,
-            );
-
-            return {
-              order,
-              animal: null,
-            };
+          } catch (error) {
+            console.error("Animal details loading error:", error);
+            return { order, animal: null };
           }
         }),
       );
 
-      setPurchasedAnimals(purchasedData);
+      setPurchasedAnimals(results);
     } catch (error) {
-      console.error("Customer Purchased Animals Loading Error:", error);
-
-      const backendMessage =
-        typeof error.response?.data === "string"
-          ? error.response.data
-          : error.response?.data?.message || error.response?.data?.error;
-
+      console.error("Buyer Orders Loading Error:", error);
       setPurchasedError(
-        backendMessage || "Unable to load your purchased animals.",
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Unable to load your orders.",
       );
-
       setPurchasedAnimals([]);
     } finally {
       setPurchasedLoading(false);
     }
   };
 
-  // =====================================================
-  // LOAD DATA
-  // =====================================================
-
   useEffect(() => {
     loadAnimals();
-  }, []);
-
-  useEffect(() => {
     loadPurchasedAnimals();
+    // Initial dashboard load.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // =====================================================
-  // EXISTING IMAGE URL FUNCTION
-  // =====================================================
 
   const getImageUrl = (animal) => {
     const image =
@@ -168,429 +113,554 @@ function BuyerDashboard() {
       animal?.sideImageUrl ||
       animal?.backImageUrl;
 
-    if (!image) {
-      return "/images/default-animal.jpg";
-    }
+    if (!image) return "/images/default-animal.jpg";
+    if (/^https?:\/\//i.test(image)) return image;
 
-    if (image.startsWith("http")) {
-      return image;
-    }
-
-    return `http://localhost:8080${image.startsWith("/") ? "" : "/"}${image}`;
+    return apiUrl(image.startsWith("/") ? image : `/${image}`);
   };
 
-  // =====================================================
-  // NEW - OPEN DIRECT CHAT
-  // =====================================================
+  const categories = useMemo(
+    () => [
+      "All",
+      ...new Set(animals.map((animal) => animal.category).filter(Boolean)),
+    ],
+    [animals],
+  );
+
+  const filteredAnimals = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return animals.filter((animal) => {
+      const matchesCategory =
+        category === "All" || animal.category === category;
+
+      const searchableText = [
+        animal.animalName,
+        animal.category,
+        animal.breed,
+        animal.location,
+        animal.sellerName,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return matchesCategory && searchableText.includes(query);
+    });
+  }, [animals, category, search]);
+
+  const orderStatus = (order) =>
+    String(order?.status || "")
+      .trim()
+      .toUpperCase();
+
+  const pendingOrders = purchasedAnimals.filter(({ order }) =>
+    ["PENDING", "PROCESSING", "CONFIRMED"].includes(orderStatus(order)),
+  ).length;
+
+  const completedOrders = purchasedAnimals.filter(({ order }) =>
+    ["COMPLETED", "DELIVERED"].includes(orderStatus(order)),
+  ).length;
+
+  const handleSection = (section) => {
+    setActiveSection(section);
+
+    if (section === "bids") {
+      navigate("/buyer/bids");
+      return;
+    }
+
+    if (section === "profile") {
+      navigate("/buyer/profile");
+      return;
+    }
+
+    if (section === "chat") {
+      const animalId = localStorage.getItem("lastChatAnimalId");
+      const sellerId = localStorage.getItem("lastChatSellerId");
+
+      if (!customerId) {
+        navigate("/buyer/login");
+      } else if (animalId && sellerId) {
+        navigate(
+          `/buyer/chat?animalId=${encodeURIComponent(animalId)}&sellerId=${encodeURIComponent(sellerId)}`,
+        );
+      } else {
+        navigate("/buyer/chat");
+      }
+
+      return;
+    }
+
+    const sectionId =
+      section === "orders"
+        ? "buyer-orders"
+        : section === "animals"
+          ? "available-animals"
+          : "buyer-overview";
+
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const handlePurchasedAnimalChat = (animalId, sellerId) => {
-    const customerId = localStorage.getItem("customerId");
-
-    // =================================================
-    // CUSTOMER LOGIN CHECK
-    // =================================================
-
     if (!customerId) {
       navigate("/buyer/login");
       return;
     }
 
-    // =================================================
-    // CHAT DATA CHECK
-    // =================================================
-
     if (!animalId || !sellerId) {
-      alert("Animal or seller information is missing for chat.");
+      window.alert("Animal or seller information is missing.");
       return;
     }
 
-    // =================================================
-    // SAVE LAST ACTIVE CHAT
-    // =================================================
-
     localStorage.setItem("lastChatAnimalId", String(animalId));
-
     localStorage.setItem("lastChatSellerId", String(sellerId));
 
-    // =================================================
-    // OPEN DIRECT CHAT
-    // =================================================
-
-    navigate(`/buyer/chat?animalId=${animalId}&sellerId=${sellerId}`);
+    navigate(
+      `/buyer/chat?animalId=${encodeURIComponent(animalId)}&sellerId=${encodeURIComponent(sellerId)}`,
+    );
   };
 
-  // =====================================================
-  // RETURN UI
-  // =====================================================
+  const menuItems = [
+    { id: "overview", icon: "⌂", label: "Overview" },
+    { id: "animals", icon: "♧", label: "Browse Animals" },
+    { id: "orders", icon: "▤", label: "My Orders" },
+    { id: "bids", icon: "⇄", label: "My Bids" },
+    { id: "chat", icon: "▤", label: "Messages" },
+    { id: "profile", icon: "♙", label: "My Profile" },
+  ];
 
   return (
-    <div
-      className="container-fluid py-4"
-      style={{
-        backgroundColor: "#f7f8fc",
-        minHeight: "100vh",
-      }}
-    >
-      {/* =================================================
-          HEADER
-          ================================================= */}
-
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h2 className="fw-bold mb-1">Buyer Dashboard</h2>
-
-          <p className="text-muted mb-0">
-            Find and purchase animals from verified sellers.
-          </p>
-        </div>
-
+    <div className="buyer-dashboard">
+      <aside className="buyer-sidebar">
         <button
-          className="btn btn-primary"
-          onClick={() => navigate("/animals")}
+          className="buyer-brand"
+          onClick={() => handleSection("overview")}
+          type="button"
         >
-          Browse Animals
+          <span className="buyer-brand-icon">A</span>
+          <span>
+            <strong>AnimalSale</strong>
+            <small>BUYER PORTAL</small>
+          </span>
         </button>
-      </div>
 
-      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
+        <div className="buyer-menu-heading">WORKSPACE</div>
 
-      {/* =================================================
-          SUMMARY CARDS
-          EXISTING CODE KEPT
-          ================================================= */}
+        <nav className="buyer-sidebar-nav" aria-label="Buyer navigation">
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`buyer-menu-item ${
+                activeSection === item.id ? "active" : ""
+              }`}
+              onClick={() => handleSection(item.id)}
+            >
+              <span className="buyer-menu-icon">{item.icon}</span>
+              <span>{item.label}</span>
+              {item.id === "orders" && purchasedAnimals.length > 0 && (
+                <span className="buyer-menu-count">
+                  {purchasedAnimals.length}
+                </span>
+              )}
+            </button>
+          ))}
+        </nav>
 
-      <div className="row g-4 mb-4">
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <h6 className="text-muted">Available Animals</h6>
-
-              <h2 className="fw-bold mb-0">{animals.length}</h2>
-            </div>
-          </div>
+        <div className="buyer-sidebar-help">
+          <div className="buyer-help-icon">?</div>
+          <strong>Need assistance?</strong>
+          <p>Explore animals or contact your seller for more information.</p>
+          <button type="button" onClick={() => handleSection("animals")}>
+            Explore animals →
+          </button>
         </div>
 
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <h6 className="text-muted">Categories</h6>
-
-              <h2 className="fw-bold mb-0">
-                {
-                  new Set(
-                    animals.map((animal) => animal.category).filter(Boolean),
-                  ).size
-                }
-              </h2>
-            </div>
-          </div>
+        <div className="buyer-sidebar-footer">
+          <span className="buyer-avatar">
+            {customerName.charAt(0).toUpperCase()}
+          </span>
+          <span className="buyer-user-info">
+            <strong>{customerName}</strong>
+            <small>Buyer account</small>
+          </span>
         </div>
+      </aside>
 
-        <div className="col-md-4">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
-              <h6 className="text-muted">Verified Sellers</h6>
-
-              <h2 className="fw-bold mb-0">
-                {
-                  new Set(
-                    animals.map((animal) => animal.sellerId).filter(Boolean),
-                  ).size
-                }
-              </h2>
-            </div>
+      <main className="buyer-main">
+        <header className="buyer-page-header">
+          <div>
+            <div className="buyer-breadcrumb">Workspace / Overview</div>
+            <h1>Buyer Dashboard</h1>
+            <p>Manage your orders and discover quality animals.</p>
           </div>
-        </div>
-      </div>
 
-      {/* =================================================
-          NEW - MY PURCHASED ANIMALS
-          ================================================= */}
+          <button
+            className="buyer-primary-button"
+            type="button"
+            onClick={() => handleSection("animals")}
+          >
+            <span>＋</span> Browse Animals
+          </button>
+        </header>
 
-      <div className="card border-0 shadow-sm mb-4">
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-4">
+        {!customerId && (
+          <div className="buyer-notice">
+            You are browsing as a guest.{" "}
+            <button onClick={() => navigate("/buyer/login")} type="button">
+              Login to view your orders
+            </button>
+          </div>
+        )}
+
+        <section id="buyer-overview" className="buyer-welcome-panel">
+          <div className="buyer-welcome-content">
+            <span className="buyer-eyebrow">YOUR BUYING SPACE</span>
+            <h2>Welcome back, {customerName}!</h2>
+            <p>
+              Find your next animal, track your orders and stay connected with
+              sellers — all in one place.
+            </p>
+            <button
+              type="button"
+              onClick={() => handleSection("animals")}
+              className="buyer-welcome-button"
+            >
+              Discover Animals <span>→</span>
+            </button>
+          </div>
+          <div className="buyer-welcome-decoration" aria-hidden="true">
+            <span>✳</span>
+            <div className="buyer-welcome-circle">A</div>
+          </div>
+        </section>
+
+        <section className="buyer-stats-grid" aria-label="Buyer summary">
+          <article className="buyer-stat-card">
+            <div className="buyer-stat-top">
+              <span>Available Animals</span>
+              <span className="buyer-stat-icon blue">♧</span>
+            </div>
+            <strong>{loading ? "—" : animals.length}</strong>
+            <small>Approved listings available</small>
+          </article>
+
+          <article className="buyer-stat-card">
+            <div className="buyer-stat-top">
+              <span>My Orders</span>
+              <span className="buyer-stat-icon purple">▤</span>
+            </div>
+            <strong>{purchasedLoading ? "—" : purchasedAnimals.length}</strong>
+            <small>Orders in your account</small>
+          </article>
+
+          <article className="buyer-stat-card">
+            <div className="buyer-stat-top">
+              <span>Pending Orders</span>
+              <span className="buyer-stat-icon orange">◷</span>
+            </div>
+            <strong>{purchasedLoading ? "—" : pendingOrders}</strong>
+            <small>Awaiting completion</small>
+          </article>
+
+          <article className="buyer-stat-card">
+            <div className="buyer-stat-top">
+              <span>Completed Orders</span>
+              <span className="buyer-stat-icon green">✓</span>
+            </div>
+            <strong>{purchasedLoading ? "—" : completedOrders}</strong>
+            <small>Completed or delivered</small>
+          </article>
+        </section>
+
+        <section className="buyer-content-section" id="buyer-orders">
+          <div className="buyer-section-header">
             <div>
-              <h4 className="fw-bold mb-1">My Purchased Animals</h4>
-
-              <small className="text-muted">
-                Animals purchased by your customer account
-              </small>
+              <span className="buyer-section-kicker">YOUR ACTIVITY</span>
+              <h2>My Purchased Animals</h2>
+              <p>Review your orders and connect with their sellers.</p>
             </div>
-
-            {!purchasedLoading && (
-              <span className="badge bg-success fs-6">
-                {purchasedAnimals.length} Purchased
-              </span>
-            )}
+            <span className="buyer-section-total">
+              {purchasedLoading
+                ? "Loading…"
+                : `${purchasedAnimals.length} orders`}
+            </span>
           </div>
-
-          {/* =================================================
-              PURCHASED LOADING
-              ================================================= */}
 
           {purchasedLoading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-success" role="status" />
-
-              <p className="mt-3 text-muted">
-                Loading your purchased animals...
-              </p>
+            <div className="buyer-state-box">
+              <div className="buyer-spinner" />
+              Loading your orders...
             </div>
           ) : purchasedError ? (
-            <div className="alert alert-warning mb-0">{purchasedError}</div>
+            <div className="buyer-state-box buyer-state-warning">
+              {purchasedError}
+            </div>
           ) : purchasedAnimals.length === 0 ? (
-            <div className="alert alert-info mb-0">
-              You have not purchased any animals yet.
+            <div className="buyer-state-box">
+              <span className="buyer-empty-icon">▤</span>
+              <strong>No orders yet</strong>
+              <p>Your purchased animals and order details will appear here.</p>
+              <button
+                className="buyer-primary-button"
+                type="button"
+                onClick={() => handleSection("animals")}
+              >
+                Browse Animals
+              </button>
             </div>
           ) : (
-            <div className="row g-4">
+            <div className="buyer-purchased-grid">
               {purchasedAnimals.map(({ order, animal }) => {
                 const animalId = animal?.id || order.animalId;
-
                 const sellerId = order.sellerId || animal?.sellerId;
+                const status = orderStatus(order);
 
                 return (
-                  <div
-                    className="col-md-6 col-lg-4 col-xl-3"
+                  <article
+                    className="buyer-purchased-card"
                     key={order.id || `${animalId}-${sellerId}`}
                   >
-                    <div className="card h-100 border-0 shadow-sm">
-                      {/* =================================================
-                            PURCHASED ANIMAL IMAGE
-                            ================================================= */}
+                    {animal ? (
+                      <img
+                        className="buyer-animal-image"
+                        src={getImageUrl(animal)}
+                        alt={animal.animalName || "Purchased animal"}
+                        onError={(event) => {
+                          if (event.currentTarget.dataset.fallbackApplied)
+                            return;
+                          event.currentTarget.dataset.fallbackApplied = "true";
+                          event.currentTarget.src =
+                            "/images/default-animal.jpg";
+                        }}
+                      />
+                    ) : (
+                      <div className="buyer-image-placeholder">
+                        Animal image unavailable
+                      </div>
+                    )}
 
-                      {animal ? (
-                        <img
-                          src={getImageUrl(animal)}
-                          alt={
-                            animal.animalName || order.animalName || "Animal"
-                          }
-                          className="card-img-top"
-                          style={{
-                            height: "220px",
-                            objectFit: "cover",
-                          }}
-                          onError={(event) => {
-                            if (
-                              event.currentTarget.dataset.fallbackApplied ===
-                              "true"
-                            ) {
-                              return;
-                            }
-
-                            event.currentTarget.dataset.fallbackApplied =
-                              "true";
-
-                            event.currentTarget.src =
-                              "/images/default-animal.jpg";
-                          }}
-                        />
-                      ) : (
-                        <div
-                          className="d-flex align-items-center justify-content-center bg-light"
-                          style={{
-                            height: "220px",
-                            color: "#6c757d",
-                          }}
+                    <div className="buyer-purchased-body">
+                      <div className="buyer-card-title-row">
+                        <h3>
+                          {animal?.animalName || order.animalName || "Animal"}
+                        </h3>
+                        <span
+                          className={`buyer-status ${
+                            ["COMPLETED", "DELIVERED"].includes(status)
+                              ? "success"
+                              : ["CANCELLED", "REJECTED"].includes(status)
+                                ? "danger"
+                                : "pending"
+                          }`}
                         >
-                          No Animal Photo
-                        </div>
-                      )}
+                          {order.status || "Unknown"}
+                        </span>
+                      </div>
 
-                      {/* =================================================
-                            PURCHASED ANIMAL DETAILS
-                            ================================================= */}
+                      <p className="buyer-animal-meta">
+                        {animal?.category || "Animal"} ·{" "}
+                        {animal?.breed || "Breed not specified"}
+                      </p>
 
-                      <div className="card-body">
-                        <h5 className="fw-bold">
-                          {animal?.animalName || order.animalName || "-"}
-                        </h5>
+                      <div className="buyer-order-details">
+                        <span>Order ID</span>
+                        <strong>{order.orderNumber || order.id || "—"}</strong>
+                        <span>Seller</span>
+                        <strong>
+                          {order.sellerName || animal?.sellerName || "—"}
+                        </strong>
+                      </div>
 
-                        <p className="mb-1">
-                          <strong>Animal ID:</strong> {animalId || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Category:</strong> {animal?.category || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Breed:</strong> {animal?.breed || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Age:</strong> {animal?.age ?? "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Gender:</strong> {animal?.gender || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Seller:</strong>{" "}
-                          {order.sellerName || animal?.sellerName || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Order:</strong>{" "}
-                          {order.orderNumber || order.id || "-"}
-                        </p>
-
-                        <p className="mb-1">
-                          <strong>Order Status:</strong> {order.status || "-"}
-                        </p>
-
-                        <h5 className="fw-bold mt-3">
+                      <div className="buyer-purchased-bottom">
+                        <strong className="buyer-price">
                           ₹{" "}
                           {order.totalAmount ??
                             order.amount ??
                             animal?.price ??
-                            "-"}
-                        </h5>
+                            "—"}
+                        </strong>
+                        <button
+                          type="button"
+                          className="buyer-text-button"
+                          onClick={() => navigate(`/buyer/order/${order.id}`)}
+                          disabled={!order.id}
+                        >
+                          Order details →
+                        </button>
+                      </div>
 
-                        <hr />
-
-                        {/* =================================================
-                              VIEW ANIMAL
-                              ================================================= */}
-
+                      <div className="buyer-card-actions">
                         {animalId && (
                           <button
                             type="button"
-                            className="btn btn-outline-primary w-100 mb-2"
+                            className="buyer-secondary-button"
                             onClick={() => navigate(`/animal/${animalId}`)}
                           >
                             View Animal
                           </button>
                         )}
-
-                        {/* =================================================
-                              DIRECT CHAT
-                              ================================================= */}
-
                         <button
                           type="button"
-                          className="btn btn-success w-100"
+                          className="buyer-chat-button"
+                          disabled={!animalId || !sellerId}
                           onClick={() =>
                             handlePurchasedAnimalChat(animalId, sellerId)
                           }
-                          disabled={!animalId || !sellerId}
                         >
-                          💬 Chat with Seller
+                          Chat with Seller
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
           )}
-        </div>
-      </div>
+        </section>
 
-      {/* =================================================
-          AVAILABLE ANIMALS
-          EXISTING CODE KEPT
-          ================================================= */}
-
-      <div className="card border-0 shadow-sm">
-        <div className="card-body">
-          <div className="d-flex justify-content-between align-items-center mb-4">
+        <section className="buyer-content-section" id="available-animals">
+          <div className="buyer-section-header buyer-animals-heading">
             <div>
-              <h4 className="fw-bold mb-1">Available Animals</h4>
-
-              <small className="text-muted">
-                Animals listed by approved sellers
-              </small>
+              <span className="buyer-section-kicker">EXPLORE MARKETPLACE</span>
+              <h2>Available Animals</h2>
+              <p>Discover listings from approved sellers.</p>
             </div>
+            <span className="buyer-section-total">
+              {loading ? "Loading…" : `${filteredAnimals.length} available`}
+            </span>
+          </div>
+
+          <div className="buyer-filter-bar">
+            <label className="buyer-search-box">
+              <span>⌕</span>
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search name, breed, location..."
+                aria-label="Search available animals"
+              />
+              {search && (
+                <button
+                  type="button"
+                  aria-label="Clear search"
+                  onClick={() => setSearch("")}
+                >
+                  ×
+                </button>
+              )}
+            </label>
+
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              aria-label="Filter by category"
+              className="buyer-category-select"
+            >
+              {categories.map((item) => (
+                <option value={item} key={item}>
+                  {item === "All" ? "All Categories" : item}
+                </option>
+              ))}
+            </select>
           </div>
 
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" />
-
-              <p className="mt-3 text-muted">Loading animals...</p>
+            <div className="buyer-state-box">
+              <div className="buyer-spinner" />
+              Loading available animals...
             </div>
-          ) : animals.length === 0 ? (
-            <div className="alert alert-info mb-0">
-              No animals are currently available.
+          ) : errorMessage ? (
+            <div className="buyer-state-box buyer-state-warning">
+              {errorMessage}
+              <button
+                type="button"
+                className="buyer-secondary-button"
+                onClick={loadAnimals}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredAnimals.length === 0 ? (
+            <div className="buyer-state-box">
+              <strong>No matching animals found</strong>
+              <p>Try a different search or category.</p>
+              <button
+                type="button"
+                className="buyer-secondary-button"
+                onClick={() => {
+                  setSearch("");
+                  setCategory("All");
+                }}
+              >
+                Clear Filters
+              </button>
             </div>
           ) : (
-            <div className="row g-4">
-              {animals.map((animal) => (
-                <div className="col-md-6 col-lg-4 col-xl-3" key={animal.id}>
-                  <div className="card h-100 border-0 shadow-sm">
+            <div className="buyer-animal-grid">
+              {filteredAnimals.map((animal) => (
+                <article className="buyer-animal-card" key={animal.id}>
+                  <div className="buyer-animal-image-wrap">
                     <img
                       src={getImageUrl(animal)}
-                      alt={animal.animalName || "Animal"}
-                      className="card-img-top"
-                      style={{
-                        height: "220px",
-                        objectFit: "cover",
-                      }}
+                      alt={animal.animalName || "Available animal"}
+                      className="buyer-animal-image"
                       onError={(event) => {
-                        // =================================================
-                        // PREVENT INFINITE FALLBACK IMAGE LOOP
-                        // =================================================
-
-                        if (
-                          event.currentTarget.dataset.fallbackApplied === "true"
-                        ) {
-                          return;
-                        }
-
+                        if (event.currentTarget.dataset.fallbackApplied) return;
                         event.currentTarget.dataset.fallbackApplied = "true";
-
                         event.currentTarget.src = "/images/default-animal.jpg";
                       }}
                     />
+                    <span className="buyer-available-badge">Available</span>
+                  </div>
 
-                    <div className="card-body">
-                      <h5 className="fw-bold">{animal.animalName || "-"}</h5>
+                  <div className="buyer-animal-card-body">
+                    <div className="buyer-animal-card-category">
+                      {animal.category || "Animal"}
+                    </div>
+                    <h3>{animal.animalName || "Unnamed Animal"}</h3>
+                    <p className="buyer-animal-meta">
+                      {animal.breed || "Breed not specified"}
+                    </p>
 
-                      <p className="mb-1">
-                        <strong>Category:</strong> {animal.category || "-"}
-                      </p>
+                    <div className="buyer-animal-facts">
+                      <span>Age: {animal.age ?? "—"}</span>
+                      <span>Gender: {animal.gender || "—"}</span>
+                    </div>
 
-                      <p className="mb-1">
-                        <strong>Breed:</strong> {animal.breed || "-"}
-                      </p>
+                    <div className="buyer-animal-location">
+                      <span>⌖</span>{" "}
+                      {animal.location || "Location not specified"}
+                    </div>
 
-                      <p className="mb-1">
-                        <strong>Age:</strong> {animal.age ?? "-"}
-                      </p>
-
-                      <p className="mb-1">
-                        <strong>Gender:</strong> {animal.gender || "-"}
-                      </p>
-
-                      <p className="mb-1">
-                        <strong>Location:</strong> {animal.location || "-"}
-                      </p>
-
-                      <h5 className="fw-bold mt-3">₹ {animal.price ?? "-"}</h5>
-
-                      <hr />
-
-                      <p className="mb-3">
-                        <strong>Seller:</strong> {animal.sellerName || "-"}
-                      </p>
-
+                    <div className="buyer-animal-card-footer">
+                      <div>
+                        <small>Listed price</small>
+                        <strong>₹ {animal.price ?? "—"}</strong>
+                      </div>
                       <button
-                        className="btn btn-primary w-100"
+                        type="button"
                         onClick={() => navigate(`/animal/${animal.id}`)}
                       >
-                        View Details
+                        View Details →
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           )}
-        </div>
-      </div>
+        </section>
+
+        <footer className="buyer-dashboard-footer">
+          <span>AnimalSale · Buyer Portal</span>
+          <span>Your marketplace, all in one place.</span>
+        </footer>
+      </main>
     </div>
   );
 }

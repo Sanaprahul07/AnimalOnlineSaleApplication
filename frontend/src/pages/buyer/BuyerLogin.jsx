@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 function BuyerLogin() {
   const navigate = useNavigate();
@@ -41,22 +42,50 @@ function BuyerLogin() {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/customer/login",
-        {
-          email: formData.email,
-          password: formData.password,
-        },
-      );
+      // =====================================================
+      // CLEAR PREVIOUS BUYER SESSION
+      // Only clear the previous login identity.
+      // Do not delete chat messages from the database.
+      // =====================================================
+
+      localStorage.removeItem("customerId");
+      localStorage.removeItem("customerName");
+      localStorage.removeItem("customerEmail");
+
+      // =====================================================
+      // EXISTING BUYER LOGIN API
+      // =====================================================
+
+      const response = await axios.post(apiUrl("/api/customer/login"), {
+        email: formData.email,
+        password: formData.password,
+      });
 
       console.log("Customer Login Response:", response.data);
 
       // =====================================================
-      // SAVE CUSTOMER ID
+      // SAVE CURRENT CUSTOMER ID
       // =====================================================
 
-      if (response.data?.id) {
-        localStorage.setItem("customerId", String(response.data.id));
+      const customerId = response.data?.id;
+
+      if (
+        customerId === undefined ||
+        customerId === null ||
+        String(customerId).trim() === ""
+      ) {
+        setError("Customer ID not received from server. Please try again.");
+        return;
+      }
+
+      localStorage.setItem("customerId", String(customerId));
+
+      if (response.data?.customerName) {
+        localStorage.setItem("customerName", response.data.customerName);
+      }
+
+      if (response.data?.email) {
+        localStorage.setItem("customerEmail", response.data.email);
       }
 
       // =====================================================

@@ -219,13 +219,21 @@
 
 .as-hero {
     position: relative;
-    /* Full-width green meadow banner (like the mockup): a warm sun glow at the
-       top-right, fading into a bright meadow that is light on the left — so the
-       dark heading/stats stay readable — and greener toward the bottom where it
-       grounds into grass. */
+
     background:
-        radial-gradient(90% 85% at 82% 10%, rgba(255, 245, 190, 0.55), rgba(255, 245, 190, 0) 46%),
-        linear-gradient(115deg, #eef9f1 0%, #e1f4e6 38%, #c5e9cb 72%, #a6d9ac 100%);
+        radial-gradient(
+            90% 85% at 82% 10%,
+            rgba(255, 245, 190, 0.55),
+            rgba(255, 245, 190, 0) 46%
+        ),
+        linear-gradient(
+            115deg,
+            #eef9f1 0%,
+            #e1f4e6 38%,
+            #c5e9cb 72%,
+            #a6d9ac 100%
+        );
+
     padding: 60px 0;
     overflow: hidden;
 }
@@ -276,14 +284,11 @@
     display: block;
     width: 100%;
     height: auto;
-    /* keep the full animal group visible — never crop it */
     border-radius: 18px;
-    /* green-tinted shadow so the photo sits on the meadow instead of
-       floating in a white card */
     box-shadow: 0 22px 45px rgba(20, 83, 45, 0.22);
 }
 
-/* ---------- Hero meadow scene (watermark-free, self-contained) ---------- */
+/* ---------- Hero meadow scene ---------- */
 
 .as-hero-scene {
     position: relative;
@@ -291,10 +296,25 @@
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+
     background:
-        radial-gradient(circle at 80% 20%, rgba(255, 244, 186, 0.95), rgba(255, 244, 186, 0) 26%),
-        radial-gradient(120% 70% at 20% 68%, #7fce97 0%, #7fce97 40%, rgba(127, 206, 151, 0) 41%),
-        radial-gradient(120% 70% at 85% 66%, #8bd3a1 0%, #8bd3a1 42%, rgba(139, 211, 161, 0) 43%),
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 244, 186, 0.95),
+            rgba(255, 244, 186, 0) 26%
+        ),
+        radial-gradient(
+            120% 70% at 20% 68%,
+            #7fce97 0%,
+            #7fce97 40%,
+            rgba(127, 206, 151, 0) 41%
+        ),
+        radial-gradient(
+            120% 70% at 85% 66%,
+            #8bd3a1 0%,
+            #8bd3a1 42%,
+            rgba(139, 211, 161, 0) 43%
+        ),
         linear-gradient(
             #bfe6ff 0%,
             #d9f2ff 34%,
@@ -305,7 +325,6 @@
         );
 }
 
-/* grass foreground */
 .as-hero-scene::after {
     content: "";
     position: absolute;
@@ -313,7 +332,10 @@
     right: 0;
     bottom: 0;
     height: 44%;
-    background: linear-gradient(#63bd80 0%, #4aa869 100%);
+    background: linear-gradient(
+        #63bd80 0%,
+        #4aa869 100%
+    );
 }
 
 .as-hero-animals {
@@ -326,7 +348,9 @@
     position: absolute;
     transform: translateX(-50%);
     line-height: 1;
-    filter: drop-shadow(0 8px 6px rgba(0, 0, 0, 0.28));
+    filter: drop-shadow(
+        0 8px 6px rgba(0, 0, 0, 0.28)
+    );
 }
 
 .as-hero-animal.cow {
@@ -435,7 +459,10 @@
     text-align: center;
     cursor: pointer;
     height: 100%;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .as-cat-card:hover {
@@ -492,15 +519,25 @@
     scroll-behavior: smooth;
 }
 
+/* ==========================================================
+   ANIMAL CARDS
+   STABLE CARD HEIGHT
+========================================================== */
+
 .as-animal-card {
     flex: 0 0 240px;
     width: 240px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     background: #fff;
     border: 1px solid var(--as-border);
     border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .as-animal-card:hover {
@@ -511,6 +548,7 @@
 .as-animal-media {
     position: relative;
     height: 170px;
+    flex-shrink: 0;
     background: #f3f4f6;
     overflow: hidden;
 }
@@ -533,8 +571,16 @@
     border-radius: 20px;
 }
 
+/* ==========================================================
+   ANIMAL BODY
+   STABLE BOTTOM BUTTONS
+========================================================== */
+
 .as-animal-body {
     padding: 14px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .as-animal-name {
@@ -555,6 +601,69 @@
     font-size: 13px;
     color: var(--as-muted);
     margin: 0 0 2px;
+}
+
+/* ==========================================================
+   LOCATION
+========================================================== */
+
+.as-animal-location {
+    min-height: 40px;
+}
+
+/* ==========================================================
+   STABLE BUTTON POSITION
+========================================================== */
+
+.as-animal-body .btn {
+    margin-top: auto;
+}
+
+/* ==========================================================
+   VIEW BIDS POPUP
+   HOME PAGE ONLY
+========================================================== */
+
+.as-bids-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 5000;
+}
+
+.as-bids-modal {
+    width: 100%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+}
+
+.as-bids-table-wrapper {
+    max-height: 250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+}
+
+.as-bids-table-wrapper table {
+    margin-bottom: 0;
+}
+
+.as-bids-table-wrapper thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 /* ==========================================================
@@ -621,7 +730,9 @@
     padding: 24px 16px;
     text-align: center;
     height: 100%;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .as-why-card:hover {
@@ -658,7 +769,11 @@
 ========================================================== */
 
 .as-cta {
-    background: linear-gradient(120deg, #d9f2e4 0%, #eafaf1 100%);
+    background: linear-gradient(
+        120deg,
+        #d9f2e4 0%,
+        #eafaf1 100%
+    );
     border-radius: 18px;
     padding: 36px 40px;
     display: flex;
@@ -814,4 +929,457 @@
     .as-section-title {
         font-size: 24px;
     }
+
+    .as-bids-modal-backdrop {
+        padding: 12px;
+    }
+
+    .as-bids-modal {
+        padding: 18px;
+        max-height: 85vh;
+    }
+
+
+
+    /* ==========================================================
+   MOBILE RESPONSIVE OVERRIDES
+   Existing desktop styles/functionality are preserved.
+   Add this block at the VERY END of Home.css.
+========================================================== */
+
+@media (max-width: 767.98px) {
+
+    /* ---------- Page width / overflow ---------- */
+
+    .as-header,
+    .as-catnav,
+    .as-hero,
+    .as-trustbar,
+    .as-section,
+    .as-footer {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* ---------- HEADER ---------- */
+
+    .as-header .container {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 12px;
+        padding-right: 12px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .as-brand {
+        font-size: 19px;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .as-location {
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+
+    .as-header-action {
+        font-size: 11px;
+        padding: 4px 6px;
+        white-space: nowrap;
+    }
+
+    .as-search {
+        flex: 1 1 100%;
+        width: 100%;
+        max-width: 100%;
+        order: 10;
+        margin-top: 4px;
+    }
+
+    .as-search input {
+        min-width: 0;
+        font-size: 13px;
+        padding: 9px 10px;
+    }
+
+    .as-search .as-search-btn {
+        padding: 0 14px;
+        font-size: 13px;
+    }
+
+    /* ---------- CATEGORY NAV ---------- */
+
+    .as-catnav-inner {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 2px;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 8px;
+
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .as-catnav-inner::-webkit-scrollbar {
+        display: none;
+    }
+
+    .as-catnav-all,
+    .as-catnav-link {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        font-size: 13px;
+        padding: 10px 11px;
+    }
+
+    .as-catnav-all {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background: #fff;
+    }
+
+    .as-megamenu {
+        left: 8px;
+        width: calc(100% - 16px);
+        max-height: 70vh;
+        overflow-y: auto;
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* ---------- HERO ---------- */
+
+    .as-hero {
+        padding: 30px 0;
+    }
+
+    .as-hero .container {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .as-hero h1 {
+        font-size: 29px;
+        line-height: 1.12;
+        margin-bottom: 12px;
+    }
+
+    .as-hero-sub {
+        font-size: 15px;
+        line-height: 1.5;
+        max-width: 100%;
+    }
+
+    .as-hero-search {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .as-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        width: 100%;
+    }
+
+    .as-stat-num {
+        font-size: 21px;
+    }
+
+    .as-stat-label {
+        font-size: 11px;
+        line-height: 1.25;
+    }
+
+    .as-hero-scene {
+        width: 100%;
+        height: 245px;
+        margin-top: 20px;
+        border-radius: 14px;
+    }
+
+    .as-hero-animal.cow {
+        font-size: 70px;
+    }
+
+    .as-hero-animal.dog {
+        font-size: 62px;
+    }
+
+    .as-hero-animal.goat {
+        font-size: 55px;
+    }
+
+    .as-hero-animal.rabbit {
+        font-size: 38px;
+    }
+
+    .as-hero-animal.cat {
+        font-size: 45px;
+    }
+
+    /* ---------- TRUST BAR ---------- */
+
+    .as-trustbar {
+        padding: 18px 0;
+    }
+
+    .as-trust-item {
+        gap: 10px;
+    }
+
+    .as-trust-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+    }
+
+    .as-trust-item h6 {
+        font-size: 13px;
+    }
+
+    .as-trust-item p {
+        font-size: 11px;
+    }
+
+    /* ---------- SECTIONS ---------- */
+
+    .as-section {
+        padding: 38px 0;
+    }
+
+    .as-section-title {
+        font-size: 23px;
+        line-height: 1.2;
+    }
+
+    /* ---------- CATEGORY CARDS ---------- */
+
+    .as-cat-card {
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .as-cat-thumb {
+        width: 76px;
+        height: 76px;
+        margin-bottom: 9px;
+    }
+
+    .as-cat-thumb .as-cat-emoji {
+        font-size: 36px;
+    }
+
+    .as-cat-name {
+        font-size: 14px;
+    }
+
+    .as-cat-count {
+        font-size: 12px;
+    }
+
+    /* ---------- FEATURED ANIMALS ---------- */
+
+    .as-featured-scroll {
+        gap: 12px;
+        padding-left: 4px;
+        padding-right: 4px;
+        padding-bottom: 12px;
+        overflow-x: auto;
+    }
+
+    .as-animal-card {
+        flex: 0 0 78vw;
+        width: 78vw;
+        max-width: 290px;
+        border-radius: 13px;
+    }
+
+    .as-animal-media {
+        height: 165px;
+    }
+
+    .as-animal-body {
+        padding: 12px;
+    }
+
+    .as-animal-name {
+        font-size: 15px;
+    }
+
+    .as-animal-price {
+        font-size: 16px;
+    }
+
+    /* ---------- HOW IT WORKS ---------- */
+
+    .as-steps {
+        padding: 20px 10px;
+        gap: 0;
+    }
+
+    .as-step {
+        flex: 1 1 100%;
+        padding: 14px 8px;
+    }
+
+    .as-step-icon {
+        width: 50px;
+        height: 50px;
+        margin-bottom: 10px;
+    }
+
+    /* ---------- WHY CHOOSE ---------- */
+
+    .as-why-card {
+        padding: 20px 14px;
+    }
+
+    /* ---------- SELL CTA ---------- */
+
+    .as-cta {
+        margin-left: 12px;
+        margin-right: 12px;
+        padding: 26px 18px;
+        border-radius: 14px;
+    }
+
+    .as-cta h3 {
+        font-size: 22px;
+    }
+
+    .as-cta p {
+        font-size: 14px;
+    }
+
+    /* ---------- BID MODAL ---------- */
+
+    .as-bids-modal-backdrop {
+        padding: 10px;
+    }
+
+    .as-bids-modal {
+        width: 100%;
+        max-width: 100%;
+        padding: 16px;
+        max-height: 88vh;
+        border-radius: 12px;
+    }
+
+    .as-bids-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .as-bids-table-wrapper table {
+        min-width: 520px;
+    }
+
+    /* ---------- FOOTER ---------- */
+
+    .as-footer {
+        padding-top: 38px;
+    }
+
+    .as-footer-bottom {
+        margin-top: 28px;
+        text-align: center;
+    }
+
+    .as-footer-bottom a {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+}
+
+
+/* ==========================================================
+   VERY SMALL PHONES
+========================================================== */
+
+@media (max-width: 399px) {
+
+    .as-brand {
+        font-size: 18px;
+    }
+
+    .as-header-action {
+        font-size: 10px;
+        padding: 4px;
+    }
+
+    .as-hero h1 {
+        font-size: 26px;
+    }
+
+    .as-stat-num {
+        font-size: 19px;
+    }
+
+    .as-stat-label {
+        font-size: 10px;
+    }
+
+    .as-animal-card {
+        flex-basis: 84vw;
+        width: 84vw;
+    }
+
+    .as-hero-scene {
+        height: 225px;
+    }
+}
+
+
+
+/* ==========================================================
+   FEATURED ANIMALS GRID — MOBILE ONLY
+   Desktop 5-column layout remains unchanged.
+========================================================== */
+
+@media (max-width: 767.98px) {
+
+    .as-featured-grid {
+        grid-template-columns: 1fr !important;
+        column-gap: 0 !important;
+        row-gap: 18px !important;
+        width: 100% !important;
+    }
+
+    .as-featured-grid > div {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .as-featured-grid .as-animal-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+    }
+
+    .as-featured-grid .as-animal-media {
+        height: 210px;
+    }
+
+    .as-featured-grid .as-animal-body {
+        padding: 14px;
+    }
+}
+
+
+/* ---------- Very small phones ---------- */
+
+@media (max-width: 399px) {
+
+    .as-featured-grid .as-animal-media {
+        height: 190px;
+    }
+}
 }

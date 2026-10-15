@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
-// import { Link, useNavigate } from "react-router-dom";
-
 import { Link, useNavigate } from "react-router-dom";
+import { apiUrl } from "../../config/api";
+
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
+
+import "leaflet/dist/leaflet.css";
 
 import {
   registerSeller,
@@ -13,35 +22,96 @@ import {
 
 import "./SellerRegister.css";
 
+// =========================================================
+// LOCATION EVENT HANDLER
+// =========================================================
+
+function LocationEvents({ onLocationFound, onLocationError }) {
+  useMapEvents({
+    locationfound: (e) => {
+      const latitude = e.latlng.lat;
+      const longitude = e.latlng.lng;
+
+      onLocationFound(latitude, longitude, e.accuracy);
+    },
+
+    locationerror: (e) => {
+      onLocationError(e.message || "Unable to get your current location.");
+    },
+  });
+
+  return null;
+}
+
+// =========================================================
+// CURRENT LOCATION BUTTON
+// =========================================================
+function LocateButton({ onStart }) {
+  const map = useMap();
+
+  const handleCurrentLocation = () => {
+    onStart();
+
+    map.locate({
+      setView: true,
+      maxZoom: 16,
+      enableHighAccuracy: true,
+    });
+  };
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        zIndex: 1000,
+      }}
+    >
+      <button
+        type="button"
+        onClick={handleCurrentLocation}
+        style={{
+          background: "#008577",
+          color: "#ffffff",
+          border: "none",
+          borderRadius: "6px",
+          padding: "9px 14px",
+          fontWeight: "600",
+          cursor: "pointer",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.20)",
+        }}
+      >
+        📍 Use Current Location
+      </button>
+    </div>
+  );
+}
+
 function SellerRegister() {
   const navigate = useNavigate();
 
   // =========================================================
   // SELLER INFORMATION
   // =========================================================
-
   const [sellerName, setSellerName] = useState("");
   const [email, setEmail] = useState("");
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
-
   const [businessName, setBusinessName] = useState("");
   const [farmName, setFarmName] = useState("");
 
   // =========================================================
   // KYC
   // =========================================================
-
   const [aadhaarNumber, setAadhaarNumber] = useState("");
   const [panNumber, setPanNumber] = useState("");
-
   const [aadhaarFrontFile, setAadhaarFrontFile] = useState(null);
   const [aadhaarBackFile, setAadhaarBackFile] = useState(null);
 
   // =========================================================
   // ADDRESS
   // =========================================================
-
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -52,15 +122,21 @@ function SellerRegister() {
   const [location, setLocation] = useState("");
 
   // =========================================================
+  // GEO LOCATION
+  // =========================================================
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [locationAccuracy, setLocationAccuracy] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  // =========================================================
   // PROFILE IMAGE
   // =========================================================
-
   const [profileImage, setProfileImage] = useState(null);
 
   // =========================================================
   // SUBSCRIPTION
   // =========================================================
-
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
   const [plansLoading, setPlansLoading] = useState(false);
@@ -68,21 +144,18 @@ function SellerRegister() {
   // =========================================================
   // PAYMENT
   // =========================================================
-
   const [transactionId, setTransactionId] = useState("");
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
 
   // =========================================================
   // OTP
   // =========================================================
-
   const [otp, setOtp] = useState("");
   const [otpStep, setOtpStep] = useState(false);
 
   // =========================================================
   // COMMON
   // =========================================================
-
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,7 +164,6 @@ function SellerRegister() {
   // =========================================================
   // LOAD ACTIVE SUBSCRIPTION PLANS
   // =========================================================
-
   useEffect(() => {
     const loadPlans = async () => {
       try {
@@ -99,7 +171,6 @@ function SellerRegister() {
         setError("");
 
         const response = await getSellerSubscriptionPlans();
-
         const plans = response.data || [];
 
         setSubscriptionPlans(plans);
@@ -124,16 +195,13 @@ function SellerRegister() {
   // =========================================================
   // SELECTED PLAN
   // =========================================================
-
   const selectedPlan = subscriptionPlans.find(
     (plan) => String(plan.id) === String(selectedPlanId),
   );
 
   // =========================================================
   // PAYMENT QR IMAGE
-  // ONLY NEW REQUIREMENT
   // =========================================================
-
   const getPaymentQrImage = () => {
     if (!selectedPlan) {
       return null;
@@ -155,7 +223,6 @@ function SellerRegister() {
   // =========================================================
   // IMAGE VALIDATION
   // =========================================================
-
   const validateImageFile = (file, fieldName) => {
     if (!file) {
       return `${fieldName} is required.`;
@@ -177,7 +244,6 @@ function SellerRegister() {
   // =========================================================
   // PAYMENT SCREENSHOT
   // =========================================================
-
   const handlePaymentScreenshotChange = (e) => {
     const file = e.target.files?.[0] || null;
 
@@ -200,9 +266,50 @@ function SellerRegister() {
   };
 
   // =========================================================
+  // GEO LOCATION START
+  // =========================================================
+  const handleLocationStart = () => {
+    setLocationLoading(true);
+    setError("");
+  };
+
+  // =========================================================
+  // GEO LOCATION FOUND
+  // =========================================================
+  const handleLocationFound = (foundLatitude, foundLongitude, accuracy) => {
+    const formattedLatitude = foundLatitude.toFixed(6);
+
+    const formattedLongitude = foundLongitude.toFixed(6);
+
+    setLatitude(formattedLatitude);
+    setLongitude(formattedLongitude);
+
+    // Keep existing location field.
+    // Automatically fill coordinates after current location is found.
+    setLocation(
+      `Latitude: ${formattedLatitude}, Longitude: ${formattedLongitude}`,
+    );
+
+    setLocationAccuracy(accuracy);
+    setLocationLoading(false);
+    setError("");
+  };
+
+  // =========================================================
+  // GEO LOCATION ERROR
+  // =========================================================
+  const handleLocationError = (message) => {
+    setLocationLoading(false);
+
+    setError(
+      message ||
+        "Unable to get your current location. Please allow browser location permission.",
+    );
+  };
+
+  // =========================================================
   // SELLER REGISTRATION + PAYMENT
   // =========================================================
-
   const handleRegister = async (e) => {
     e.preventDefault();
 
@@ -212,7 +319,6 @@ function SellerRegister() {
     // =======================================================
     // SUBSCRIPTION VALIDATION
     // =======================================================
-
     if (!selectedPlanId) {
       setError("Please select a subscription plan.");
       return;
@@ -226,7 +332,6 @@ function SellerRegister() {
     // =======================================================
     // BASIC VALIDATION
     // =======================================================
-
     if (!sellerName.trim()) {
       setError("Please enter seller name.");
       return;
@@ -303,14 +408,23 @@ function SellerRegister() {
     }
 
     if (!location.trim()) {
-      setError("Please enter location.");
+      setError("Please use the 'Use Current Location' button.");
       return;
     }
 
     // =======================================================
+    // GEO LOCATION VALIDATION
+    // =======================================================
+    // if (!latitude || !longitude) {
+    //   setError(
+    //     "Please use the 'Use Current Location' button to select seller location.",
+    //   );
+    //   return;
+    // }
+
+    // =======================================================
     // EMAIL VALIDATION
     // =======================================================
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailRegex.test(email.trim())) {
@@ -321,7 +435,6 @@ function SellerRegister() {
     // =======================================================
     // MOBILE VALIDATION
     // =======================================================
-
     if (!/^[0-9]{10}$/.test(mobile.trim())) {
       setError("Mobile number must be 10 digits.");
       return;
@@ -330,7 +443,6 @@ function SellerRegister() {
     // =======================================================
     // PINCODE VALIDATION
     // =======================================================
-
     if (!/^[0-9]{6}$/.test(pincode.trim())) {
       setError("Pincode must be 6 digits.");
       return;
@@ -339,7 +451,6 @@ function SellerRegister() {
     // =======================================================
     // AADHAAR VALIDATION
     // =======================================================
-
     if (!/^[0-9]{12}$/.test(aadhaarNumber.trim())) {
       setError("Aadhaar number must be 12 digits.");
       return;
@@ -348,7 +459,6 @@ function SellerRegister() {
     // =======================================================
     // PAN VALIDATION
     // =======================================================
-
     if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(panNumber.trim().toUpperCase())) {
       setError("Please enter a valid PAN number.");
       return;
@@ -357,7 +467,6 @@ function SellerRegister() {
     // =======================================================
     // PASSWORD VALIDATION
     // =======================================================
-
     if (password.length < 6) {
       setError("Password must be at least 6 characters.");
       return;
@@ -366,7 +475,6 @@ function SellerRegister() {
     // =======================================================
     // AADHAAR FRONT
     // =======================================================
-
     const frontError = validateImageFile(
       aadhaarFrontFile,
       "Aadhaar front image",
@@ -380,7 +488,6 @@ function SellerRegister() {
     // =======================================================
     // AADHAAR BACK
     // =======================================================
-
     const backError = validateImageFile(aadhaarBackFile, "Aadhaar back image");
 
     if (backError) {
@@ -391,7 +498,6 @@ function SellerRegister() {
     // =======================================================
     // PAYMENT VALIDATION
     // =======================================================
-
     if (!transactionId.trim()) {
       setError("Please enter UTR / Transaction Number.");
       return;
@@ -410,7 +516,6 @@ function SellerRegister() {
     // =======================================================
     // CREATE SELLER FORM DATA
     // =======================================================
-
     const formData = new FormData();
 
     formData.append("sellerName", sellerName.trim());
@@ -441,6 +546,13 @@ function SellerRegister() {
 
     formData.append("location", location.trim());
 
+    // =======================================================
+    // GEO LOCATION DATA
+    // =======================================================
+    formData.append("latitude", latitude);
+
+    formData.append("longitude", longitude);
+
     formData.append("aadhaarNumber", aadhaarNumber.trim());
 
     formData.append("panNumber", panNumber.trim().toUpperCase());
@@ -456,13 +568,11 @@ function SellerRegister() {
     // =======================================================
     // SUBSCRIPTION PLAN ID
     // =======================================================
-
     formData.append("subscriptionPlanId", selectedPlanId);
 
     // =======================================================
     // REGISTER SELLER
     // =======================================================
-
     try {
       setLoading(true);
 
@@ -482,12 +592,11 @@ function SellerRegister() {
       // =====================================================
       // GET CREATED SELLER SUBSCRIPTION
       // =====================================================
-
       let subscriptionId = null;
 
       try {
         const subscriptionResponse = await fetch(
-          `http://localhost:8080/api/seller/subscriptions/current/${sellerId}`,
+          apiUrl(`/api/seller/subscriptions/current/${sellerId}`),
         );
 
         if (subscriptionResponse.ok) {
@@ -502,7 +611,6 @@ function SellerRegister() {
       // =====================================================
       // SUBSCRIPTION ID VALIDATION
       // =====================================================
-
       if (!subscriptionId) {
         setError(
           "Seller registered, but subscription information could not be found.",
@@ -513,7 +621,6 @@ function SellerRegister() {
       // =====================================================
       // SUBMIT PAYMENT
       // =====================================================
-
       await submitSellerPayment(
         sellerId,
         subscriptionId,
@@ -528,8 +635,6 @@ function SellerRegister() {
       //
       // Existing seller registration backend already sends
       // the Email OTP during registration.
-      //
-      // Therefore only ONE OTP is sent.
       // =====================================================
 
       setOtp("");
@@ -556,9 +661,9 @@ function SellerRegister() {
   // =========================================================
   // VERIFY EMAIL OTP
   // =========================================================
-
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
+
     setError("");
     setMessage("");
 
@@ -574,6 +679,7 @@ function SellerRegister() {
 
     try {
       setLoading(true);
+
       await verifyEmailOtp(email.trim().toLowerCase(), otp.trim());
 
       setMessage(
@@ -587,6 +693,7 @@ function SellerRegister() {
       }, 1500);
     } catch (err) {
       console.error("OTP Verification Error:", err);
+
       setError(
         err?.response?.data?.message ||
           err?.response?.data ||
@@ -600,7 +707,6 @@ function SellerRegister() {
   // =========================================================
   // RESEND OTP
   // =========================================================
-
   const handleResendOtp = async () => {
     setError("");
     setMessage("");
@@ -627,7 +733,6 @@ function SellerRegister() {
   // =========================================================
   // OTP PAGE
   // =========================================================
-
   if (otpStep) {
     return (
       <div className="seller-register-page">
@@ -742,14 +847,12 @@ function SellerRegister() {
   // =========================================================
   // MAIN SELLER REGISTRATION PAGE
   // =========================================================
-
   return (
     <div className="seller-register-page">
       <div className="seller-register-layout">
         {/* ===================================================
             LEFT SIDE - ANIMAL SALE INFORMATION
-        =================================================== */}
-
+            =================================================== */}
         <aside className="seller-info-panel">
           <div className="seller-brand">
             <div className="seller-brand-name">🐄 AnimalSale</div>
@@ -820,12 +923,10 @@ function SellerRegister() {
 
         {/* ===================================================
             RIGHT SIDE - SELLER REGISTRATION
-        =================================================== */}
-
+            =================================================== */}
         <main className="seller-form-panel">
           <div className="seller-register-card">
             {/* HEADER */}
-
             <div className="seller-card-header">
               <h2>Seller Registration</h2>
 
@@ -839,8 +940,7 @@ function SellerRegister() {
             <form onSubmit={handleRegister}>
               {/* =================================================
                   BASIC INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section">
                 <h3>Basic Information</h3>
 
@@ -900,8 +1000,7 @@ function SellerRegister() {
 
               {/* =================================================
                   BUSINESS INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section">
                 <h3>Business Information</h3>
 
@@ -934,8 +1033,7 @@ function SellerRegister() {
 
               {/* =================================================
                   KYC INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section">
                 <h3>KYC Information</h3>
 
@@ -1004,8 +1102,7 @@ function SellerRegister() {
 
               {/* =================================================
                   ADDRESS INFORMATION
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section">
                 <h3>Address Information</h3>
 
@@ -1098,23 +1195,149 @@ function SellerRegister() {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Location *</label>
+                {/* =================================================
+                    LEAFLET GEO LOCATION
+                    ================================================= */}
+                <div
+                  className="form-group"
+                  style={{
+                    marginTop: "20px",
+                  }}
+                >
+                  <label>Seller Location *</label>
 
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="Enter location"
-                  />
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "100%",
+                      height: "350px",
+                      border: "1px solid #dddddd",
+                      borderRadius: "8px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <MapContainer
+                      center={[20.5937, 78.9629]}
+                      zoom={5}
+                      scrollWheelZoom={true}
+                      style={{
+                        height: "100%",
+                        width: "100%",
+                      }}
+                    >
+                      <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      />
+
+                      <LocationEvents
+                        onLocationFound={handleLocationFound}
+                        onLocationError={handleLocationError}
+                      />
+
+                      <LocateButton onStart={handleLocationStart} />
+
+                      {latitude && longitude && (
+                        <CircleMarker
+                          center={[Number(latitude), Number(longitude)]}
+                          radius={10}
+                          pathOptions={{
+                            color: "#008577",
+                            fillColor: "#009688",
+                            fillOpacity: 0.8,
+                          }}
+                        />
+                      )}
+                    </MapContainer>
+                  </div>
+
+                  {locationLoading && (
+                    <div className="alert alert-info mt-3">
+                      Detecting your current location...
+                    </div>
+                  )}
+
+                  {!locationLoading && latitude && longitude && (
+                    <div className="alert alert-success mt-3">
+                      <strong>Seller location selected successfully.</strong>
+
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          marginTop: "5px",
+                        }}
+                      >
+                        Latitude: {latitude}
+                        <br />
+                        Longitude: {longitude}
+                      </div>
+
+                      {locationAccuracy && (
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            marginTop: "5px",
+                          }}
+                        >
+                          Accuracy: approximately {Math.round(locationAccuracy)}{" "}
+                          meters
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Location *</label>
+
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}
+                        placeholder="Use current location"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Latitude</label>
+
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={latitude}
+                        readOnly
+                        placeholder="Latitude"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Longitude</label>
+
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={longitude}
+                        readOnly
+                        placeholder="Longitude"
+                      />
+                    </div>
+                  </div>
+
+                  <small
+                    style={{
+                      color: "#666666",
+                    }}
+                  >
+                    Click <strong>"Use Current Location"</strong> and allow
+                    browser location permission.
+                  </small>
                 </div>
               </section>
 
               {/* =================================================
                   PROFILE IMAGE
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section">
                 <h3>Profile Image</h3>
 
@@ -1134,8 +1357,7 @@ function SellerRegister() {
 
               {/* =================================================
                   SUBSCRIPTION PLANS
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section subscription-section">
                 <h3>Select Subscription Plan</h3>
 
@@ -1194,8 +1416,7 @@ function SellerRegister() {
 
               {/* =================================================
                   PAYMENT
-              ================================================= */}
-
+                  ================================================= */}
               <section className="form-section payment-section">
                 <h3>Payment Details</h3>
 
@@ -1205,12 +1426,7 @@ function SellerRegister() {
                   <span>Scan the Admin QR and complete the payment.</span>
                 </div>
 
-                {/* =================================================
-                    DYNAMIC QR CODE
-                    6 MONTHS -> admin-qr.png
-                    12 MONTHS -> admin-qr.png999.png
-                ================================================= */}
-
+                {/* DYNAMIC QR CODE */}
                 {selectedPlan && getPaymentQrImage() && (
                   <div className="qr-container">
                     <img
@@ -1220,11 +1436,7 @@ function SellerRegister() {
                   </div>
                 )}
 
-                {/* =================================================
-                    DYNAMIC PRICE
-                    PRICE COMES FROM DATABASE
-                ================================================= */}
-
+                {/* DYNAMIC PRICE */}
                 {selectedPlan && (
                   <div className="pay-amount">
                     Pay Exactly:
@@ -1260,8 +1472,7 @@ function SellerRegister() {
 
               {/* =================================================
                   REGISTER BUTTON
-              ================================================= */}
-
+                  ================================================= */}
               <button
                 type="submit"
                 className="register-button"

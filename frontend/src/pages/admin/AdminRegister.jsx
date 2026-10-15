@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
 function AdminRegister() {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -24,7 +23,6 @@ function AdminRegister() {
   // =====================================================
 
   const handleChange = (e) => {
-
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -41,7 +39,6 @@ function AdminRegister() {
   // =====================================================
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     setErrorMessage("");
@@ -96,23 +93,19 @@ function AdminRegister() {
     // =================================================
 
     try {
-
       setLoading(true);
 
-      const response = await axios.post(
-        "http://localhost:8080/api/admin/register",
-        {
-          adminName: formData.adminName.trim(),
-          email: formData.email.trim().toLowerCase(),
-          mobile: formData.mobile.trim(),
-          password: formData.password,
-        }
-      );
+      const response = await axios.post(apiUrl("/api/admin/register"), {
+        adminName: formData.adminName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        mobile: formData.mobile.trim(),
+        password: formData.password,
+      });
 
       console.log("Admin Registration Response:", response.data);
 
       setSuccessMessage(
-        response.data?.message || "Admin registration successful."
+        response.data?.message || "Admin registration successful.",
       );
 
       // =================================================
@@ -122,44 +115,25 @@ function AdminRegister() {
       setTimeout(() => {
         navigate("/admin/login");
       }, 1000);
-
     } catch (error) {
-
       console.error("Admin Registration Error:", error);
 
       if (error.response) {
+        console.error("Backend Status:", error.response.status);
 
-        console.error(
-          "Backend Status:",
-          error.response.status
-        );
-
-        console.error(
-          "Backend Response:",
-          error.response.data
-        );
+        console.error("Backend Response:", error.response.data);
 
         setErrorMessage(
           error.response.data?.message ||
-          error.response.data ||
-          "Admin registration failed."
+            error.response.data ||
+            "Admin registration failed.",
         );
-
       } else if (error.request) {
-
-        setErrorMessage(
-          "Unable to connect to backend server."
-        );
-
+        setErrorMessage("Unable to connect to backend server.");
       } else {
-
-        setErrorMessage(
-          error.message || "Admin registration failed."
-        );
+        setErrorMessage(error.message || "Admin registration failed.");
       }
-
     } finally {
-
       setLoading(false);
     }
   };
@@ -170,7 +144,6 @@ function AdminRegister() {
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light p-3">
-
       <div
         className="card border-0 shadow"
         style={{
@@ -179,15 +152,12 @@ function AdminRegister() {
           borderRadius: "16px",
         }}
       >
-
         <div className="card-body p-4 p-md-5">
-
           {/* =================================================
               BRAND
           ================================================= */}
 
           <div className="text-center mb-4">
-
             <div
               className="fw-bold text-success"
               style={{
@@ -197,14 +167,11 @@ function AdminRegister() {
               🐾 AnimalSale
             </div>
 
-            <h3 className="fw-bold mt-3 mb-1">
-              Admin Registration
-            </h3>
+            <h3 className="fw-bold mt-3 mb-1">Admin Registration</h3>
 
             <p className="text-muted mb-0">
               Create your AnimalSale admin account
             </p>
-
           </div>
 
           {/* =================================================
@@ -212,10 +179,7 @@ function AdminRegister() {
           ================================================= */}
 
           {errorMessage && (
-            <div
-              className="alert alert-danger"
-              role="alert"
-            >
+            <div className="alert alert-danger" role="alert">
               {errorMessage}
             </div>
           )}
@@ -225,10 +189,7 @@ function AdminRegister() {
           ================================================= */}
 
           {successMessage && (
-            <div
-              className="alert alert-success"
-              role="alert"
-            >
+            <div className="alert alert-success" role="alert">
               {successMessage}
             </div>
           )}
@@ -238,14 +199,10 @@ function AdminRegister() {
           ================================================= */}
 
           <form onSubmit={handleSubmit}>
-
             {/* ADMIN NAME */}
 
             <div className="mb-3">
-
-              <label className="form-label fw-semibold">
-                Admin Name
-              </label>
+              <label className="form-label fw-semibold">Admin Name</label>
 
               <input
                 type="text"
@@ -257,16 +214,12 @@ function AdminRegister() {
                 autoComplete="name"
                 disabled={loading}
               />
-
             </div>
 
             {/* EMAIL */}
 
             <div className="mb-3">
-
-              <label className="form-label fw-semibold">
-                Email
-              </label>
+              <label className="form-label fw-semibold">Email</label>
 
               <input
                 type="email"
@@ -278,16 +231,12 @@ function AdminRegister() {
                 autoComplete="email"
                 disabled={loading}
               />
-
             </div>
 
             {/* MOBILE */}
 
             <div className="mb-3">
-
-              <label className="form-label fw-semibold">
-                Mobile Number
-              </label>
+              <label className="form-label fw-semibold">Mobile Number</label>
 
               <input
                 type="tel"
@@ -300,16 +249,12 @@ function AdminRegister() {
                 autoComplete="tel"
                 disabled={loading}
               />
-
             </div>
 
             {/* PASSWORD */}
 
             <div className="mb-3">
-
-              <label className="form-label fw-semibold">
-                Password
-              </label>
+              <label className="form-label fw-semibold">Password</label>
 
               <input
                 type="password"
@@ -321,16 +266,12 @@ function AdminRegister() {
                 autoComplete="new-password"
                 disabled={loading}
               />
-
             </div>
 
             {/* CONFIRM PASSWORD */}
 
             <div className="mb-4">
-
-              <label className="form-label fw-semibold">
-                Confirm Password
-              </label>
+              <label className="form-label fw-semibold">Confirm Password</label>
 
               <input
                 type="password"
@@ -342,7 +283,6 @@ function AdminRegister() {
                 autoComplete="new-password"
                 disabled={loading}
               />
-
             </div>
 
             {/* REGISTER BUTTON */}
@@ -352,11 +292,8 @@ function AdminRegister() {
               className="btn btn-success w-100 py-2 fw-semibold"
               disabled={loading}
             >
-              {loading
-                ? "Registering..."
-                : "Register as Admin"}
+              {loading ? "Registering..." : "Register as Admin"}
             </button>
-
           </form>
 
           {/* =================================================
@@ -364,10 +301,7 @@ function AdminRegister() {
           ================================================= */}
 
           <div className="text-center mt-4">
-
-            <span className="text-muted">
-              Already have an admin account?{" "}
-            </span>
+            <span className="text-muted">Already have an admin account? </span>
 
             <button
               type="button"
@@ -377,7 +311,6 @@ function AdminRegister() {
             >
               Login
             </button>
-
           </div>
 
           {/* =================================================
@@ -385,7 +318,6 @@ function AdminRegister() {
           ================================================= */}
 
           <div className="text-center mt-3">
-
             <button
               type="button"
               className="btn btn-link text-decoration-none"
@@ -394,15 +326,11 @@ function AdminRegister() {
             >
               ← Back to Home
             </button>
-
           </div>
-
         </div>
       </div>
-
     </div>
   );
 }
 
 export default AdminRegister;
-

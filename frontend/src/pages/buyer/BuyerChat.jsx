@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import axios from "axios";
+import { apiUrl } from "../../config/api";
 
-const BASE_URL = "http://localhost:8080/api/chat";
+const BASE_URL = apiUrl("/api/chat");
 
 function BuyerChat() {
   const [searchParams] = useSearchParams();
@@ -71,12 +72,13 @@ function BuyerChat() {
 
   // =====================================================
   // CHECK CONTACT INFORMATION UNLOCKED
+  // REQUIREMENT CHANGE ONLY
+  // CUSTOMER OR SELLER OFFER ACCEPTED
   // =====================================================
 
   const acceptedOfferMessage = messages.find(
     (chatMessage) =>
-      chatMessage.senderType === "SELLER" &&
-      chatMessage.offerStatus === "ACCEPTED",
+      chatMessage.offerPrice != null && chatMessage.offerStatus === "ACCEPTED",
   );
 
   const contactInformationUnlocked = !!acceptedOfferMessage;
@@ -291,6 +293,7 @@ function BuyerChat() {
 
               <div className="col-md-6 mb-3">
                 <strong>Mobile Number</strong>
+
                 <div>
                   {sellerInfo.sellerMobile ? (
                     <a

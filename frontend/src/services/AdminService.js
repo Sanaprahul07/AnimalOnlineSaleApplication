@@ -1,10 +1,11 @@
 import axios from "axios";
+import { apiUrl } from "../config/api";
 
 // =====================================================
 // BASE URL
 // =====================================================
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = apiUrl("/api");
 
 // =====================================================
 // ADMIN SERVICE
@@ -123,19 +124,16 @@ const AdminService = {
   // =====================================================
 
   // GET PENDING ANIMALS
-
   getPendingAnimals: async () => {
     return axios.get(`${BASE_URL}/admin/animals/pending`);
   },
 
   // APPROVE ANIMAL
-
   approveAnimal: async (id) => {
     return axios.put(`${BASE_URL}/admin/animals/${id}/approve`);
   },
 
   // REJECT ANIMAL
-
   rejectAnimal: async (id) => {
     return axios.put(`${BASE_URL}/admin/animals/${id}/reject`);
   },
@@ -224,9 +222,6 @@ const AdminService = {
   // =================================================
 
   // GET SELLER LATEST PAYMENT
-  // Payment screenshot +
-  // payment status +
-  // subscription details
   getSellerLatestPayment: async (sellerId) => {
     return axios.get(`${BASE_URL}/payments/seller/${sellerId}/latest`);
   },
@@ -249,6 +244,21 @@ const AdminService = {
   // REJECT SELLER PAYMENT
   rejectSellerPayment: async (paymentId) => {
     return axios.put(`${BASE_URL}/payments/admin/${paymentId}/reject`);
+  },
+
+  // GET APPROVED PAYMENT SUMMARY BY PLAN
+  getApprovedPaymentSummary: async () => {
+    return axios.get(`${BASE_URL}/admin/payments/summary`);
+  },
+
+  // =====================================================
+  // MONTH-WISE SELLER REGISTRATION REPORT
+  // =====================================================
+
+  getMonthlySellerRegistrations: async (year) => {
+    return axios.get(`${BASE_URL}/seller/reports/monthly-registrations`, {
+      params: { year },
+    });
   },
 };
 

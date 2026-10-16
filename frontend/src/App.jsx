@@ -89,6 +89,7 @@ import BuyerRegister from "./pages/buyer/BuyerRegister";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import BuyerOrder from "./pages/buyer/BuyerOrder";
 import BuyerChat from "./pages/buyer/BuyerChat";
+import BuyerProfile from "./pages/buyer/BuyerProfile";
 
 function App() {
   return (
@@ -314,11 +315,20 @@ function App() {
 
       {/* TEMPORARY PROFILE NAVIGATION */}
 
-      <Route
+      {/* <Route
         path="/buyer/profile"
         element={
           <BuyerLayout>
             <BuyerDashboard />
+          </BuyerLayout>
+        }
+      /> */}
+
+      <Route
+        path="/buyer/profile"
+        element={
+          <BuyerLayout>
+            <BuyerProfile />
           </BuyerLayout>
         }
       />

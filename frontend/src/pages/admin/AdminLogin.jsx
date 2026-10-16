@@ -93,7 +93,8 @@ function AdminLogin() {
 
       localStorage.setItem("adminName", admin.adminName || "Admin");
 
-      localStorage.setItem("adminRole", admin.role || "ADMIN");
+      // localStorage.setItem("adminRole", admin.role || "ADMIN");
+      localStorage.setItem("activeRole", "ADMIN");
 
       // =================================================
       // ADMIN DASHBOARD

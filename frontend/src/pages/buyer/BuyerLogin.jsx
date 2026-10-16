@@ -78,7 +78,8 @@ function BuyerLogin() {
         return;
       }
 
-      localStorage.setItem("customerId", String(customerId));
+      // localStorage.setItem("customerId", String(customerId));
+      localStorage.setItem("activeRole", "BUYER");
 
       if (response.data?.customerName) {
         localStorage.setItem("customerName", response.data.customerName);

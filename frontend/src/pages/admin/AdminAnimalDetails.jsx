@@ -5,6 +5,93 @@ import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminService from "../../services/AdminService";
 import { apiUrl } from "../../config/api";
 
+const responsiveStyles = `
+  .admin-animal-details-main {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    min-width: 0;
+    flex: 1;
+  }
+
+  .admin-animal-details-header {
+    padding: 16px 24px;
+  }
+
+  .admin-animal-details-content {
+    padding: 24px;
+    min-width: 0;
+  }
+
+  .admin-animal-details-main .card,
+  .admin-animal-details-main .row {
+    min-width: 0;
+  }
+
+  .admin-animal-details-main img {
+    max-width: 100%;
+  }
+
+  .admin-animal-details-main .approval-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .admin-animal-details-main .text-muted,
+  .admin-animal-details-main .alert {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 767.98px) {
+    .admin-animal-details-main {
+      margin-left: 0 !important;
+      width: 100% !important;
+      min-width: 0;
+    }
+
+    .admin-animal-details-header {
+      padding: 14px 12px !important;
+    }
+
+    .admin-animal-details-header h3 {
+      font-size: 22px;
+    }
+
+    .admin-animal-details-header small {
+      font-size: 12px;
+    }
+
+    .admin-animal-details-content {
+      padding: 12px !important;
+    }
+
+    .admin-animal-details-main .card-body {
+      padding: 14px;
+    }
+
+    .admin-animal-details-main h5 {
+      font-size: 17px;
+    }
+
+    .admin-animal-details-main .row > [class*="col-"] {
+      width: 100%;
+    }
+
+    .admin-animal-details-main .approval-buttons {
+      width: 100%;
+      flex-direction: column;
+    }
+
+    .admin-animal-details-main .approval-buttons .btn {
+      width: 100%;
+    }
+
+    .admin-animal-details-main .animal-image {
+      height: 220px !important;
+    }
+  }
+`;
+
 function AdminAnimalDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -40,7 +127,6 @@ function AdminAnimalDetails() {
       setAnimal(response.data);
     } catch (error) {
       console.error("Admin Animal Details Error:", error);
-
       console.error("Backend Response:", error?.response?.data);
 
       setErrorMessage(
@@ -162,7 +248,6 @@ function AdminAnimalDetails() {
       await loadAnimalDetails();
     } catch (error) {
       console.error("Approve Animal Error:", error);
-
       console.error("Approve Backend Response:", error?.response?.data);
 
       setErrorMessage(
@@ -208,7 +293,6 @@ function AdminAnimalDetails() {
       await loadAnimalDetails();
     } catch (error) {
       console.error("Reject Animal Error:", error);
-
       console.error("Reject Backend Response:", error?.response?.data);
 
       setErrorMessage(
@@ -232,16 +316,11 @@ function AdminAnimalDetails() {
           backgroundColor: "#f7f8fc",
         }}
       >
+        <style>{responsiveStyles}</style>
+
         <AdminSidebar />
 
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{
-            marginLeft: "250px",
-            width: "calc(100% - 250px)",
-            minHeight: "100vh",
-          }}
-        >
+        <div className="admin-animal-details-main d-flex justify-content-center align-items-center">
           <div className="text-center">
             <div className="spinner-border text-primary mb-3" role="status" />
 
@@ -265,15 +344,11 @@ function AdminAnimalDetails() {
           backgroundColor: "#f7f8fc",
         }}
       >
+        <style>{responsiveStyles}</style>
+
         <AdminSidebar />
 
-        <div
-          style={{
-            marginLeft: "250px",
-            width: "calc(100% - 250px)",
-            padding: "30px",
-          }}
-        >
+        <div className="admin-animal-details-main admin-animal-details-content">
           {errorMessage ? (
             <div className="alert alert-danger">{errorMessage}</div>
           ) : (
@@ -312,27 +387,15 @@ function AdminAnimalDetails() {
         backgroundColor: "#f7f8fc",
       }}
     >
-      {/* =================================================
-                SIDEBAR
-            ================================================= */}
+      <style>{responsiveStyles}</style>
 
+      {/* SIDEBAR */}
       <AdminSidebar />
 
-      {/* =================================================
-                MAIN CONTENT
-            ================================================= */}
-
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "calc(100% - 250px)",
-        }}
-      >
-        {/* =================================================
-                    HEADER
-                ================================================= */}
-
-        <div className="bg-white border-bottom px-4 py-3">
+      {/* MAIN CONTENT */}
+      <div className="admin-animal-details-main">
+        {/* HEADER */}
+        <div className="admin-animal-details-header bg-white border-bottom">
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm mb-3"
@@ -344,31 +407,22 @@ function AdminAnimalDetails() {
           <h3 className="fw-bold mb-1">Animal Details</h3>
 
           <small className="text-muted">
-            Complete animal information & approval management
+            Complete animal information &amp; approval management
           </small>
         </div>
 
-        <div className="p-4">
-          {/* =================================================
-                        ERROR
-                    ================================================= */}
-
+        <div className="admin-animal-details-content">
+          {/* ERROR */}
           {errorMessage && (
             <div className="alert alert-danger">{errorMessage}</div>
           )}
 
-          {/* =================================================
-                        SUCCESS
-                    ================================================= */}
-
+          {/* SUCCESS */}
           {successMessage && (
             <div className="alert alert-success">{successMessage}</div>
           )}
 
-          {/* =================================================
-                        ANIMAL APPROVAL MANAGEMENT
-                    ================================================= */}
-
+          {/* ANIMAL APPROVAL MANAGEMENT */}
           <div
             className="card border-0 shadow-sm mb-4"
             style={{
@@ -385,7 +439,7 @@ function AdminAnimalDetails() {
                   </div>
                 </div>
 
-                <div className="d-flex gap-2 flex-wrap">
+                <div className="approval-buttons">
                   {approvalStatus === "PENDING" && (
                     <>
                       <button
@@ -412,10 +466,7 @@ function AdminAnimalDetails() {
 
               <hr />
 
-              {/* =================================================
-                                CURRENT STATUS
-                            ================================================= */}
-
+              {/* CURRENT STATUS */}
               <div className="row g-3">
                 <div className="col-md-4">
                   <div className="border rounded p-3">
@@ -454,10 +505,7 @@ function AdminAnimalDetails() {
                 </div>
               </div>
 
-              {/* =================================================
-                                APPROVAL MESSAGE
-                            ================================================= */}
-
+              {/* APPROVAL MESSAGE */}
               {approvalStatus === "PENDING" && (
                 <div className="alert alert-warning mt-3 mb-0">
                   <strong>Review Required:</strong> Admin should verify the
@@ -468,10 +516,7 @@ function AdminAnimalDetails() {
             </div>
           </div>
 
-          {/* =================================================
-                        ANIMAL INFORMATION
-                    ================================================= */}
-
+          {/* ANIMAL INFORMATION */}
           <div
             className="card border-0 shadow-sm mb-4"
             style={{
@@ -511,10 +556,7 @@ function AdminAnimalDetails() {
                 />
               </div>
 
-              {/* =================================================
-                                DESCRIPTION
-                            ================================================= */}
-
+              {/* DESCRIPTION */}
               <div className="border rounded p-3 mt-3">
                 <div className="text-muted small mb-2">Description</div>
 
@@ -523,10 +565,7 @@ function AdminAnimalDetails() {
             </div>
           </div>
 
-          {/* =================================================
-                        ANIMAL IMAGES
-                    ================================================= */}
-
+          {/* ANIMAL IMAGES */}
           <div
             className="card border-0 shadow-sm mb-4"
             style={{
@@ -537,10 +576,7 @@ function AdminAnimalDetails() {
               <h5 className="fw-bold mb-4">Animal Images</h5>
 
               <div className="row g-4">
-                {/* =================================================
-                                    FRONT IMAGE
-                                ================================================= */}
-
+                {/* FRONT IMAGE */}
                 <div className="col-md-4">
                   <AnimalImageCard
                     src={getImageUrl(animal.frontImageUrl)}
@@ -548,10 +584,7 @@ function AdminAnimalDetails() {
                   />
                 </div>
 
-                {/* =================================================
-                                    SIDE IMAGE
-                                ================================================= */}
-
+                {/* SIDE IMAGE */}
                 <div className="col-md-4">
                   <AnimalImageCard
                     src={getImageUrl(animal.sideImageUrl)}
@@ -559,10 +592,7 @@ function AdminAnimalDetails() {
                   />
                 </div>
 
-                {/* =================================================
-                                    BACK IMAGE
-                                ================================================= */}
-
+                {/* BACK IMAGE */}
                 <div className="col-md-4">
                   <AnimalImageCard
                     src={getImageUrl(animal.backImageUrl)}
@@ -573,10 +603,7 @@ function AdminAnimalDetails() {
             </div>
           </div>
 
-          {/* =================================================
-                        SELLER INFORMATION
-                    ================================================= */}
-
+          {/* SELLER INFORMATION */}
           <div
             className="card border-0 shadow-sm mb-4"
             style={{
@@ -603,10 +630,7 @@ function AdminAnimalDetails() {
             </div>
           </div>
 
-          {/* =================================================
-                        FINAL APPROVAL ACTION
-                    ================================================= */}
-
+          {/* FINAL APPROVAL ACTION */}
           <div
             className="card border-0 shadow-sm"
             style={{
@@ -621,7 +645,7 @@ function AdminAnimalDetails() {
                 photos and seller information before taking the final action.
               </p>
 
-              <div className="d-flex gap-2 flex-wrap">
+              <div className="approval-buttons">
                 {approvalStatus === "PENDING" ? (
                   <>
                     <button
@@ -693,6 +717,7 @@ function AnimalImageCard({ src, label }) {
 
       {src && !imageError ? (
         <img
+          className="animal-image"
           src={src}
           alt={label}
           title={`View ${label}`}

@@ -9,10 +9,6 @@ function ManageAnimals() {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
 
-  // =====================================================
-  // SAMPLE UI DATA
-  // =====================================================
-
   const [animals, setAnimals] = useState([
     {
       id: 1,
@@ -66,10 +62,6 @@ function ManageAnimals() {
     },
   ]);
 
-  // =====================================================
-  // CATEGORY LIST
-  // =====================================================
-
   const categories = [
     "All",
     "Cow",
@@ -104,10 +96,6 @@ function ManageAnimals() {
     "Guinea Fowl",
   ];
 
-  // =====================================================
-  // FILTER
-  // =====================================================
-
   const filteredAnimals = animals.filter((animal) => {
     const searchValue = search.toLowerCase().trim();
 
@@ -127,10 +115,6 @@ function ManageAnimals() {
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // =====================================================
-  // STATUS CHANGE
-  // =====================================================
-
   const handleStatusChange = (id) => {
     setAnimals((prev) =>
       prev.map((animal) =>
@@ -144,10 +128,6 @@ function ManageAnimals() {
     );
   };
 
-  // =====================================================
-  // DELETE
-  // =====================================================
-
   const handleDelete = (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to remove this animal from the admin list?",
@@ -159,10 +139,6 @@ function ManageAnimals() {
 
     setAnimals((prev) => prev.filter((animal) => animal.id !== id));
   };
-
-  // =====================================================
-  // STATUS BADGE
-  // =====================================================
 
   const getStatusClass = (status) => {
     if (status === "Available") {
@@ -177,43 +153,140 @@ function ManageAnimals() {
   };
 
   return (
-    <div
-      className="d-flex"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fc",
-      }}
-    >
-      {/* =====================================================
-                SIDEBAR
-            ===================================================== */}
+    <div className="manage-animals-page d-flex">
+      <style>{`
+        .manage-animals-page {
+          min-height: 100vh;
+          background-color: #f7f8fc;
+          width: 100%;
+        }
+
+        .manage-animals-main {
+          margin-left: 250px;
+          width: calc(100% - 250px);
+          min-width: 0;
+          min-height: 100vh;
+          flex: 1;
+        }
+
+        .manage-animals-header {
+          min-height: 70px;
+        }
+
+        .manage-animals-content {
+          min-width: 0;
+        }
+
+        .manage-animals-table {
+          min-width: 1050px;
+        }
+
+        .manage-animals-actions {
+          white-space: nowrap;
+        }
+
+        @media (max-width: 767.98px) {
+          .manage-animals-main {
+            margin-left: 0;
+            width: 100%;
+            min-width: 0;
+          }
+
+          .manage-animals-header {
+            padding: 12px !important;
+            gap: 10px;
+            align-items: flex-start !important;
+            flex-wrap: wrap;
+          }
+
+          .manage-animals-header h5 {
+            font-size: 17px;
+          }
+
+          .manage-animals-header small {
+            font-size: 12px;
+          }
+
+          .manage-animals-header button {
+            font-size: 13px;
+            padding: 7px 10px;
+            white-space: nowrap;
+          }
+
+          .manage-animals-content {
+            padding: 12px !important;
+          }
+
+          .manage-animals-title {
+            align-items: flex-start !important;
+            flex-direction: column;
+            gap: 10px;
+          }
+
+          .manage-animals-title h2 {
+            font-size: 22px;
+          }
+
+          .manage-animals-title p {
+            font-size: 13px;
+          }
+
+          .manage-animals-title-total {
+            font-size: 13px;
+          }
+
+          .manage-animals-filter .card-body {
+            padding: 12px;
+          }
+
+          .manage-animals-filter .form-label {
+            font-size: 13px;
+          }
+
+          .manage-animals-filter .form-control,
+          .manage-animals-filter .form-select {
+            width: 100%;
+            min-width: 0;
+            font-size: 14px;
+          }
+
+          .manage-animals-table-card .card-body {
+            min-width: 0;
+          }
+
+          .manage-animals-table {
+            min-width: 1050px;
+          }
+
+          .manage-animals-table th,
+          .manage-animals-table td {
+            font-size: 13px;
+            white-space: nowrap;
+          }
+
+          .manage-animals-table .animal-name-cell {
+            white-space: normal;
+            min-width: 150px;
+          }
+
+          .manage-animals-actions {
+            white-space: nowrap;
+          }
+
+          .manage-animals-footnote {
+            font-size: 12px;
+            overflow-wrap: anywhere;
+          }
+        }
+      `}</style>
 
       <AdminSidebar />
 
-      {/* =====================================================
-                MAIN AREA
-            ===================================================== */}
-
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "calc(100% - 250px)",
-          minHeight: "100vh",
-        }}
-      >
-        {/* =================================================
-                    TOP HEADER
-                ================================================= */}
-
-        <div
-          className="bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center"
-          style={{
-            minHeight: "70px",
-          }}
-        >
+      <div className="manage-animals-main">
+        {/* TOP HEADER */}
+        <div className="manage-animals-header bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
           <div>
             <h5 className="fw-bold mb-0">Animal Management</h5>
-
             <small className="text-muted">
               Manage all animals listed on the platform
             </small>
@@ -228,48 +301,33 @@ function ManageAnimals() {
           </button>
         </div>
 
-        {/* =================================================
-                    CONTENT
-                ================================================= */}
-
-        <div className="p-4">
-          {/* =================================================
-                        TITLE
-                    ================================================= */}
-
-          <div className="d-flex justify-content-between align-items-center mb-4">
+        {/* CONTENT */}
+        <div className="manage-animals-content p-4">
+          {/* TITLE */}
+          <div className="manage-animals-title d-flex justify-content-between align-items-center mb-4">
             <div>
               <h2 className="fw-bold mb-1">Manage Animals</h2>
-
               <p className="text-muted mb-0">
                 View, filter and manage seller animal listings.
               </p>
             </div>
 
-            <div className="text-muted">
+            <div className="manage-animals-title-total text-muted">
               Total: <strong>{animals.length}</strong>
             </div>
           </div>
 
-          {/* =================================================
-                        FILTER CARD
-                    ================================================= */}
-
+          {/* FILTER CARD */}
           <div
-            className="card border-0 shadow-sm mb-4"
-            style={{
-              borderRadius: "14px",
-            }}
+            className="manage-animals-filter card border-0 shadow-sm mb-4"
+            style={{ borderRadius: "14px" }}
           >
             <div className="card-body">
               <div className="row g-3">
-                {/* SEARCH */}
-
-                <div className="col-lg-5">
+                <div className="col-12 col-lg-5">
                   <label className="form-label fw-semibold">
                     Search Animal
                   </label>
-
                   <input
                     type="text"
                     className="form-control"
@@ -279,11 +337,8 @@ function ManageAnimals() {
                   />
                 </div>
 
-                {/* CATEGORY */}
-
-                <div className="col-lg-3">
+                <div className="col-12 col-sm-6 col-lg-3">
                   <label className="form-label fw-semibold">Category</label>
-
                   <select
                     className="form-select"
                     value={categoryFilter}
@@ -297,29 +352,21 @@ function ManageAnimals() {
                   </select>
                 </div>
 
-                {/* STATUS */}
-
-                <div className="col-lg-2">
+                <div className="col-12 col-sm-6 col-lg-2">
                   <label className="form-label fw-semibold">Status</label>
-
                   <select
                     className="form-select"
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
                     <option value="All">All</option>
-
                     <option value="Available">Available</option>
-
                     <option value="Sold">Sold</option>
-
                     <option value="Pending">Pending</option>
                   </select>
                 </div>
 
-                {/* RESET */}
-
-                <div className="col-lg-2 d-flex align-items-end">
+                <div className="col-12 col-lg-2 d-flex align-items-end">
                   <button
                     type="button"
                     className="btn btn-secondary w-100"
@@ -336,37 +383,24 @@ function ManageAnimals() {
             </div>
           </div>
 
-          {/* =================================================
-                        ANIMAL TABLE
-                    ================================================= */}
-
+          {/* ANIMAL TABLE */}
           <div
-            className="card border-0 shadow-sm"
-            style={{
-              borderRadius: "14px",
-            }}
+            className="manage-animals-table-card card border-0 shadow-sm"
+            style={{ borderRadius: "14px" }}
           >
             <div className="card-body p-0">
               <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
+                <table className="manage-animals-table table table-hover align-middle mb-0">
                   <thead className="table-light">
                     <tr>
                       <th className="px-4 py-3">#</th>
-
                       <th className="py-3">Animal</th>
-
                       <th className="py-3">Category</th>
-
                       <th className="py-3">Breed</th>
-
                       <th className="py-3">Seller</th>
-
                       <th className="py-3">Price</th>
-
                       <th className="py-3">Location</th>
-
                       <th className="py-3">Status</th>
-
                       <th className="py-3 text-end px-4">Actions</th>
                     </tr>
                   </thead>
@@ -383,13 +417,14 @@ function ManageAnimals() {
                         <tr key={animal.id}>
                           <td className="px-4">{index + 1}</td>
 
-                          <td>
+                          <td className="animal-name-cell">
                             <div className="d-flex align-items-center gap-3">
                               <div
                                 className="rounded d-flex align-items-center justify-content-center"
                                 style={{
                                   width: "48px",
                                   height: "48px",
+                                  minWidth: "48px",
                                   backgroundColor: "#e8f5e9",
                                   fontSize: "22px",
                                 }}
@@ -401,7 +436,6 @@ function ManageAnimals() {
                                 <div className="fw-semibold">
                                   {animal.animalName}
                                 </div>
-
                                 <small className="text-muted">
                                   ID: {animal.id}
                                 </small>
@@ -416,7 +450,6 @@ function ManageAnimals() {
                           </td>
 
                           <td>{animal.breed}</td>
-
                           <td>{animal.seller}</td>
 
                           <td className="fw-semibold text-success">
@@ -431,7 +464,7 @@ function ManageAnimals() {
                             </span>
                           </td>
 
-                          <td className="text-end px-4">
+                          <td className="manage-animals-actions text-end px-4">
                             <div className="d-flex justify-content-end gap-2">
                               <button
                                 type="button"
@@ -475,11 +508,8 @@ function ManageAnimals() {
             </div>
           </div>
 
-          {/* =================================================
-                        FOOT NOTE
-                    ================================================= */}
-
-          <div className="mt-3 text-muted small">
+          {/* FOOT NOTE */}
+          <div className="manage-animals-footnote mt-3 text-muted small">
             Showing <strong>{filteredAnimals.length}</strong> of{" "}
             <strong>{animals.length}</strong> animals.
           </div>

@@ -8,23 +8,12 @@ import { apiUrl } from "../../config/api";
 function AdminAnimals() {
   const navigate = useNavigate();
 
-  // =====================================================
-  // STATE
-  // =====================================================
-
   const [animals, setAnimals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // SEARCH
   const [searchText, setSearchText] = useState("");
-
-  // STATUS FILTER
   const [statusFilter, setStatusFilter] = useState("ALL");
-
-  // =====================================================
-  // LOAD ALL ANIMALS
-  // =====================================================
 
   const loadAnimals = async () => {
     try {
@@ -42,28 +31,18 @@ function AdminAnimals() {
       }
     } catch (error) {
       console.error("Error loading admin animals:", error);
-
       console.error("Backend Response:", error?.response?.data);
 
       setError(error?.response?.data?.message || "Unable to load animals.");
-
       setAnimals([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // =====================================================
-  // PAGE LOAD
-  // =====================================================
-
   useEffect(() => {
     loadAnimals();
   }, []);
-
-  // =====================================================
-  // IMAGE URL
-  // =====================================================
 
   const getImageUrl = (image) => {
     if (!image) {
@@ -78,9 +57,6 @@ function AdminAnimals() {
 
     return apiUrl(cleanPath);
   };
-  // =====================================================
-  // PRICE FORMAT
-  // =====================================================
 
   const formatPrice = (price) => {
     if (price === null || price === undefined || price === "") {
@@ -96,10 +72,6 @@ function AdminAnimals() {
     return `₹${numericPrice.toLocaleString("en-IN")}`;
   };
 
-  // =====================================================
-  // STATUS CLASS
-  // =====================================================
-
   const getStatusClass = (status) => {
     const currentStatus = status?.toUpperCase() || "PENDING";
 
@@ -114,23 +86,14 @@ function AdminAnimals() {
     return "badge bg-warning text-dark";
   };
 
-  // =====================================================
-  // FILTER ANIMALS
-  // =====================================================
-
   const filteredAnimals = animals.filter((animal) => {
     const search = searchText.trim().toLowerCase();
 
     const animalName = animal.animalName?.toLowerCase() || "";
-
     const categoryName = animal.categoryName?.toLowerCase() || "";
-
     const breed = animal.breed?.toLowerCase() || "";
-
     const sellerName = animal.sellerName?.toLowerCase() || "";
-
     const animalId = String(animal.animalId || "");
-
     const sellerId = String(animal.sellerId || "");
 
     const matchesSearch =
@@ -150,87 +113,143 @@ function AdminAnimals() {
     return matchesSearch && matchesStatus;
   });
 
-  // =====================================================
-  // LOADING
-  // =====================================================
-
-  if (loading) {
-    return (
-      <div
-        className="d-flex"
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#f7f8fc",
-        }}
-      >
-        <AdminSidebar />
-
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{
-            marginLeft: "250px",
-            width: "calc(100% - 250px)",
-            minHeight: "100vh",
-          }}
-        >
-          <div className="text-center">
-            <div className="spinner-border text-primary mb-3" role="status" />
-
-            <div className="text-muted">Loading animals...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // =====================================================
-  // MAIN UI
-  // =====================================================
-
   return (
-    <div
-      className="d-flex"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fc",
-      }}
-    >
-      {/* =================================================
-                SIDEBAR
-            ================================================= */}
+    <div className="admin-animals-page d-flex">
+      <style>{`
+        .admin-animals-page {
+          min-height: 100vh;
+          width: 100%;
+          background-color: #f7f8fc;
+        }
+
+        .admin-animals-main {
+          margin-left: 250px;
+          width: calc(100% - 250px);
+          min-width: 0;
+          min-height: 100vh;
+          flex: 1;
+        }
+
+        .admin-animals-header {
+          padding: 10px 18px;
+        }
+
+        .admin-animals-content {
+          padding: 18px;
+          min-width: 0;
+        }
+
+        .admin-animals-table {
+          min-width: 1050px;
+        }
+
+        .admin-animals-no-data {
+          padding: 55px;
+        }
+
+        @media (max-width: 767.98px) {
+          .admin-animals-main {
+            margin-left: 0;
+            width: 100%;
+            min-width: 0;
+          }
+
+          .admin-animals-header {
+            padding: 12px !important;
+          }
+
+          .admin-animals-header h5 {
+            font-size: 15px !important;
+          }
+
+          .admin-animals-header small {
+            font-size: 11px;
+          }
+
+          .admin-animals-header .btn {
+            flex-shrink: 0;
+            font-size: 12px;
+            padding: 6px 9px;
+          }
+
+          .admin-animals-header-inner {
+            gap: 8px;
+          }
+
+          .admin-animals-content {
+            padding: 12px !important;
+          }
+
+          .admin-animals-title {
+            align-items: flex-start !important;
+            gap: 8px;
+          }
+
+          .admin-animals-title h2 {
+            font-size: 21px !important;
+          }
+
+          .admin-animals-title p {
+            font-size: 12px !important;
+          }
+
+          .admin-animals-total {
+            font-size: 12px !important;
+            white-space: nowrap;
+          }
+
+          .admin-animals-filter .card-body {
+            padding: 12px;
+          }
+
+          .admin-animals-filter .form-control,
+          .admin-animals-filter .form-select,
+          .admin-animals-filter .btn {
+            width: 100%;
+            min-width: 0;
+            font-size: 14px;
+          }
+
+          .admin-animals-filter .form-label {
+            font-size: 12px !important;
+          }
+
+          .admin-animals-result-count {
+            font-size: 12px !important;
+            overflow-wrap: anywhere;
+          }
+
+          .admin-animals-table-card {
+            width: 100%;
+            min-width: 0;
+          }
+
+          .admin-animals-table {
+            min-width: 1050px;
+          }
+
+          .admin-animals-no-data {
+            padding: 30px 14px !important;
+          }
+
+          .admin-animals-no-data h5 {
+            font-size: 17px;
+          }
+
+          .admin-animals-no-data p {
+            font-size: 13px;
+          }
+        }
+      `}</style>
 
       <AdminSidebar />
 
-      {/* =================================================
-                MAIN CONTENT
-            ================================================= */}
-
-      <div
-        className="flex-grow-1"
-        style={{
-          minWidth: 0,
-          marginLeft: "250px",
-          width: "calc(100% - 250px)",
-        }}
-      >
-        {/* =================================================
-                    TOP HEADER
-                ================================================= */}
-
-        <div
-          className="bg-white border-bottom"
-          style={{
-            padding: "10px 18px",
-          }}
-        >
-          <div className="d-flex justify-content-between align-items-center">
+      <div className="admin-animals-main">
+        {/* TOP HEADER */}
+        <div className="admin-animals-header bg-white border-bottom">
+          <div className="admin-animals-header-inner d-flex justify-content-between align-items-center">
             <div>
-              <h5
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "16px",
-                }}
-              >
+              <h5 className="fw-bold mb-1" style={{ fontSize: "16px" }}>
                 Animal Management
               </h5>
 
@@ -249,76 +268,42 @@ function AdminAnimals() {
           </div>
         </div>
 
-        {/* =================================================
-                    CONTENT
-                ================================================= */}
-
-        <div
-          style={{
-            padding: "18px",
-          }}
-        >
-          {/* =================================================
-                        TITLE
-                    ================================================= */}
-
-          <div className="d-flex justify-content-between align-items-center mb-3">
+        {/* CONTENT */}
+        <div className="admin-animals-content">
+          {/* TITLE */}
+          <div className="admin-animals-title d-flex justify-content-between align-items-center mb-3">
             <div>
-              <h2
-                className="fw-bold mb-1"
-                style={{
-                  fontSize: "24px",
-                }}
-              >
+              <h2 className="fw-bold mb-1" style={{ fontSize: "24px" }}>
                 All Animals
               </h2>
 
-              <p
-                className="text-muted mb-0"
-                style={{
-                  fontSize: "13px",
-                }}
-              >
+              <p className="text-muted mb-0" style={{ fontSize: "13px" }}>
                 Animals added by sellers.
               </p>
             </div>
 
             <div
-              className="text-muted"
-              style={{
-                fontSize: "13px",
-              }}
+              className="admin-animals-total text-muted"
+              style={{ fontSize: "13px" }}
             >
               Total: <strong>{animals.length}</strong>
             </div>
           </div>
 
-          {/* =================================================
-                        ERROR
-                    ================================================= */}
-
+          {/* ERROR */}
           {error && <div className="alert alert-danger">{error}</div>}
 
-          {/* =================================================
-                        SEARCH + FILTER
-                    ================================================= */}
-
+          {/* SEARCH + FILTER */}
           <div
-            className="card border-0 shadow-sm mb-3"
-            style={{
-              borderRadius: "12px",
-            }}
+            className="admin-animals-filter card border-0 shadow-sm mb-3"
+            style={{ borderRadius: "12px" }}
           >
             <div className="card-body py-3">
               <div className="row g-3 align-items-end">
-                {/* SEARCH */}
-
-                <div className="col-lg-7 col-md-6">
+                <div className="col-12 col-md-6 col-lg-7">
                   <label
                     className="form-label fw-semibold mb-1"
-                    style={{
-                      fontSize: "12px",
-                    }}
+                    style={{ fontSize: "12px" }}
                   >
                     Search Animal
                   </label>
@@ -332,14 +317,10 @@ function AdminAnimals() {
                   />
                 </div>
 
-                {/* STATUS */}
-
-                <div className="col-lg-3 col-md-3">
+                <div className="col-12 col-sm-6 col-md-3 col-lg-3">
                   <label
                     className="form-label fw-semibold mb-1"
-                    style={{
-                      fontSize: "12px",
-                    }}
+                    style={{ fontSize: "12px" }}
                   >
                     Approval Status
                   </label>
@@ -350,18 +331,13 @@ function AdminAnimals() {
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
                     <option value="ALL">All</option>
-
                     <option value="PENDING">Pending</option>
-
                     <option value="APPROVED">Approved</option>
-
                     <option value="REJECTED">Rejected</option>
                   </select>
                 </div>
 
-                {/* RESET */}
-
-                <div className="col-lg-2 col-md-3">
+                <div className="col-12 col-sm-6 col-md-3 col-lg-2">
                   <button
                     type="button"
                     className="btn btn-secondary w-100"
@@ -377,37 +353,33 @@ function AdminAnimals() {
             </div>
           </div>
 
-          {/* =================================================
-                        RESULT COUNT
-                    ================================================= */}
-
+          {/* RESULT COUNT */}
           <div
-            className="text-muted mb-2"
-            style={{
-              fontSize: "13px",
-            }}
+            className="admin-animals-result-count text-muted mb-2"
+            style={{ fontSize: "13px" }}
           >
             Showing <strong>{filteredAnimals.length}</strong> of{" "}
             <strong>{animals.length}</strong> animals
           </div>
 
-          {/* =================================================
-                        NO DATA
-                    ================================================= */}
-
-          {filteredAnimals.length === 0 ? (
+          {/* LOADING */}
+          {loading ? (
+            <div className="card border-0 shadow-sm">
+              <div className="card-body text-center py-5">
+                <div
+                  className="spinner-border text-primary mb-3"
+                  role="status"
+                />
+                <div className="text-muted">Loading animals...</div>
+              </div>
+            </div>
+          ) : filteredAnimals.length === 0 ? (
+            /* NO DATA */
             <div
               className="card border-0 shadow-sm"
-              style={{
-                borderRadius: "12px",
-              }}
+              style={{ borderRadius: "12px" }}
             >
-              <div
-                className="card-body text-center"
-                style={{
-                  padding: "55px",
-                }}
-              >
+              <div className="admin-animals-no-data card-body text-center">
                 <h5 className="fw-bold">No Animals Found</h5>
 
                 <p className="text-muted mb-0">
@@ -416,79 +388,43 @@ function AdminAnimals() {
               </div>
             </div>
           ) : (
-            /* =================================================
-                            TABLE
-                        ================================================= */
-
+            /* TABLE */
             <div
-              className="card border-0 shadow-sm"
-              style={{
-                borderRadius: "12px",
-              }}
+              className="admin-animals-table-card card border-0 shadow-sm"
+              style={{ borderRadius: "12px" }}
             >
               <div className="card-body p-0">
                 <div className="table-responsive">
-                  <table
-                    className="table table-hover align-middle mb-0"
-                    style={{
-                      minWidth: "1050px",
-                    }}
-                  >
-                    {/* =================================================
-                                            HEADER
-                                        ================================================= */}
-
+                  <table className="admin-animals-table table table-hover align-middle mb-0">
                     <thead>
                       <tr>
                         <th style={headerStyle}>#</th>
-
                         <th style={headerStyle}>Animal</th>
-
                         <th style={headerStyle}>Category</th>
-
                         <th style={headerStyle}>Breed</th>
-
                         <th style={headerStyle}>Age</th>
-
                         <th style={headerStyle}>Price</th>
-
                         <th style={headerStyle}>Seller</th>
-
                         <th style={headerStyle}>Photo</th>
-
                         <th style={headerStyle}>Status</th>
-
                         <th style={headerStyle}>Action</th>
                       </tr>
                     </thead>
 
-                    {/* =================================================
-                                            BODY
-                                        ================================================= */}
-
                     <tbody>
                       {filteredAnimals.map((animal, index) => {
                         const animalId = animal.animalId;
-
                         const status =
                           animal.approvalStatus?.toUpperCase() || "PENDING";
-
                         const frontImage = getImageUrl(animal.frontImageUrl);
 
                         return (
                           <tr key={animalId || `${animal.animalName}-${index}`}>
-                            {/* # */}
-
                             <td style={cellStyle}>{index + 1}</td>
-
-                            {/* ANIMAL */}
 
                             <td style={cellStyle}>
                               <div
-                                style={{
-                                  fontWeight: "700",
-                                  fontSize: "13px",
-                                }}
+                                style={{ fontWeight: "700", fontSize: "13px" }}
                               >
                                 {animal.animalName || "N/A"}
                               </div>
@@ -504,21 +440,13 @@ function AdminAnimals() {
                               </div>
                             </td>
 
-                            {/* CATEGORY */}
-
                             <td style={cellStyle}>
                               {animal.categoryName || "N/A"}
                             </td>
 
-                            {/* BREED */}
-
                             <td style={cellStyle}>{animal.breed || "N/A"}</td>
 
-                            {/* AGE */}
-
                             <td style={cellStyle}>{animal.age ?? "N/A"}</td>
-
-                            {/* PRICE */}
 
                             <td
                               style={{
@@ -530,14 +458,9 @@ function AdminAnimals() {
                               {formatPrice(animal.price)}
                             </td>
 
-                            {/* SELLER */}
-
                             <td style={cellStyle}>
                               <div
-                                style={{
-                                  fontWeight: "600",
-                                  fontSize: "13px",
-                                }}
+                                style={{ fontWeight: "600", fontSize: "13px" }}
                               >
                                 {animal.sellerName || "N/A"}
                               </div>
@@ -553,13 +476,9 @@ function AdminAnimals() {
                               </div>
                             </td>
 
-                            {/* SINGLE PHOTO */}
-
                             <td style={cellStyle}>
                               <AnimalThumbnail src={frontImage} label="Front" />
                             </td>
-
-                            {/* STATUS */}
 
                             <td style={cellStyle}>
                               <span
@@ -573,8 +492,6 @@ function AdminAnimals() {
                               </span>
                             </td>
 
-                            {/* ACTION */}
-
                             <td style={cellStyle}>
                               <button
                                 type="button"
@@ -584,7 +501,6 @@ function AdminAnimals() {
                                     "Opening Animal ID:",
                                     animal.animalId,
                                   );
-
                                   navigate(`/admin/animals/${animal.animalId}`);
                                 }}
                               >
@@ -606,20 +522,11 @@ function AdminAnimals() {
   );
 }
 
-// =====================================================
-// SINGLE ANIMAL PHOTO
-// =====================================================
-
 function AnimalThumbnail({ src, label }) {
   const [imageError, setImageError] = useState(false);
 
   return (
-    <div
-      style={{
-        width: "65px",
-        textAlign: "center",
-      }}
-    >
+    <div style={{ width: "65px", textAlign: "center" }}>
       {src && !imageError ? (
         <img
           src={src}
@@ -670,10 +577,6 @@ function AnimalThumbnail({ src, label }) {
   );
 }
 
-// =====================================================
-// HEADER STYLE
-// =====================================================
-
 const headerStyle = {
   padding: "10px",
   color: "#ffffff",
@@ -683,10 +586,6 @@ const headerStyle = {
   backgroundColor: "#0d6efd",
   borderBottom: "2px solid #0d6efd",
 };
-
-// =====================================================
-// CELL STYLE
-// =====================================================
 
 const cellStyle = {
   padding: "12px",

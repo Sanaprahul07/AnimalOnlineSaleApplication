@@ -9,43 +9,24 @@ function AdminSellerDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // =========================================================
   // SELLER / PAYMENT STATE
-  // =========================================================
-
   const [seller, setSeller] = useState(null);
   const [payment, setPayment] = useState(null);
 
-  // =========================================================
   // COMMON STATE
-  // =========================================================
-
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // =========================================================
   // LOAD SELLER DETAILS
-  // =========================================================
-
   const loadSellerDetails = async () => {
     try {
       setLoading(true);
       setErrorMessage("");
 
-      // -------------------------------------------------------
-      // SELLER DETAILS
-      // -------------------------------------------------------
-
       const response = await AdminService.getAdminSellerById(id);
-
       setSeller(response.data);
-
-      // -------------------------------------------------------
-      // LATEST PAYMENT
-      // -------------------------------------------------------
 
       try {
         const paymentResponse = await AdminService.getSellerLatestPayment(id);
@@ -53,7 +34,6 @@ function AdminSellerDetails() {
         setPayment(paymentResponse.data || null);
       } catch (paymentError) {
         console.log("No payment found for this seller:", paymentError);
-
         setPayment(null);
       }
     } catch (error) {
@@ -67,20 +47,14 @@ function AdminSellerDetails() {
     }
   };
 
-  // =========================================================
   // INITIAL LOAD
-  // =========================================================
-
   useEffect(() => {
     if (id) {
       loadSellerDetails();
     }
   }, [id]);
 
-  // =========================================================
   // COMMON ACTION HANDLER
-  // =========================================================
-
   const executeSellerAction = async (action, successText) => {
     try {
       setActionLoading(true);
@@ -89,51 +63,27 @@ function AdminSellerDetails() {
 
       let response;
 
-      // -------------------------------------------------------
-      // APPROVE
-      // -------------------------------------------------------
-
       if (action === "approve") {
         response = await AdminService.approveSeller(id);
       }
-
-      // -------------------------------------------------------
-      // BLOCK
-      // -------------------------------------------------------
 
       if (action === "block") {
         response = await AdminService.blockSeller(id);
       }
 
-      // -------------------------------------------------------
-      // ACTIVATE
-      // -------------------------------------------------------
-
       if (action === "activate") {
         response = await AdminService.activateSeller(id);
       }
 
-      // -------------------------------------------------------
-      // REJECT
-      // -------------------------------------------------------
-
       if (action === "reject") {
         response = await AdminService.rejectSeller(id);
       }
-
-      // -------------------------------------------------------
-      // UPDATE SELLER DATA FROM RESPONSE
-      // -------------------------------------------------------
 
       if (response?.data) {
         setSeller(response.data);
       }
 
       setSuccessMessage(response?.data?.message || successText);
-
-      // -------------------------------------------------------
-      // REFRESH DETAILS
-      // -------------------------------------------------------
 
       await loadSellerDetails();
     } catch (error) {
@@ -147,9 +97,7 @@ function AdminSellerDetails() {
     }
   };
 
-  // =========================================================
   // APPROVE SELLER
-  // =========================================================
   const handleApprove = () => {
     if (!window.confirm("Are you sure you want to APPROVE this seller?")) {
       return;
@@ -158,10 +106,7 @@ function AdminSellerDetails() {
     executeSellerAction("approve", "Seller approved successfully.");
   };
 
-  // =========================================================
   // BLOCK SELLER
-  // =========================================================
-
   const handleBlock = () => {
     if (!window.confirm("Are you sure you want to BLOCK this seller?")) {
       return;
@@ -170,10 +115,7 @@ function AdminSellerDetails() {
     executeSellerAction("block", "Seller blocked successfully.");
   };
 
-  // =========================================================
   // ACTIVATE SELLER
-  // =========================================================
-
   const handleActivate = () => {
     if (!window.confirm("Are you sure you want to ACTIVATE this seller?")) {
       return;
@@ -182,10 +124,7 @@ function AdminSellerDetails() {
     executeSellerAction("activate", "Seller activated successfully.");
   };
 
-  // =========================================================
   // REJECT SELLER
-  // =========================================================
-
   const handleReject = () => {
     if (!window.confirm("Are you sure you want to REJECT this seller?")) {
       return;
@@ -194,10 +133,7 @@ function AdminSellerDetails() {
     executeSellerAction("reject", "Seller rejected successfully.");
   };
 
-  // =========================================================
   // MASK AADHAAR
-  // =========================================================
-
   const getLastFourAadhaar = (aadhaarNumber) => {
     if (!aadhaarNumber) {
       return "-";
@@ -212,10 +148,7 @@ function AdminSellerDetails() {
     return `XXXX XXXX ${value.slice(-4)}`;
   };
 
-  // =========================================================
   // MASK PAN
-  // =========================================================
-
   const getLastFourPan = (panNumber) => {
     if (!panNumber) {
       return "-";
@@ -230,10 +163,7 @@ function AdminSellerDetails() {
     return `XXXX${value.slice(-4)}`;
   };
 
-  // =========================================================
   // IMAGE URL
-  // =========================================================
-
   const getImageUrl = (imagePath) => {
     if (!imagePath) {
       return null;
@@ -248,26 +178,16 @@ function AdminSellerDetails() {
     return apiUrl(cleanPath);
   };
 
-  // =========================================================
   // PAYMENT SCREENSHOT URL
-  // =========================================================
-
   const getPaymentScreenshotUrl = (paymentScreenshot) => {
     return getImageUrl(paymentScreenshot);
   };
 
-  // =========================================================
   // STATUS CLASS
-  // =========================================================
-
   const getStatusClass = (status) => {
     const currentStatus = status ? status.toUpperCase() : "";
 
-    if (currentStatus === "APPROVED") {
-      return "badge bg-success";
-    }
-
-    if (currentStatus === "ACTIVE") {
+    if (currentStatus === "APPROVED" || currentStatus === "ACTIVE") {
       return "badge bg-success";
     }
 
@@ -286,10 +206,7 @@ function AdminSellerDetails() {
     return "badge bg-secondary";
   };
 
-  // =========================================================
   // PAYMENT STATUS CLASS
-  // =========================================================
-
   const getPaymentStatusClass = (status) => {
     const currentStatus = status ? status.toUpperCase() : "";
 
@@ -308,10 +225,7 @@ function AdminSellerDetails() {
     return "badge bg-secondary";
   };
 
-  // =========================================================
   // SUBSCRIPTION STATUS CLASS
-  // =========================================================
-
   const getSubscriptionStatusClass = (status) => {
     const currentStatus = status ? status.toUpperCase() : "";
 
@@ -334,64 +248,176 @@ function AdminSellerDetails() {
     return "badge bg-secondary";
   };
 
-  // =========================================================
-  // LOADING
-  // =========================================================
-
-  if (loading) {
-    return (
-      <div
-        className="d-flex"
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#f7f8fc",
-        }}
-      >
-        <AdminSidebar />
-
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{
-            marginLeft: "250px",
-            width: "calc(100% - 250px)",
-            minHeight: "100vh",
-          }}
-        >
-          <div className="text-center">
-            <div className="spinner-border text-primary mb-3" role="status" />
-
-            <div className="text-muted">Loading seller details...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // =========================================================
-  // MAIN
-  // =========================================================
-
   return (
-    <div
-      className="d-flex"
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#f7f8fc",
-      }}
-    >
+    <div className="seller-details-page d-flex">
+      <style>{`
+        .seller-details-page,
+        .seller-details-page * {
+          box-sizing: border-box;
+        }
+
+        .seller-details-page {
+          min-height: 100vh;
+          width: 100%;
+          max-width: 100%;
+          background-color: #f7f8fc;
+          overflow-x: clip;
+        }
+
+        .seller-details-main {
+          margin-left: 250px;
+          width: calc(100% - 250px);
+          min-width: 0;
+          flex: 1;
+        }
+
+        .seller-details-header {
+          padding: 16px 24px;
+        }
+
+        .seller-details-content {
+          padding: 24px;
+          min-width: 0;
+          width: 100%;
+        }
+
+        .seller-details-page .card {
+          min-width: 0;
+          max-width: 100%;
+          border-radius: 14px;
+          overflow-wrap: anywhere;
+        }
+
+        .seller-details-page .card-body {
+          min-width: 0;
+          padding: 20px;
+        }
+
+        .seller-details-page .row > * {
+          min-width: 0;
+        }
+
+        .seller-details-page img {
+          max-width: 100%;
+        }
+
+        .seller-details-page .seller-document-image {
+          display: block;
+          width: 100%;
+          height: 250px;
+          max-width: 100%;
+          object-fit: contain;
+          background-color: #f8f9fa;
+          cursor: pointer;
+        }
+
+        .seller-details-page .seller-payment-image {
+          display: block;
+          width: 280px;
+          max-width: 100%;
+          max-height: 350px;
+          object-fit: contain;
+          border: 1px solid #dee2e6;
+          border-radius: 10px;
+          cursor: pointer;
+          background-color: #f8f9fa;
+        }
+
+        .seller-details-page .seller-action-buttons {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .seller-details-page .seller-info-value {
+          overflow-wrap: anywhere;
+          word-break: break-word;
+        }
+
+        @media (max-width: 767.98px) {
+          .seller-details-main {
+            margin-left: 0;
+            width: 100%;
+            min-width: 0;
+            flex: 1 1 100%;
+          }
+
+          .seller-details-header {
+            padding: 14px;
+          }
+
+          .seller-details-header h3 {
+            font-size: 1.35rem;
+          }
+
+          .seller-details-content {
+            padding: 12px !important;
+            width: 100%;
+            min-width: 0;
+          }
+
+          .seller-details-page .card {
+            width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+          }
+
+          .seller-details-page .card-body {
+            padding: 14px;
+          }
+
+          .seller-details-page .card-body h5 {
+            font-size: 1.05rem;
+          }
+
+          .seller-details-page .seller-action-header {
+            align-items: stretch !important;
+          }
+
+          .seller-details-page .seller-action-buttons {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+          }
+
+          .seller-details-page .seller-action-buttons button {
+            width: 100%;
+            min-height: 42px;
+          }
+
+          .seller-details-page .seller-status-grid > div,
+          .seller-details-page .seller-info-grid > div,
+          .seller-details-page .seller-payment-grid > div,
+          .seller-details-page .seller-document-grid > div {
+            width: 100%;
+          }
+
+          .seller-details-page .seller-document-image {
+            width: 100%;
+            height: 220px;
+          }
+
+          .seller-details-page .seller-payment-image {
+            width: 100%;
+            max-width: 100%;
+          }
+
+          .seller-details-page .alert {
+            overflow-wrap: anywhere;
+          }
+
+          .seller-details-page .badge {
+            white-space: normal;
+            text-align: left;
+          }
+        }
+      `}</style>
+
       <AdminSidebar />
 
-      <div
-        style={{
-          marginLeft: "250px",
-          width: "calc(100% - 250px)",
-        }}
-      >
-        {/* =====================================================
-                            HEADER
-        ===================================================== */}
-
-        <div className="bg-white border-bottom px-4 py-3">
+      <div className="seller-details-main">
+        {/* HEADER */}
+        <div className="seller-details-header bg-white border-bottom">
           <button
             type="button"
             className="btn btn-outline-secondary btn-sm mb-3"
@@ -403,49 +429,49 @@ function AdminSellerDetails() {
           <h3 className="fw-bold mb-1">Seller Details</h3>
 
           <small className="text-muted">
-            Complete seller information & approval management
+            Complete seller information &amp; approval management
           </small>
         </div>
 
-        <div className="p-4">
-          {/* =====================================================
-                              ERROR
-          ===================================================== */}
+        <div className="seller-details-content">
+          {/* LOADING */}
+          {loading && (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{ minHeight: "50vh" }}
+            >
+              <div className="text-center">
+                <div
+                  className="spinner-border text-primary mb-3"
+                  role="status"
+                />
 
-          {errorMessage && (
+                <div className="text-muted">Loading seller details...</div>
+              </div>
+            </div>
+          )}
+
+          {/* ERROR */}
+          {!loading && errorMessage && (
             <div className="alert alert-danger">{errorMessage}</div>
           )}
 
-          {/* =====================================================
-                            SUCCESS
-          ===================================================== */}
-
-          {successMessage && (
+          {/* SUCCESS */}
+          {!loading && successMessage && (
             <div className="alert alert-success">{successMessage}</div>
           )}
 
-          {/* =====================================================
-                         SELLER NOT FOUND
-          ===================================================== */}
-
-          {!errorMessage && !seller && (
+          {/* SELLER NOT FOUND */}
+          {!loading && !errorMessage && !seller && (
             <div className="alert alert-warning">Seller not found.</div>
           )}
 
-          {seller && (
+          {!loading && seller && (
             <>
-              {/* =================================================
-                         SELLER ACTION PANEL
-              ================================================= */}
-
-              <div
-                className="card border-0 shadow-sm mb-4"
-                style={{
-                  borderRadius: "14px",
-                }}
-              >
+              {/* SELLER APPROVAL MANAGEMENT */}
+              <div className="card border-0 shadow-sm mb-4">
                 <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                  <div className="seller-action-header d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
                       <h5 className="fw-bold mb-1">
                         Seller Approval Management
@@ -456,18 +482,12 @@ function AdminSellerDetails() {
                       </div>
                     </div>
 
-                    <div className="d-flex gap-2 flex-wrap">
-                      {/* =========================================
-                                      APPROVE
-                      ========================================= */}
-
+                    <div className="seller-action-buttons">
                       <button
                         type="button"
                         className="btn btn-success"
                         disabled={
                           actionLoading || seller.approvalStatus === "APPROVED"
-                          // payment?.paymentStatus?.toUpperCase() !==
-                          //   "APPROVED"
                         }
                         onClick={handleApprove}
                         title={
@@ -478,10 +498,6 @@ function AdminSellerDetails() {
                       >
                         {actionLoading ? "Processing..." : "✓ APPROVE"}
                       </button>
-
-                      {/* =========================================
-                                      BLOCK
-                      ========================================= */}
 
                       {seller.status?.toUpperCase() === "ACTIVE" ? (
                         <button
@@ -503,10 +519,6 @@ function AdminSellerDetails() {
                         </button>
                       ) : null}
 
-                      {/* =========================================
-                                      REJECT
-                      ========================================= */}
-
                       <button
                         type="button"
                         className="btn btn-danger"
@@ -520,15 +532,12 @@ function AdminSellerDetails() {
                     </div>
                   </div>
 
-                  {/* =========================================
-                              CURRENT STATUS
-                  ========================================= */}
-
                   <hr />
 
-                  <div className="row g-3">
+                  {/* CURRENT STATUS */}
+                  <div className="row g-3 seller-status-grid">
                     <div className="col-md-4">
-                      <div className="border rounded p-3">
+                      <div className="border rounded p-3 h-100">
                         <div className="text-muted small">Approval Status</div>
 
                         <div className="mt-2">
@@ -542,7 +551,7 @@ function AdminSellerDetails() {
                     </div>
 
                     <div className="col-md-4">
-                      <div className="border rounded p-3">
+                      <div className="border rounded p-3 h-100">
                         <div className="text-muted small">Account Status</div>
 
                         <div className="mt-2">
@@ -554,7 +563,7 @@ function AdminSellerDetails() {
                     </div>
 
                     <div className="col-md-4">
-                      <div className="border rounded p-3">
+                      <div className="border rounded p-3 h-100">
                         <div className="text-muted small">Payment Status</div>
 
                         <div className="mt-2">
@@ -570,10 +579,7 @@ function AdminSellerDetails() {
                     </div>
                   </div>
 
-                  {/* =========================================
-                         APPROVAL WARNING
-                  ========================================= */}
-
+                  {/* APPROVAL WARNING */}
                   {payment?.paymentStatus?.toUpperCase() !== "APPROVED" &&
                     seller.approvalStatus !== "APPROVED" && (
                       <div className="alert alert-warning mt-3 mb-0">
@@ -584,53 +590,59 @@ function AdminSellerDetails() {
                 </div>
               </div>
 
-              {/* =================================================
-                            SELLER INFORMATION
-              ================================================= */}
-
-              <div
-                className="card border-0 shadow-sm mb-4"
-                style={{
-                  borderRadius: "14px",
-                }}
-              >
+              {/* SELLER INFORMATION */}
+              <div className="card border-0 shadow-sm mb-4">
                 <div className="card-body">
                   <h5 className="fw-bold mb-4">Seller Information</h5>
 
-                  <div className="row g-3">
+                  <div className="row g-3 seller-info-grid">
                     <div className="col-md-6">
                       <strong>Seller ID:</strong>
-                      <div>{seller.sellerId || seller.id || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.sellerId || seller.id || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Seller Name:</strong>
-                      <div>{seller.sellerName || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.sellerName || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Email:</strong>
-                      <div>{seller.email || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.email || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Mobile:</strong>
-                      <div>{seller.mobile || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.mobile || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Business Name:</strong>
-                      <div>{seller.businessName || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.businessName || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Farm Name:</strong>
-                      <div>{seller.farmName || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.farmName || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
                       <strong>Owner Name:</strong>
-                      <div>{seller.ownerName || seller.sellerName || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.ownerName || seller.sellerName || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -654,7 +666,9 @@ function AdminSellerDetails() {
 
                     <div className="col-12">
                       <strong>Address:</strong>
-                      <div>{seller.address || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.address || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-4">
@@ -689,7 +703,9 @@ function AdminSellerDetails() {
 
                     <div className="col-12">
                       <strong>Location:</strong>
-                      <div>{seller.location || "-"}</div>
+                      <div className="seller-info-value">
+                        {seller.location || "-"}
+                      </div>
                     </div>
 
                     <div className="col-md-6">
@@ -705,26 +721,15 @@ function AdminSellerDetails() {
                 </div>
               </div>
 
-              {/* =================================================
-                            SELLER IMAGES / DOCUMENTS
-              ================================================= */}
-
-              <div
-                className="card border-0 shadow-sm mb-4"
-                style={{
-                  borderRadius: "14px",
-                }}
-              >
+              {/* SELLER IMAGES & KYC DOCUMENTS */}
+              <div className="card border-0 shadow-sm mb-4">
                 <div className="card-body">
                   <h5 className="fw-bold mb-4">
-                    Seller Images & KYC Documents
+                    Seller Images &amp; KYC Documents
                   </h5>
 
-                  <div className="row g-4">
-                    {/* =========================================
-                                PROFILE IMAGE
-                    ========================================= */}
-
+                  <div className="row g-4 seller-document-grid">
+                    {/* PROFILE IMAGE */}
                     <div className="col-md-4">
                       <div className="border rounded p-3 h-100">
                         <div className="text-muted small mb-3">
@@ -735,18 +740,12 @@ function AdminSellerDetails() {
                           <img
                             src={getImageUrl(seller.profileImage)}
                             alt="Seller Profile"
-                            className="img-fluid rounded"
-                            style={{
-                              width: "100%",
-                              height: "250px",
-                              objectFit: "contain",
-                              backgroundColor: "#f8f9fa",
-                              cursor: "pointer",
-                            }}
+                            className="seller-document-image img-fluid rounded"
                             onClick={() =>
                               window.open(
                                 getImageUrl(seller.profileImage),
                                 "_blank",
+                                "noopener,noreferrer",
                               )
                             }
                           />
@@ -758,10 +757,7 @@ function AdminSellerDetails() {
                       </div>
                     </div>
 
-                    {/* =========================================
-                              AADHAAR FRONT
-                    ========================================= */}
-
+                    {/* AADHAAR FRONT */}
                     <div className="col-md-4">
                       <div className="border rounded p-3 h-100">
                         <div className="text-muted small mb-3">
@@ -772,18 +768,12 @@ function AdminSellerDetails() {
                           <img
                             src={getImageUrl(seller.aadhaarFrontImage)}
                             alt="Aadhaar Front"
-                            className="img-fluid rounded"
-                            style={{
-                              width: "100%",
-                              height: "250px",
-                              objectFit: "contain",
-                              backgroundColor: "#f8f9fa",
-                              cursor: "pointer",
-                            }}
+                            className="seller-document-image img-fluid rounded"
                             onClick={() =>
                               window.open(
                                 getImageUrl(seller.aadhaarFrontImage),
                                 "_blank",
+                                "noopener,noreferrer",
                               )
                             }
                           />
@@ -795,10 +785,7 @@ function AdminSellerDetails() {
                       </div>
                     </div>
 
-                    {/* =========================================
-                              AADHAAR BACK
-                    ========================================= */}
-
+                    {/* AADHAAR BACK */}
                     <div className="col-md-4">
                       <div className="border rounded p-3 h-100">
                         <div className="text-muted small mb-3">
@@ -809,18 +796,12 @@ function AdminSellerDetails() {
                           <img
                             src={getImageUrl(seller.aadhaarBackImage)}
                             alt="Aadhaar Back"
-                            className="img-fluid rounded"
-                            style={{
-                              width: "100%",
-                              height: "250px",
-                              objectFit: "contain",
-                              backgroundColor: "#f8f9fa",
-                              cursor: "pointer",
-                            }}
+                            className="seller-document-image img-fluid rounded"
                             onClick={() =>
                               window.open(
                                 getImageUrl(seller.aadhaarBackImage),
                                 "_blank",
+                                "noopener,noreferrer",
                               )
                             }
                           />
@@ -835,29 +816,18 @@ function AdminSellerDetails() {
                 </div>
               </div>
 
-              {/* =================================================
-                         SUBSCRIPTION & PAYMENT
-              ================================================= */}
-
-              <div
-                className="card border-0 shadow-sm mb-4"
-                style={{
-                  borderRadius: "14px",
-                }}
-              >
+              {/* SUBSCRIPTION & PAYMENT */}
+              <div className="card border-0 shadow-sm mb-4">
                 <div className="card-body">
-                  <h5 className="fw-bold mb-4">Subscription & Payment</h5>
+                  <h5 className="fw-bold mb-4">Subscription &amp; Payment</h5>
 
                   {!payment ? (
                     <div className="alert alert-warning mb-0">
                       No payment information found for this seller.
                     </div>
                   ) : (
-                    <div className="row g-4">
-                      {/* =======================================
-                                  PLAN
-                      ======================================= */}
-
+                    <div className="row g-4 seller-payment-grid">
+                      {/* PLAN */}
                       <div className="col-md-6">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-1">
@@ -876,10 +846,7 @@ function AdminSellerDetails() {
                         </div>
                       </div>
 
-                      {/* =======================================
-                                  AMOUNT
-                      ======================================= */}
-
+                      {/* AMOUNT */}
                       <div className="col-md-6">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-1">
@@ -894,10 +861,7 @@ function AdminSellerDetails() {
                         </div>
                       </div>
 
-                      {/* =======================================
-                                  PAYMENT STATUS
-                      ======================================= */}
-
+                      {/* PAYMENT STATUS */}
                       <div className="col-md-6">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-2">
@@ -914,17 +878,14 @@ function AdminSellerDetails() {
                         </div>
                       </div>
 
-                      {/* =======================================
-                                  PAYMENT DATE
-                      ======================================= */}
-
+                      {/* PAYMENT DATE */}
                       <div className="col-md-6">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-1">
                             Payment Date
                           </div>
 
-                          <div className="fw-semibold">
+                          <div className="fw-semibold seller-info-value">
                             {payment.paidAt ||
                               payment.createdAt ||
                               "Not available"}
@@ -932,10 +893,7 @@ function AdminSellerDetails() {
                         </div>
                       </div>
 
-                      {/* =======================================
-                              SUBSCRIPTION STATUS
-                      ======================================= */}
-
+                      {/* SUBSCRIPTION STATUS */}
                       <div className="col-md-6">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-2">
@@ -952,40 +910,31 @@ function AdminSellerDetails() {
                         </div>
                       </div>
 
-                      {/* =======================================
-                                  START DATE
-                      ======================================= */}
-
+                      {/* START DATE */}
                       <div className="col-md-3">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-1">
                             Start Date
                           </div>
 
-                          <div className="fw-semibold">
+                          <div className="fw-semibold seller-info-value">
                             {payment.subscriptionStartDate || "-"}
                           </div>
                         </div>
                       </div>
 
-                      {/* =======================================
-                                  END DATE
-                      ======================================= */}
-
+                      {/* END DATE */}
                       <div className="col-md-3">
                         <div className="border rounded p-3 h-100">
                           <div className="text-muted small mb-1">End Date</div>
 
-                          <div className="fw-semibold">
+                          <div className="fw-semibold seller-info-value">
                             {payment.subscriptionEndDate || "-"}
                           </div>
                         </div>
                       </div>
 
-                      {/* =======================================
-                              PAYMENT SCREENSHOT
-                      ======================================= */}
-
+                      {/* PAYMENT SCREENSHOT */}
                       <div className="col-12">
                         <div className="border rounded p-3">
                           <div className="text-muted small mb-3">
@@ -1000,23 +949,16 @@ function AdminSellerDetails() {
                                 payment.paymentScreenshot,
                               )}
                               alt="Payment Screenshot"
+                              className="seller-payment-image"
                               onClick={() =>
                                 window.open(
                                   getPaymentScreenshotUrl(
                                     payment.paymentScreenshot,
                                   ),
                                   "_blank",
+                                  "noopener,noreferrer",
                                 )
                               }
-                              style={{
-                                width: "280px",
-                                maxHeight: "350px",
-                                objectFit: "contain",
-                                border: "1px solid #dee2e6",
-                                borderRadius: "10px",
-                                cursor: "pointer",
-                                backgroundColor: "#f8f9fa",
-                              }}
                             />
                           ) : (
                             <div className="text-muted">
@@ -1030,16 +972,8 @@ function AdminSellerDetails() {
                 </div>
               </div>
 
-              {/* =================================================
-                              SELLER ANIMALS
-              ================================================= */}
-
-              <div
-                className="card border-0 shadow-sm"
-                style={{
-                  borderRadius: "14px",
-                }}
-              >
+              {/* SELLER ANIMALS - UNCHANGED */}
+              <div className="card border-0 shadow-sm">
                 <div className="card-body">
                   <h5 className="fw-bold mb-3">Seller Animals</h5>
 
@@ -1052,6 +986,39 @@ function AdminSellerDetails() {
               </div>
             </>
           )}
+
+          {/* Bottom Seller Action Buttons */}
+          <div className="card shadow-sm mt-4 mb-3">
+            <div className="card-body">
+              <div className="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                <button
+                  className="btn btn-success"
+                  onClick={handleApprove}
+                  disabled={
+                    actionLoading || seller?.approvalStatus === "APPROVED"
+                  }
+                >
+                  Approval
+                </button>
+
+                <button
+                  className="btn btn-danger"
+                  onClick={handleBlock}
+                  disabled={actionLoading}
+                >
+                  Block
+                </button>
+
+                <button
+                  className="btn btn-warning"
+                  onClick={handleReject}
+                  disabled={actionLoading}
+                >
+                  Rejected
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
